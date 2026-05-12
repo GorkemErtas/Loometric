@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "loometric"
+version = "0.1.0"
+description = "Local garment productivity data validation and pre-shift leakage assessment."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["pandas>=2.2,<4"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.9,<1"]
+
+[project.scripts]
+loometric = "loometric.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+pythonpath = ["src"]
+filterwarnings = ["error"]
+
+[tool.ruff]
+src = ["src", "tests"]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
