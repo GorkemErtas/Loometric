@@ -18,3 +18,6 @@ data/raw/*
 data/processed/*
 !data/processed/.gitkeep
 
+# Local living roadmap; retain the file without versioning it.
+/docs/COMMIT_PLAN.md
+

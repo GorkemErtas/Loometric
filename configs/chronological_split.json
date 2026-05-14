@@ -1,0 +1,23 @@
+{
+  "dataset_sha256": "763ffcdd39b7f7f360243c2af8f89ed733e8b5f9e511efeb0c886b83e1b76866",
+  "schema_version": 1,
+  "strategy": "distinct-date-floor-60-20-20-v1",
+  "test": {
+    "distinct_dates": 12,
+    "end": "2015-03-11",
+    "rows": 254,
+    "start": "2015-02-26"
+  },
+  "train": {
+    "distinct_dates": 35,
+    "end": "2015-02-10",
+    "rows": 711,
+    "start": "2015-01-01"
+  },
+  "validation": {
+    "distinct_dates": 12,
+    "end": "2015-02-25",
+    "rows": 232,
+    "start": "2015-02-11"
+  }
+}

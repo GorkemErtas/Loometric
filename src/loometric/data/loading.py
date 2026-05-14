@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 
 from loometric.data.schema import DATE_FORMAT, NUMERIC_COLUMNS
+from loometric.data.validation import ValidationResult, validate_data
 
 
 class DatasetReadError(ValueError):
@@ -48,3 +49,14 @@ def clean_data(raw: pd.DataFrame) -> pd.DataFrame:
         if column in clean:
             clean[column] = pd.to_numeric(clean[column], errors="coerce").astype("Float64")
     return clean
+
+
+def load_validated_csv(path: Path) -> tuple[pd.DataFrame, ValidationResult]:
+    """Reuse source checks before experiments; leave normalization and EDA behavior intact."""
+    raw = read_csv(path)
+    clean = clean_data(raw)
+    result = validate_data(raw, clean)
+    if not result.passed:
+        errors = "; ".join(issue.message for issue in result.issues if issue.severity == "error")
+        raise ValueError(f"Dataset validation failed: {errors}")
+    return clean, result

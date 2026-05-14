@@ -67,3 +67,39 @@ available before the predicted shift; exclude same-day outcomes when shift order
 is unknown. Target-derived aggregates must not include validation or test outcomes.
 No feature fitting, temporal split, model, or optimization is implemented in Task 1.
 
+## A02: frozen partitions and EXP-001
+
+A02 establishes the evaluation protocol after the A01 data foundation. The source
+fingerprint and partitions are persisted in `configs/chronological_split.json`.
+The rule uses sorted distinct dates and integer boundaries floor(3n/5), floor(4n/5):
+
+| Partition | First date | Last date | Dates | Rows |
+| --- | --- | --- | --- | --- |
+| Training | 2015-01-01 | 2015-02-10 | 35 | 711 |
+| Validation | 2015-02-11 | 2015-02-25 | 12 | 232 |
+| Final test | 2015-02-26 | 2015-03-11 | 12 | 254 |
+
+Endpoints are inclusive. With 59 observed dates this gives 59.32%/20.34%/20.34%; no
+boundary adjustment based on targets, department balance, or measured errors is made.
+Sort only a copy, keep dates intact, verify strict non-overlap and complete coverage,
+and fail on source/config drift instead of silently repartitioning. The saved split
+is shared by future experiments, including algorithms and feature engineering.
+
+EXP-001 estimates one global training-target mean and one mean per training
+department. At prediction time, only scheduled department is passed to the latter;
+unknown/missing departments fall back to the global training mean. The historical
+source validator continues to reject unknown/missing departments in the input CSV.
+Every training label must have been available before the validation period starts.
+No other source field enters prediction, and statistics remain fixed in validation.
+
+Only validation MAE, RMSE, R², prediction bias, and department MAE are calculated.
+Positive bias means overprediction. R² is explicitly undefined for a single sample
+or constant actual targets. Primary comparison uses validation MAE; final test
+performance remains uncalculated until a later, separately authorized final evaluation.
+
+The pre-existing A01 data profile describes the whole CSV, including dates now
+reserved for final test. This limits claims that the holdout is untouched by EDA;
+it does not authorize using those labels for fitting or performance-based selection.
+See [ADR 0002](decisions/0002-chronological-evaluation-and-naive-baselines.md) and
+the measured [EXP-001 report](experiments/EXP-001-naive-baseline.md).
+
