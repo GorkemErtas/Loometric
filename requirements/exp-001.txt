@@ -1,0 +1,14 @@
+# Exact installed environment for EXP-001; Python 3.13.14 on Windows.
+# No new runtime dependency is introduced by A02.
+colorama==0.4.6
+iniconfig==2.3.1
+numpy==2.5.5
+packaging==26.3
+pandas==3.1.1
+pluggy==1.7.0
+Pygments==2.21.0
+pytest==9.2.0
+python-dateutil==4.0.0
+ruff==0.17.5
+setuptools==84.2.1
+tzdata==2026.6
