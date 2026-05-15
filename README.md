@@ -1,8 +1,9 @@
 # Loometric
 
-Local data foundations for a garment productivity ML engineering project. This first task
-contains CSV validation, exploratory data analysis, and a pre-shift leakage assessment.
-There is no model training, application server, database, or deployment in this task.
+Local garment productivity ML engineering project. Current capabilities include CSV
+validation, exploratory analysis, a pre-shift leakage assessment, frozen chronological
+partitions, and two naive mean baselines evaluated on validation data only.
+Application services, databases, optimization, and further ML algorithms are deferred.
 
 ## Prediction problem
 
@@ -80,6 +81,46 @@ Fractional `no_of_workers` is retained because the source may report average sta
 it still must be finite and positive. There is no assumed fixed team roster, staffing
 ceiling, production calendar, or statistical outlier threshold.
 
+## EXP-001: chronological splits and naive baselines
+
+The versioned [split configuration](configs/chronological_split.json) binds partitions
+to the exact CSV SHA-256. It uses the first floor(60%) and floor(80%) boundaries of
+sorted distinct dates. All rows on a date stay together; sorting operates on a copy.
+
+| Partition | Inclusive date range | Distinct dates | Rows |
+| --- | --- | --- | --- |
+| Training | 2015-01-01 to 2015-02-10 | 35 | 711 |
+| Validation | 2015-02-11 to 2015-02-25 | 12 | 232 |
+| Final test | 2015-02-26 to 2015-03-11 | 12 | 254 |
+
+Reuse this file for every experiment. Dataset bytes, policy, counts, or boundaries
+that disagree with it fail explicitly. No reshuffling or automatic regeneration occurs.
+The one-time initializer, `python -m loometric.data.splitting`, refuses to overwrite
+an existing configuration and is not part of routine experiment reproduction.
+
+For the recorded Python 3.13.14 environment, install the exact EXP-001 dependency
+snapshot before running the experiment (no new ML dependencies are needed):
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements/exp-001.txt
+.\.venv\Scripts\python.exe -m pip install --no-build-isolation --no-deps -e .
+.\.venv\Scripts\python.exe -m loometric.experiments.naive
+```
+
+The command generates [EXP-001](docs/experiments/EXP-001-naive-baseline.md). Both
+predictors estimate arithmetic target means from training rows only. One predicts the
+global mean; the other uses the scheduled department's training mean and falls back
+to the global mean for unknown/missing departments. No realized shift feature is used.
+Validation MAE is 0.144606972 for the global mean and 0.143226295 for the department
+mean, a 0.9548% decrease. Both validation R² values are negative; these are references,
+not evidence of production-ready forecasting. The report includes RMSE, signed bias,
+department slices, counts, fitted means, environment, and measured runtime.
+
+Final test metrics are never calculated by this command. A01's existing full-source
+EDA already described all source targets; the final test is reserved from performance
+evaluation, not claimed to be unseen in earlier descriptive analysis. See
+[ADR 0002](docs/decisions/0002-chronological-evaluation-and-naive-baselines.md).
+
 ## Checks
 
 ```powershell
@@ -91,6 +132,8 @@ ceiling, production calendar, or statistical outlier threshold.
 Tests use small synthetic data and temporary directories, and run without the private
 CSV. They cover parsing, validation failures, chronology, department WIP reporting,
 leakage policy coverage, CLI exit codes, reproducibility, and preservation of raw data.
+Additional checks cover complete date groups, frozen split reuse, baseline fallback,
+hand-calculated metrics, train-only statistics, and exclusion of final test scoring.
 Type hints are used throughout; no static type checker is configured for this task.
 
 ## Layout
@@ -99,23 +142,33 @@ Type hints are used throughout; no static type checker is configured for this ta
 data/
   raw/                       # User-supplied immutable CSV (ignored)
   processed/                 # Reserved; no transformed data is written yet
+configs/
+  chronological_split.json   # Frozen source fingerprint, date ranges, and counts
+requirements/
+  exp-001.txt                # Exact installed EXP-001 environment snapshot
 src/loometric/
   cli.py                     # Local orchestration and exit codes
   leakage.py                 # Source-column availability policy
+  baselines.py               # Global and department training-mean predictors
+  evaluation.py              # Explicit regression metrics and alignment checks
+  experiments/               # EXP-001 orchestration and report rendering
   data/
     schema.py                # Expected columns and domain constraints
     loading.py               # Strict CSV ingestion and normalization
     validation.py            # Structured errors and reviewable warnings
     profiling.py             # Deterministic Markdown EDA report
+    splitting.py             # Complete-date chronological partitions and config CLI
 tests/                       # Synthetic unit and CLI integration tests
 docs/
   data_profile.md            # Actual generated findings, or explicit pending status
   prediction_problem.md      # Cutoff, grain, eligibility, and evaluation contract
   decisions/                 # Architecture decisions and rationale
+  experiments/               # Measured experiment reports
 ```
 
 See [architecture decisions](docs/decisions/0001-local-data-foundation.md).
 The future stack is React, Node.js, PostgreSQL, FastAPI, XGBoost, and OR-Tools.
-Those components are deferred; this package establishes the data contract they will
-depend on. No credentials, external telemetry, automatic commits, or pushes are used.
+Those components are deferred; this package establishes the data and evaluation
+contracts they will depend on. `docs/COMMIT_PLAN.md` is an intentionally ignored local
+roadmap. No credentials, external telemetry, automatic commits, or pushes are used.
 
