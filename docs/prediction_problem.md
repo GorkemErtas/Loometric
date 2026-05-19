@@ -103,3 +103,32 @@ it does not authorize using those labels for fitting or performance-based select
 See [ADR 0002](decisions/0002-chronological-evaluation-and-naive-baselines.md) and
 the measured [EXP-001 report](experiments/EXP-001-naive-baseline.md).
 
+## A03: provisional pre-shift feature boundary and EXP-002
+
+EXP-002 uses the same frozen partitions and compares four declared linear feature
+sets on validation only. All eligibility remains provisional: the source contains
+no capture timestamps. Scheduled department/team assignment must be frozen before
+the shift, the scheduled date must already be known, and training outcomes must be
+finalized before validation starts.
+
+| Model feature | Representation | Availability assumption |
+| --- | --- | --- |
+| department | Training-fitted one-hot category | Scheduled department known at cutoff; reuse existing source normalization. |
+| team | Training-fitted one-hot category | Scheduled team ID known at cutoff; numeric whole IDs become strings, never magnitudes. |
+| day_of_week | Date-derived one-hot category, Monday=0 | Derive from scheduled local date; ignore source day. |
+| day_of_month | Date-derived numeric integer 1..31 | Derive from the same scheduled date; no outcome information. |
+
+No other source field is admitted. In particular, the evidence required for
+targeted_productivity, smv, wip, no_of_workers, and no_of_style_change has not been
+supplied. Realized overtime, incentives, idle time/staffing, and the label remain
+excluded. Quarter semantics remain unverified. No planned values are substituted
+for realized values or inferred from them.
+
+The stateless builder accepts only date, department, and team. Only training rows
+fit the encoder and estimator together in a Pipeline. Unknown categories encode as
+zeros for their feature; missing eligible inputs fail instead of being imputed.
+Calendar features are a joint addition to the department/team model. No test frame
+is passed to feature construction, fitting, inference, metrics, or selection.
+See [ADR 0003](decisions/0003-leakage-safe-linear-comparison.md) and
+[EXP-002](experiments/EXP-002-linear-regression.md) for the protocol and results.
+
