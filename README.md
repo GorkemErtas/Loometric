@@ -2,8 +2,9 @@
 
 Local garment productivity ML engineering project. Current capabilities include CSV
 validation, exploratory analysis, a pre-shift leakage assessment, frozen chronological
-partitions, and two naive mean baselines evaluated on validation data only.
-Application services, databases, optimization, and further ML algorithms are deferred.
+partitions, two naive mean baselines, and leakage-safe Linear Regression evaluated
+on validation data only. Application services, databases, optimization, and further
+ML algorithms are deferred.
 
 ## Prediction problem
 
@@ -11,7 +12,7 @@ Immediately before a scheduled shift starts, predict a team's department-level
 `actual_productivity` at the end of that shift using only information already available
 at the cutoff. The tentative observation key is `(date, department, team)`. The source
 does not include shift IDs or measurement timestamps, so that grain and feature timing
-need confirmation before training.
+remain provisional assumptions in the current experiments.
 
 Realized overtime, incentives, idle time, and idle staffing are unavailable at the
 cutoff. WIP, planned productivity, standard minute value, staffing, and style changes
@@ -121,6 +122,48 @@ EDA already described all source targets; the final test is reserved from perfor
 evaluation, not claimed to be unseen in earlier descriptive analysis. See
 [ADR 0002](docs/decisions/0002-chronological-evaluation-and-naive-baselines.md).
 
+## EXP-002: Linear Regression and provisional pre-shift features
+
+The [EXP-002 report](docs/experiments/EXP-002-linear-regression.md) records four fixed
+feature comparisons using the unchanged 711 training / 232 validation records.
+Department, categorical team ID, date-derived categorical weekday, and numeric day
+of month are provisionally available before the shift. All conditional planning
+fields, realized shift values, and labels remain excluded as inputs.
+
+A scikit-learn Pipeline contains ColumnTransformer, OneHotEncoder with unknown
+category handling, and ordinary LinearRegression. Learned preprocessing and model
+fitting use training only. No predictions are clipped or missing inputs imputed.
+
+| Feature set | Validation MAE | Change vs department-mean baseline |
+| --- | --- | --- |
+| Department only | 0.143226295 | 0.0000% |
+| Team only | 0.149747347 | +4.5530% |
+| Department + team | 0.150379924 | +4.9946% |
+| Department + team + calendar | 0.150551578 | +5.1145% |
+
+**No model improves on the EXP-001 department mean.** Department-only regression
+reproduces that predictor: RMSE 0.196492435, R² -0.094198670, bias +0.060338141.
+Adding calendar features to department/team increases MAE by 0.1141%, although RMSE
+and bias decrease. Team-containing models worsen MAE in both departments relative
+to the department mean. Keep the department baseline as the comparison reference.
+
+Install the exact recorded ML environment and run locally:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements/exp-002.txt
+.\.venv\Scripts\python.exe -m pip install --no-build-isolation --no-deps -e .
+.\.venv\Scripts\python.exe -m loometric.experiments.linear
+```
+
+For an unpinned development install, use `pip install -e ".[dev,ml]"`; the `ml`
+extra keeps the data-only workflow independent of scikit-learn. The runner writes
+`data/processed/exp-002-linear-regression.json` (ignored), preserving the reviewed
+Markdown report. Use `--output` for an alternate JSON path. The report documents
+runtime, residuals, range checks, exact configuration, environment, and limitations.
+Two real-data runs matched after excluding measured runtimes. The final test remains
+excluded from all fitting, feature construction, prediction, selection, and metrics.
+See [ADR 0003](docs/decisions/0003-leakage-safe-linear-comparison.md).
+
 ## Checks
 
 ```powershell
@@ -133,7 +176,9 @@ Tests use small synthetic data and temporary directories, and run without the pr
 CSV. They cover parsing, validation failures, chronology, department WIP reporting,
 leakage policy coverage, CLI exit codes, reproducibility, and preservation of raw data.
 Additional checks cover complete date groups, frozen split reuse, baseline fallback,
-hand-calculated metrics, train-only statistics, and exclusion of final test scoring.
+hand-calculated metrics, train-only encoding/statistics, unknown categories, restricted
+feature inputs, reproducible training, and exclusion of final test prediction/scoring.
+Install the `ml` extra or EXP-002 snapshot to run the complete test suite.
 Type hints are used throughout; no static type checker is configured for this task.
 
 ## Layout
@@ -146,12 +191,15 @@ configs/
   chronological_split.json   # Frozen source fingerprint, date ranges, and counts
 requirements/
   exp-001.txt                # Exact installed EXP-001 environment snapshot
+  exp-002.txt                # EXP-001 pins plus exact ML dependency closure
 src/loometric/
   cli.py                     # Local orchestration and exit codes
   leakage.py                 # Source-column availability policy
   baselines.py               # Global and department training-mean predictors
   evaluation.py              # Explicit regression metrics and alignment checks
-  experiments/               # EXP-001 orchestration and report rendering
+  features.py                # Stateless provisional pre-shift feature boundary
+  linear.py                  # Training-fitted one-hot/OLS pipeline constructor
+  experiments/               # EXP-001 report runner and EXP-002 JSON runner
   data/
     schema.py                # Expected columns and domain constraints
     loading.py               # Strict CSV ingestion and normalization
