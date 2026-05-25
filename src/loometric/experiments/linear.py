@@ -21,59 +21,17 @@ from loometric.data.splitting import (
     apply_split_config,
     load_split_config,
 )
-from loometric.evaluation import RegressionMetrics, regression_metrics
-from loometric.features import CATEGORICAL_FEATURES, FEATURE_SETS, SOURCE_COLUMNS, build_features
+from loometric.evaluation import (
+    MaeChange,
+    PredictionDiagnostics,
+    RegressionMetrics,
+    mae_change,
+    prediction_diagnostics,
+    regression_metrics,
+)
+from loometric.features import FEATURE_SETS, SOURCE_COLUMNS, build_features
 from loometric.linear import build_linear_pipeline
-
-
-@dataclass(frozen=True)
-class MaeChange:
-    absolute: float
-    relative_percent: float | None
-
-
-def mae_change(candidate: float, reference: float) -> MaeChange:
-    """Candidate minus reference; negative is improvement; zero reference is undefined."""
-    return MaeChange(
-        candidate - reference, 100 * (candidate - reference) / reference if reference else None
-    )
-
-
-@dataclass(frozen=True)
-class PredictionDiagnostics:
-    residual_quantiles: dict[str, float]
-    residual_std: float
-    residual_bins: dict[str, int]
-    prediction_min: float
-    prediction_max: float
-    below_zero: int
-    above_one: int
-    outside_training_target_range: int
-
-
-def prediction_diagnostics(
-    actual: pd.Series, predicted: pd.Series, training_target: pd.Series
-) -> PredictionDiagnostics:
-    """Residual = prediction - actual; 1 is a review threshold, not a proven upper bound."""
-    regression_metrics(actual, predicted)  # Validate alignment/completeness before arithmetic.
-    residuals = predicted - actual
-    edges = [-float("inf"), -0.2, -0.1, 0.0, 0.1, 0.2, float("inf")]
-    labels = ("(-inf,-0.2]", "(-0.2,-0.1]", "(-0.1,0]", "(0,0.1]", "(0.1,0.2]", "(0.2,inf)")
-    bins = pd.cut(residuals, edges, labels=labels).value_counts(sort=False)
-    return PredictionDiagnostics(
-        residual_quantiles={
-            str(q): float(residuals.quantile(q)) for q in (0.0, 0.05, 0.25, 0.5, 0.75, 0.95, 1.0)
-        },
-        residual_std=float(residuals.std(ddof=0)),
-        residual_bins={str(label): int(count) for label, count in bins.items()},
-        prediction_min=float(predicted.min()),
-        prediction_max=float(predicted.max()),
-        below_zero=int(predicted.lt(0).sum()),
-        above_one=int(predicted.gt(1).sum()),
-        outside_training_target_range=int(
-            (predicted.lt(training_target.min()) | predicted.gt(training_target.max())).sum()
-        ),
-    )
+from loometric.preprocessing import inspect_preprocessor
 
 
 @dataclass(frozen=True)
@@ -143,18 +101,12 @@ def run_experiment(
             )
         inference_seconds = perf_counter() - started
         if name in feature_sets:
-            preprocessing = pipeline.named_steps["preprocessing"]
-            categorical = [column for column in columns if column in CATEGORICAL_FEATURES]
-            encoder = preprocessing.named_transformers_["categorical"]
-            categories = {
-                column: tuple(str(value) for value in values)
-                for column, values in zip(categorical, encoder.categories_, strict=True)
-            }
-            unknown = {
-                column: int((~validation_features[column].isin(values)).sum())
-                for column, values in categories.items()
-            }
-            encoded = tuple(preprocessing.get_feature_names_out())
+            metadata = inspect_preprocessor(
+                pipeline.named_steps["preprocessing"], validation_features
+            )
+            categories = metadata.training_categories
+            unknown = metadata.unknown_validation_categories
+            encoded = metadata.encoded_columns
         models[name] = ModelResult(
             columns=columns,
             metrics=regression_metrics(validation[TARGET], predictions),
