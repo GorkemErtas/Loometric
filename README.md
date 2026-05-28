@@ -2,9 +2,9 @@
 
 Local garment productivity ML engineering project. Current capabilities include CSV
 validation, exploratory analysis, a pre-shift leakage assessment, frozen chronological
-partitions, two naive mean baselines, and leakage-safe Linear Regression evaluated
-on validation data only. Application services, databases, optimization, and further
-ML algorithms are deferred.
+partitions, two naive mean baselines, Linear Regression, and Random Forest Regression.
+Models are selected on validation only; the final test remains reserved. Application
+services, databases, optimization, and further ML algorithms are deferred.
 
 ## Prediction problem
 
@@ -164,6 +164,43 @@ Two real-data runs matched after excluding measured runtimes. The final test rem
 excluded from all fitting, feature construction, prediction, selection, and metrics.
 See [ADR 0003](docs/decisions/0003-leakage-safe-linear-comparison.md).
 
+## EXP-003: a fixed Random Forest comparison
+
+[EXP-003](docs/experiments/EXP-003-random-forest.md) compares six predefined forests:
+department/team or department/team/calendar, each with three depth/leaf/tree-count
+profiles. All use seed 42, one worker, the same training-fitted categorical encoding,
+and the unchanged 711 training / 232 validation observations. No new input fields
+or dependencies are added, and final-test data stays excluded from modeling/scoring.
+
+The best candidate, **B_RF-01**, uses department, team, weekday, and day of month,
+with **100 trees, max_depth=3, min_samples_leaf=20**. Its validation MAE is
+**0.140201317**, a **0.003024977 (2.1120%) decrease** from the department mean and
+equivalent best EXP-002 model. Validation RMSE is 0.195062509, R² -0.078331093, and
+bias +0.055805734. Finishing/sewing MAE is 0.165290002 / 0.123111924; both improve
+on the department mean.
+
+This is the preferred candidate within the fixed validation comparison. The gain is
+modest, R² remains negative, and feature timing remains provisional. Deeper profiles
+have lower training errors but worse validation MAE. The flexible calendar model's
+training/validation MAE is 0.067919069 / 0.159350747, indicating overfitting risk.
+Impurity importance is descriptive training attribution, without causal meaning or
+demonstrated out-of-sample importance. No significance or operational-readiness claim
+is made. The report contains every candidate's metrics, slices, runtimes, residuals,
+prediction ranges, importance, and limitations.
+
+Reuse the existing exact ML environment; no new dependency snapshot is needed:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements/exp-002.txt
+.\.venv\Scripts\python.exe -m pip install --no-build-isolation --no-deps -e .
+.\.venv\Scripts\python.exe -m loometric.experiments.forest
+```
+
+The runner writes ignored `data/processed/exp-003-random-forest.json`; `--output`
+chooses an alternate local path. Two real-data runs matched except measured runtimes,
+and earlier experiments reproduced after extracting shared preprocessing/diagnostics.
+See [ADR 0004](docs/decisions/0004-bounded-random-forest-comparison.md).
+
 ## Checks
 
 ```powershell
@@ -178,6 +215,8 @@ leakage policy coverage, CLI exit codes, reproducibility, and preservation of ra
 Additional checks cover complete date groups, frozen split reuse, baseline fallback,
 hand-calculated metrics, train-only encoding/statistics, unknown categories, restricted
 feature inputs, reproducible training, and exclusion of final test prediction/scoring.
+Forest checks cover fixed profiles, seed/worker settings, training diagnostics,
+validation-only selection/baseline retention, and importance aggregation arithmetic.
 Install the `ml` extra or EXP-002 snapshot to run the complete test suite.
 Type hints are used throughout; no static type checker is configured for this task.
 
@@ -186,7 +225,7 @@ Type hints are used throughout; no static type checker is configured for this ta
 ```text
 data/
   raw/                       # User-supplied immutable CSV (ignored)
-  processed/                 # Reserved; no transformed data is written yet
+  processed/                 # Local numerical experiment artifacts (ignored)
 configs/
   chronological_split.json   # Frozen source fingerprint, date ranges, and counts
 requirements/
@@ -198,8 +237,10 @@ src/loometric/
   baselines.py               # Global and department training-mean predictors
   evaluation.py              # Explicit regression metrics and alignment checks
   features.py                # Stateless provisional pre-shift feature boundary
+  preprocessing.py           # Shared training-fitted categorical encoding/metadata
   linear.py                  # Training-fitted one-hot/OLS pipeline constructor
-  experiments/               # EXP-001 report runner and EXP-002 JSON runner
+  forest.py                  # Fixed forest profiles, pipeline, and importance summaries
+  experiments/               # EXP-001 report and EXP-002/EXP-003 JSON runners
   data/
     schema.py                # Expected columns and domain constraints
     loading.py               # Strict CSV ingestion and normalization
