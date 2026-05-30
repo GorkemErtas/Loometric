@@ -2,7 +2,8 @@
 
 Local garment productivity ML engineering project. Current capabilities include CSV
 validation, exploratory analysis, a pre-shift leakage assessment, frozen chronological
-partitions, two naive mean baselines, Linear Regression, and Random Forest Regression.
+partitions, two naive mean baselines, Linear Regression, Random Forest Regression,
+and an expanding-window temporal audit inside the original training period.
 Models are selected on validation only; the final test remains reserved. Application
 services, databases, optimization, and further ML algorithms are deferred.
 
@@ -201,6 +202,40 @@ chooses an alternate local path. Two real-data runs matched except measured runt
 and earlier experiments reproduced after extracting shared preprocessing/diagnostics.
 See [ADR 0004](docs/decisions/0004-bounded-random-forest-comparison.md).
 
+## EXP-004: temporal robustness inside training only
+
+[EXP-004](docs/experiments/EXP-004-temporal-robustness.md) audits five fixed models
+using four expanding windows inside the original 35 training dates. Begin with
+15 observed dates, evaluate the next five, and expand the prefix by five each time.
+The evaluation windows cover 393 rows once each; original validation and final test
+stay excluded. Every fold fits fresh preprocessing and models on its earlier prefix.
+
+The frozen EXP-003 forest wins **2 windows and loses 2** against the department mean.
+Its pooled MAE is **0.148426346**, versus **0.147273373** for that baseline:
+**+0.001152973 (+0.7829%)**. Pooled finishing MAE worsens (0.172184645 vs 0.165755260),
+while sewing improves (0.132452681 vs 0.134847254). OLS with department/team has
+the lowest pooled MAE here, 0.141037325. This is a retrospective audit of fixed
+choices, without selecting a new model.
+
+The forest's earlier 2.1120% validation gain remains a valid EXP-003 measurement,
+but its advantage is not consistent across these historical windows. Fold sizes,
+dates, and training histories differ; scores are not directly interchangeable.
+Overlapping training prefixes, recurring teams, and the forest's earlier selection
+limit independence. Feature capture times and label-finalization latency remain
+unverified. The audit does not justify proceeding directly to gradient boosting
+as an evidence-backed increase in complexity.
+
+```powershell
+.\.venv\Scripts\python.exe -m loometric.experiments.temporal
+```
+
+Reuse the EXP-002 dependency snapshot. The command writes ignored
+`data/processed/exp-004-temporal-robustness.json`, including folds, metrics,
+department slices, runtime, and original-training-only evaluation predictions.
+Two real-data runs matched exactly except runtimes. The report contains all fold
+MAE/RMSE/R²/bias, equal-fold and pooled summaries, timing assumptions, limitations,
+and reproduction commands. See [ADR 0005](docs/decisions/0005-training-only-temporal-robustness.md).
+
 ## Checks
 
 ```powershell
@@ -217,6 +252,8 @@ hand-calculated metrics, train-only encoding/statistics, unknown categories, res
 feature inputs, reproducible training, and exclusion of final test prediction/scoring.
 Forest checks cover fixed profiles, seed/worker settings, training diagnostics,
 validation-only selection/baseline retention, and importance aggregation arithmetic.
+Temporal checks cover whole-date windows, expanding prefixes, fresh fold encoders,
+pooled metric arithmetic, deterministic predictions, and exclusion of both outer holdouts.
 Install the `ml` extra or EXP-002 snapshot to run the complete test suite.
 Type hints are used throughout; no static type checker is configured for this task.
 
@@ -247,6 +284,7 @@ src/loometric/
     validation.py            # Structured errors and reviewable warnings
     profiling.py             # Deterministic Markdown EDA report
     splitting.py             # Complete-date chronological partitions and config CLI
+    temporal.py              # Expanding complete-date windows within verified training
 tests/                       # Synthetic unit and CLI integration tests
 docs/
   data_profile.md            # Actual generated findings, or explicit pending status
