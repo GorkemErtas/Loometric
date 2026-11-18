@@ -21,3 +21,5 @@ data/processed/*
 # Local living roadmap; retain the file without versioning it.
 /docs/COMMIT_PLAN.md
 
+# Local Codex instructions; keep untracked.
+/AGENTS.md
