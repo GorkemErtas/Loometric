@@ -3,7 +3,7 @@
 Local garment productivity ML engineering project. Current capabilities include CSV
 validation, exploratory analysis, a pre-shift leakage assessment, frozen chronological
 partitions, two naive mean baselines, Linear Regression, Random Forest Regression,
-and an expanding-window temporal audit inside the original training period.
+an expanding-window temporal audit, and saved-prediction error/readiness analysis.
 Models are selected on validation only; the final test remains reserved. Application
 services, databases, optimization, and further ML algorithms are deferred.
 
@@ -236,6 +236,48 @@ Two real-data runs matched exactly except runtimes. The report contains all fold
 MAE/RMSE/R²/bias, equal-fold and pooled summaries, timing assumptions, limitations,
 and reproduction commands. See [ADR 0005](docs/decisions/0005-training-only-temporal-robustness.md).
 
+## EXP-005: error analysis and experimental prediction readiness
+
+[EXP-005](docs/experiments/EXP-005-error-analysis.md) reuses the same saved EXP-004
+predictions for 393 original-training observations on 20 dates. Models are not
+retrained or tuned; original validation and test remain excluded from diagnostics.
+The loader verifies artifact identity, folds, aligned targets/metadata, fixed
+parameters, and recorded metrics before joining team identifiers.
+
+| Model | MAE | Bias | Absolute-error median | Absolute-error P95 | Errors >=0.30 |
+| --- | --- | --- | --- | --- | --- |
+| Department mean | 0.147273373 | -0.007933222 | 0.134205331 | 0.378168359 | 34 |
+| Linear A | 0.141037325 | -0.005961664 | 0.124371194 | 0.339531775 | 35 |
+| Frozen forest | 0.148426346 | -0.023333554 | 0.129913097 | 0.352088849 | 33 |
+
+The largest four errors contribute only about 3–4% of absolute error, while the
+largest 40 contribute about 25–27%. A common 353-row sensitivity population retains
+the same MAE ordering after excluding the baseline's worst 40 rows. Tail exclusions
+are descriptive checks, not cleaned-data results or new model selection.
+
+Bias changes direction across windows. Finishing has higher pooled error, and the
+forest worsens finishing while improving sewing relative to the department mean.
+Sixteen of 24 department/team groups have fewer than 20 rows; every team/window
+cell is small. Stored IDs show variation, without establishing stable rosters,
+worker performance, or a causal explanation.
+
+The evidence supports an **explicitly experimental retrospective review tool** with
+baseline comparison, provenance, support counts, limitations, and human oversight.
+Live production readiness is unverified: feature/assignment timing, label latency,
+target meaning, freshness, uncertainty, monitoring, and operational oversight need
+real factory evidence. The report distinguishes confirmed software behavior from
+provisional assumptions and unverified operational requirements.
+
+```powershell
+.\.venv\Scripts\python.exe -m loometric.experiments.errors
+```
+
+Use the unchanged CSV/split and existing EXP-004 JSON. Missing or inconsistent saved
+predictions fail explicitly. Detailed groups, concentration, sensitivity, target
+distributions, and high-error observation details stay in ignored
+`data/processed/exp-005-error-analysis.json`. No raw observations are added to Git.
+See [ADR 0006](docs/decisions/0006-saved-prediction-error-audit.md).
+
 ## Checks
 
 ```powershell
@@ -254,6 +296,8 @@ Forest checks cover fixed profiles, seed/worker settings, training diagnostics,
 validation-only selection/baseline retention, and importance aggregation arithmetic.
 Temporal checks cover whole-date windows, expanding prefixes, fresh fold encoders,
 pooled metric arithmetic, deterministic predictions, and exclusion of both outer holdouts.
+Error-analysis checks cover hand-calculated summaries/tails, group support, identical
+sensitivity populations, artifact drift, no refitting, and holdout isolation.
 Install the `ml` extra or EXP-002 snapshot to run the complete test suite.
 Type hints are used throughout; no static type checker is configured for this task.
 
@@ -273,11 +317,12 @@ src/loometric/
   leakage.py                 # Source-column availability policy
   baselines.py               # Global and department training-mean predictors
   evaluation.py              # Explicit regression metrics and alignment checks
+  error_analysis.py          # Pure saved-prediction error, group, and tail diagnostics
   features.py                # Stateless provisional pre-shift feature boundary
   preprocessing.py           # Shared training-fitted categorical encoding/metadata
   linear.py                  # Training-fitted one-hot/OLS pipeline constructor
   forest.py                  # Fixed forest profiles, pipeline, and importance summaries
-  experiments/               # EXP-001 report and EXP-002/EXP-003 JSON runners
+  experiments/               # Local experiment runners and saved-prediction audit CLI
   data/
     schema.py                # Expected columns and domain constraints
     loading.py               # Strict CSV ingestion and normalization
@@ -297,5 +342,6 @@ See [architecture decisions](docs/decisions/0001-local-data-foundation.md).
 The future stack is React, Node.js, PostgreSQL, FastAPI, XGBoost, and OR-Tools.
 Those components are deferred; this package establishes the data and evaluation
 contracts they will depend on. `docs/COMMIT_PLAN.md` is an intentionally ignored local
-roadmap. No credentials, external telemetry, automatic commits, or pushes are used.
+roadmap. Analysis commands make no network calls and use no embedded credentials
+or external telemetry.
 
