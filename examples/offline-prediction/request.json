@@ -1,0 +1,10 @@
+{
+  "input_schema_version": 1,
+  "scheduled_date": "2030-01-03",
+  "department": "sewing",
+  "team": "1",
+  "prediction_cutoff": "2030-01-03T07:00:00+03:00",
+  "source_snapshot_timestamp": "2030-01-03T06:30:00+03:00",
+  "source_id": "synthetic:m01-demo",
+  "shift_id": "synthetic-day-shift"
+}

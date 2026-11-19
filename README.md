@@ -3,7 +3,8 @@
 Local garment productivity ML engineering project. Current capabilities include CSV
 validation, exploratory analysis, a pre-shift leakage assessment, frozen chronological
 partitions, two naive mean baselines, Linear Regression, Random Forest Regression,
-an expanding-window temporal audit, and saved-prediction error/readiness analysis.
+an expanding-window temporal audit, saved-prediction error/readiness analysis, and
+an experimental offline prediction contract with explicit artifact generation.
 Models are selected on validation only; the final test remains reserved. Application
 services, databases, optimization, and further ML algorithms are deferred.
 
@@ -278,6 +279,40 @@ distributions, and high-error observation details stay in ignored
 `data/processed/exp-005-error-analysis.json`. No raw observations are added to Git.
 See [ADR 0006](docs/decisions/0006-saved-prediction-error-audit.md).
 
+## M01: Experimental offline prediction
+
+The local `loometric.prediction` CLI explicitly trains the frozen B_RF-01 and
+Department Mean artifacts on the original **711 training rows**, then separately
+loads a verified artifact for prediction. Inference never retrains. Strict versioned
+requests include scheduled date, department/team, aware cutoff/snapshot timestamps
+and provenance. Outputs include both predictions, artifact/model identity, warnings,
+and VALID_EXPERIMENTAL, REVIEW_REQUIRED or ABSTAIN status. Every result requires
+human review and is ineligible for automated staffing or scheduling decisions.
+
+```powershell
+$receipt = .\.venv\Scripts\python.exe -m loometric.prediction train `
+  --artifact data/processed/m01-b-rf01
+if ($LASTEXITCODE -ne 0) { throw "Artifact generation failed" }
+$modelFingerprint = ($receipt | ConvertFrom-Json).artifact_fingerprint
+.\.venv\Scripts\python.exe -m loometric.prediction predict `
+  --artifact data/processed/m01-b-rf01 --expected-fingerprint $modelFingerprint `
+  --request examples/offline-prediction/request.json `
+  --policy examples/offline-prediction/review-policy.json `
+  --at "2030-01-03T06:45:00+03:00"
+```
+
+Use the existing ML environment; choose a new artifact directory. Load only trusted
+locally generated joblib artifacts using a separately retained training fingerprint.
+Artifacts remain ignored. Two real builds were byte-identical; the synthetic replay
+returned **0.820818668** versus baseline **0.738511299**, with REVIEW_REQUIRED for
+unverified timing/freshness. These are example predictions, not accuracy results.
+No new validation/test scoring occurs. The forest's temporal advantage remains
+inconsistent; no production readiness or automatic decision authorization follows.
+
+See the [input/output contract, measured checks and reproduction guide](docs/architecture/offline-prediction-contract.md)
+and [ADR 0007](docs/decisions/0007-experimental-offline-prediction-contract.md).
+There is no HTTP endpoint, database, frontend or optimizer in this milestone.
+
 ## Checks
 
 ```powershell
@@ -298,6 +333,9 @@ Temporal checks cover whole-date windows, expanding prefixes, fresh fold encoder
 pooled metric arithmetic, deterministic predictions, and exclusion of both outer holdouts.
 Error-analysis checks cover hand-calculated summaries/tails, group support, identical
 sensitivity populations, artifact drift, no refitting, and holdout isolation.
+Offline-prediction checks cover strict request/provenance contracts, source-bound
+review policy, unknown/stale inputs, trusted artifact compatibility/integrity,
+deterministic artifacts/inference, training-only label loading and explicit abstention.
 Install the `ml` extra or EXP-002 snapshot to run the complete test suite.
 Type hints are used throughout; no static type checker is configured for this task.
 
@@ -323,6 +361,7 @@ src/loometric/
   linear.py                  # Training-fitted one-hot/OLS pipeline constructor
   forest.py                  # Fixed forest profiles, pipeline, and importance summaries
   experiments/               # Local experiment runners and saved-prediction audit CLI
+  prediction/                # Offline contracts, policy, artifacts, inference and CLI
   data/
     schema.py                # Expected columns and domain constraints
     loading.py               # Strict CSV ingestion and normalization
@@ -336,6 +375,8 @@ docs/
   prediction_problem.md      # Cutoff, grain, eligibility, and evaluation contract
   decisions/                 # Architecture decisions and rationale
   experiments/               # Measured experiment reports
+  architecture/              # Offline prediction contract and lifecycle
+examples/offline-prediction/  # Synthetic request and non-operational review policy
 ```
 
 See [architecture decisions](docs/decisions/0001-local-data-foundation.md).
