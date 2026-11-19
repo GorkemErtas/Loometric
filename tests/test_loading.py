@@ -55,3 +55,30 @@ def test_utf8_bom_is_supported(tmp_path: Path) -> None:
     path = tmp_path / "bom.csv"
     path.write_text("date,team\n01/01/2015,1\n", encoding="utf-8-sig")
     assert read_csv(path).columns.tolist() == ["date", "team"]
+
+
+def test_projection_and_source_row_selection(dataset_path: Path) -> None:
+    projected = read_csv(dataset_path, columns=("date",), row_indices=frozenset({1, 3}))
+    assert projected.columns.tolist() == ["date"]
+    assert projected["date"].tolist() == ["01/01/2015", "01/02/2015"]
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"columns": ("missing",)},
+        {"columns": ("date", "date")},
+        {"row_indices": frozenset({-1})},
+        {"row_indices": frozenset({999})},
+    ],
+)
+def test_invalid_projection_rejected(dataset_path: Path, kwargs: dict) -> None:
+    with pytest.raises(DatasetReadError):
+        read_csv(dataset_path, **kwargs)
+
+
+def test_unselected_rows_still_receive_structural_checks(tmp_path: Path) -> None:
+    path = tmp_path / "ragged-outer.csv"
+    path.write_text("date,team\n01/01/2015,1\n01/02/2015\n", encoding="utf-8")
+    with pytest.raises(DatasetReadError):
+        read_csv(path, columns=("date",), row_indices=frozenset({0}))

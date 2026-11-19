@@ -47,6 +47,7 @@ def test_valid_contract_and_default_review(request_payload):
         ("team", "-1"),
         ("prediction_cutoff", "2030-01-02T07:00:00"),
         ("prediction_cutoff", "2030-01-02T07:00:00+25:00"),
+        ("prediction_cutoff", "2030-01-02T07:00:00+03:60"),
         ("prediction_cutoff", "2030-01-03T07:00:00Z"),
         ("source_snapshot_timestamp", "2030-01-02T08:00:00+03:00"),
         ("source_id", ""),
