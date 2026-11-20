@@ -12,6 +12,8 @@ An optional OR-Tools CP-SAT engine optimizes the same frozen scheduling policy,
 with independently verified results and explicit lexicographic proof status.
 An offline synthetic benchmark runner audits solver budgets, scale, proof status,
 resource limits and same-instance comparisons with the reference scheduler.
+An immutable what-if engine compares explicit synthetic capacity changes, with
+same-demand deltas and verified greedy fallback for optional solver attempts.
 Models are selected on validation only; the final test remains reserved. Application
 services, databases, and further ML algorithms are deferred.
 
@@ -452,9 +454,45 @@ Across 162 native runs: **90 better, 6 ties, 7 worse, 59 without an incumbent**;
 all **36** reference inputs passed independent saved-result audits. Small cases
 proved all 54 runs; 60-order cases yielded no useful improvement. Ten of 81 repeated
 pairs differed under wall limits, despite fixed seeds and one worker. Peak job
-committed memory was **441.02 MiB** under a **768 MiB** cap. The full suite passes
-**716 tests**. These observations support bounded local workflows with explicit
+committed memory was **441.02 MiB** under a **768 MiB** cap. At M03C completion, the
+suite passed **716 tests**. These observations support bounded local workflows with explicit
 proof/abstention handling; they do not establish general production readiness.
+
+## M04: Conditional production scenarios
+
+The local `loometric.scenarios` CLI binds an ordered change specification to an exact
+baseline fingerprint. It atomically changes workers, profile efficiency, assignments,
+planned downtime or line availability, preserving orders, standards, dates and the
+frozen scheduling policy. Invalid references and conflicting edits fail explicitly.
+
+```powershell
+.\.venv\Scripts\python.exe -m loometric.scenarios `
+  --baseline examples/scenarios/capacity-baseline.json `
+  --scenario examples/scenarios/additional-workers.json
+
+.\.venv\Scripts\python.exe -m loometric.scenarios `
+  --baseline examples/scenarios/routing-baseline.json `
+  --scenario examples/scenarios/capacity-optimizer-recovery.json
+```
+
+Greedy is always independently verified. Explicit optional CP-SAT runs under existing
+resource limits; its verified incumbent replaces greedy only when strictly better
+in frozen objective order. Ties, worse results, UNKNOWN and resource/dependency
+failures retain greedy with an explicit reason. Candidate proof and selected producer
+remain separate. Greedy needs no optional solver package.
+
+Worked examples finish **45→55 units** with additional workers. A smaller downtime
+reduction increases capacity **45→50 standard minutes** while still finishing **45**.
+A routing example shows greedy worsening **28→18 units** despite capacity increasing
+**30→40**; optional CP-SAT recovers **28 units** and improves makespan **10→9 minutes**.
+These are conditional synthetic calculations, without measured factory-productivity
+or causal claims. Utilization changes expose their capacity denominators.
+
+All 14 specifications reproduced twice (12 valid, two rejected as declared); native
+comparison excludes measured runtime. The complete suite passes **812 tests**.
+See the [schema, worked results, metrics, selection policy and limitations](docs/architecture/what-if-scenario-engine.md)
+and [ADR 0012](docs/decisions/0012-atomic-what-if-and-verified-selection.md).
+M05 API integration and all services, databases, frontend and deployment remain deferred.
 
 ## Checks
 
@@ -492,6 +530,9 @@ oracles, deterministic output and byte-identical reference reports.
 Scalability checks cover generated-schema validity, pressure arithmetic, input
 fingerprints, resource enforcement, wall-watchdog cleanup, incomplete-proof states,
 independent audit rejection and retained skip/result evidence.
+Scenario checks cover immutable baselines, atomic edits, strict provenance/schema,
+same-demand deltas, hand-calculated outcomes, unknown/feasible/proven solver states,
+strict-better selection and verified greedy fallback.
 Install the M03B snapshot or all three extras (`dev,ml,optimization`) for the complete suite.
 Type hints are used throughout; no static type checker is configured for this task.
 
@@ -509,6 +550,7 @@ requirements/
   exp-002.txt                # EXP-001 pins plus exact ML dependency closure
   m03b.txt                   # Prior pins plus exact optional OR-Tools dependency closure
 src/loometric/
+  execution.py               # Shared hard process limits and bounded native workers
   cli.py                     # Local orchestration and exit codes
   leakage.py                 # Source-column availability policy
   baselines.py               # Global and department training-mean predictors
@@ -524,6 +566,7 @@ src/loometric/
   scheduling/                # Frozen contracts, reference dispatch, verifier, metrics and CLI
   optimization/              # CP-SAT model, proof-gated solves, adapter and comparison
   benchmarks/                # Synthetic generator, isolated resource guards and audit CLI
+  scenarios/                 # Immutable capacity edits, verified selection, deltas and CLI
   data/
     schema.py                # Expected columns and domain constraints
     loading.py               # Strict CSV ingestion and normalization
@@ -541,6 +584,7 @@ docs/
 examples/offline-prediction/  # Synthetic request and non-operational review policy
 examples/planning/            # Synthetic capacity and invalid-input scenarios
 examples/scheduling/          # Synthetic benchmarks and deliberately invalid proposals
+examples/scenarios/           # Small explicit what-if inputs, including conflicts/regressions
 ```
 
 See [architecture decisions](docs/decisions/0001-local-data-foundation.md).

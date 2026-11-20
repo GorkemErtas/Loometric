@@ -80,28 +80,55 @@ def test_fractional_budgets_do_not_silently_round_into_bounds(value):
         parse_specification(source)
 
 
-def test_cli_greedy_runs_without_site_packages_and_reads_no_protected_data():
+@pytest.mark.parametrize("mode", ["greedy", "native"])
+def test_greedy_and_native_paths_read_no_protected_data(mode):
     code = r"""
-import pathlib,sys
+import pathlib,sys,json
 sys.path.insert(0,str(pathlib.Path('src').resolve()))
 repo=pathlib.Path.cwd().as_posix().lower()
 def guard(event,args):
     if event=='open' and isinstance(args[0],str):
-        path=args[0].replace(chr(92),'/').lower()
+        path=pathlib.Path(args[0]).resolve().as_posix().lower()
         assert not path.startswith(repo+'/data/'),path
         assert not path.startswith(repo+'/src/loometric/prediction/'),path
 sys.addaudithook(guard)
-from loometric.scenarios.cli import main
-assert main(['--baseline','examples/scenarios/capacity-baseline.json',
-    '--scenario','examples/scenarios/additional-workers.json'])==0
-forbidden=('sklearn','joblib','ortools','loometric.prediction','loometric.data')
+try:
+    open('data/raw/forbidden-probe.csv')
+except AssertionError:
+    pass
+else:
+    raise AssertionError('Relative protected path bypassed the audit guard')
+if sys.argv[1]=='greedy':
+    from loometric.scenarios.cli import main
+    assert main(['--baseline','examples/scenarios/capacity-baseline.json',
+        '--scenario','examples/scenarios/additional-workers.json'])==0
+else:
+    from dataclasses import asdict
+    from loometric.execution import ResourceLimits
+    from loometric.optimization.configuration import SolverConfiguration
+    from loometric.scenarios.worker import run
+    payload=run({'instance_json':pathlib.Path('examples/scenarios/routing-baseline.json').read_text(),
+        'resource_limits':asdict(ResourceLimits()),'solver_configuration':asdict(
+            SolverConfiguration(wall_time_seconds_per_phase=1))})
+    assert payload['optimization']['verification']['feasible']
+    print(json.dumps({'status':payload['status']}))
+forbidden=('sklearn','joblib','loometric.prediction','loometric.data')
+if sys.argv[1]=='greedy':
+    forbidden+=('ortools',)
 assert not any(name.startswith(forbidden) for name in sys.modules)
 """
     result = subprocess.run(
-        [sys.executable, "-S", "-c", code], cwd=ROOT, capture_output=True, text=True
+        [sys.executable, *(["-S"] if mode == "greedy" else []), "-c", code, mode],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
     )
     assert result.returncode == 0, result.stderr
-    assert json.loads(result.stdout)["scenario"]["evaluation"]["metrics"]["scheduled_units"] == 55
+    report = json.loads(result.stdout)
+    if mode == "greedy":
+        assert report["scenario"]["evaluation"]["metrics"]["scheduled_units"] == 55
+    else:
+        assert report["status"] in ("VALID_COMPLETE", "VALID_PARTIAL")
 
 
 def test_native_worker_missing_optional_dependency_is_explicit():
