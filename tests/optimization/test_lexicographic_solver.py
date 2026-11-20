@@ -70,6 +70,32 @@ def test_analytical_optimum_by_independent_exhaustive_enumeration():
     assert {item.order_id for item in result.schedule.allocations} == {"B", "C"}
 
 
+def test_third_objective_removes_idle_time_when_higher_objectives_tie():
+    instance = load_instance(EXAMPLES / "hand-enumerated.json")
+    planning = instance.planning
+    day = planning.calendar.working_dates[0]
+    orders = tuple(
+        replace(order, quantity=2, release_date=day, due_date=day) for order in planning.orders[:2]
+    )
+    instance = replace(instance, planning=replace(planning, orders=orders))
+    # Independent two-batch enumeration: all4 pieces fit, no due penalty, then
+    # compact placement is4 minutes instead of arbitrary idle placement within10.
+    candidates = []
+    for left, right in itertools.product([None, *range(9)], repeat=2):
+        if left is not None and right is not None and max(left, right) < min(left + 2, right + 2):
+            continue
+        candidates.append(
+            (
+                2 * (left is None) + 2 * (right is None),
+                0,
+                max((start + 2 for start in (left, right) if start is not None), default=0),
+            )
+        )
+    assert min(candidates) == (0, 0, 4)
+    result = engine.optimize(instance)
+    assert result.full_lexicographic_optimal and result.objectives.as_tuple() == min(candidates)
+
+
 def test_real_zero_wall_budget_returns_unknown_without_fabricated_schedule(optimization_instance):
     result = engine.optimize(
         optimization_instance, SolverConfiguration(wall_time_seconds_per_phase=0)
