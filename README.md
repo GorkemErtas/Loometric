@@ -8,8 +8,10 @@ an experimental offline prediction contract with explicit artifact generation.
 A separate planning foundation validates synthetic production scenarios and calculates
 deterministic shift capacity. Its reference scheduler now reserves finite capacity
 and independently verifies complete or partial schedules without forecasting.
+An optional OR-Tools CP-SAT engine optimizes the same frozen scheduling policy,
+with independently verified results and explicit lexicographic proof status.
 Models are selected on validation only; the final test remains reserved. Application
-services, databases, optimization, and further ML algorithms are deferred.
+services, databases, and further ML algorithms are deferred.
 
 ## Prediction problem
 
@@ -345,8 +347,8 @@ experimental ML predictions never become operating capacity automatically.
 
 See the [domain, units, formulas, measured examples and limitations](docs/architecture/production-planning-domain.md)
 and [ADR 0008](docs/decisions/0008-independent-planning-capacity-foundation.md).
-The reference scheduling layer is described below. OR-Tools, APIs, databases and
-frontend remain deferred.
+The reference scheduling and optional CP-SAT layers are described below. APIs,
+databases and frontend remain deferred.
 
 ## M03A: Reference scheduling and independent verification
 
@@ -375,13 +377,50 @@ Five synthetic benchmarks reproduced byte-for-byte. The competition case complet
 **60 units** and leaves **80 units** unscheduled despite both orders independently
 fitting M02's slot. Parallel routing completes **90 units**, including two late
 orders, with **1,237 minutes** total tardiness. Calendar fragments, unsupported
-large operations, zero capacity and corrupted proposals are covered. The full suite
-passes **580 tests**; no new dependency or OR-Tools installation is introduced.
+large operations, zero capacity and corrupted proposals are covered. Dispatch and
+verify remain independent of OR-Tools and ML packages.
 
 See the [frozen scheduling contract, complete measured results and M03B requirements](docs/architecture/scheduling-contract.md)
 and [ADR 0009](docs/decisions/0009-reference-scheduling-policy.md).
 Splitting, preemption, shared crews, material/WIP constraints and setups are deferred.
-M03B CP-SAT, APIs, databases and frontend have not been started.
+The M03B optimizer is described below. APIs, databases and frontend remain deferred.
+
+## M03B: CP-SAT scheduling optimization
+
+The optional optimizer uses **OR-Tools 9.15.6755** and the unchanged M03A instances,
+duration rules, proposal contract, verifier and metrics. It minimizes unfinished
+finished-goods units, then completed-order priority-weighted tardiness, then
+makespan. Each objective is fixed only after its phase is proven OPTIMAL with zero
+gap tolerances. FEASIBLE stops with an explicitly unproven incumbent; UNKNOWN never
+fabricates a schedule. Every accepted incumbent passes independent verification.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements/m03b.txt
+.\.venv\Scripts\python.exe -m pip install --no-deps -e .
+.\.venv\Scripts\python.exe -m loometric.scheduling optimize `
+  --instance examples/scheduling/competition.json `
+  --seed 42 --workers 1 --time-limit-seconds 10 `
+  --deterministic-time-limit 1 --benchmark-mode
+```
+
+The pinned snapshot preserves all prior dependency versions. The `optimization`
+extra also supports a development install with `pip install -e ".[dev,ml,optimization]"`.
+Budgets apply per phase. Structured JSON separates runtime from schedules, metrics,
+proof statuses, returned bounds and the independently verified reference comparison.
+
+All six synthetic cases reproduced identical non-runtime results on two runs;
+all **18 objective phases were OPTIMAL**. Competition finishes **80 vs 60 units**,
+while makespan worsens **300 vs 225 minutes**. The hand-enumerated case finishes
+**10 vs 6 units**, while weighted tardiness worsens **1460 vs 1458 minutes**.
+The limits case improves only makespan by omitting unfinished upstream work; it
+finishes no additional goods. The other three objective vectors tie. These results
+support the declared hierarchy on small synthetic cases, without establishing
+factory readiness or general performance gains.
+
+See the [formulation, complete benchmark tables, measured runtimes, timeout policy and reproduction instructions](docs/architecture/cp-sat-optimization.md)
+and [ADR 0010](docs/decisions/0010-cp-sat-strict-lexicographic-scheduling.md).
+The final complete suite passes **639 tests**. Shared workers, setups, materials,
+splitting, WIP, ML-derived capacity and application integration remain deferred.
 
 ## Checks
 
@@ -389,6 +428,7 @@ M03B CP-SAT, APIs, databases and frontend have not been started.
 .\.venv\Scripts\python.exe -m pytest
 .\.venv\Scripts\python.exe -m ruff check .
 .\.venv\Scripts\python.exe -m ruff format --check .
+.\.venv\Scripts\python.exe -m pip check
 ```
 
 Tests use small synthetic data and temporary directories, and run without the private
@@ -412,7 +452,10 @@ or protected data access.
 Scheduling checks cover exact rounded durations, finite reservations, precedence,
 strict proposal accounting, corrupted-schedule rejection, finished-goods metrics,
 deterministic benchmarks and isolation from ML/solver/protected data dependencies.
-Install the `ml` extra or EXP-002 snapshot to run the complete test suite.
+Optimization checks cover optional alternatives, resource constraints, integer
+bounds, proof gates, time limits, independent verification, exhaustive small-case
+oracles, deterministic output and byte-identical reference reports.
+Install the M03B snapshot or all three extras (`dev,ml,optimization`) for the complete suite.
 Type hints are used throughout; no static type checker is configured for this task.
 
 ## Layout
@@ -426,6 +469,7 @@ configs/
 requirements/
   exp-001.txt                # Exact installed EXP-001 environment snapshot
   exp-002.txt                # EXP-001 pins plus exact ML dependency closure
+  m03b.txt                   # Prior pins plus exact optional OR-Tools dependency closure
 src/loometric/
   cli.py                     # Local orchestration and exit codes
   leakage.py                 # Source-column availability policy
@@ -440,6 +484,7 @@ src/loometric/
   prediction/                # Offline contracts, policy, artifacts, inference and CLI
   planning/                  # Independent domain, availability, capacity and scenario CLI
   scheduling/                # Frozen contracts, reference dispatch, verifier, metrics and CLI
+  optimization/              # CP-SAT model, proof-gated solves, adapter and comparison
   data/
     schema.py                # Expected columns and domain constraints
     loading.py               # Strict CSV ingestion and normalization
@@ -460,7 +505,7 @@ examples/scheduling/          # Synthetic benchmarks and deliberately invalid pr
 ```
 
 See [architecture decisions](docs/decisions/0001-local-data-foundation.md).
-The future stack is React, Node.js, PostgreSQL, FastAPI, XGBoost, and OR-Tools.
+The future stack includes React, Node.js, PostgreSQL, FastAPI and XGBoost.
 Those components are deferred; this package establishes the data and evaluation
 contracts they will depend on. `docs/COMMIT_PLAN.md` is an intentionally ignored local
 roadmap. Analysis commands make no network calls and use no embedded credentials
