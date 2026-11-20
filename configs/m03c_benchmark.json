@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "generator_version": "synthetic-scheduling-v1",
+  "seeds": [19, 42, 73],
+  "pressures_percent": [45, 90, 135],
+  "tiers": [
+    {"name": "small", "orders": 8, "lines": 4, "stages": 2, "horizon_days": 1, "shifts_per_day": 1, "compatible_lines": 2},
+    {"name": "medium", "orders": 24, "lines": 6, "stages": 3, "horizon_days": 2, "shifts_per_day": 1, "compatible_lines": 2},
+    {"name": "large", "orders": 60, "lines": 9, "stages": 3, "horizon_days": 3, "shifts_per_day": 1, "compatible_lines": 2},
+    {"name": "stress", "orders": 150, "lines": 20, "stages": 5, "horizon_days": 7, "shifts_per_day": 2, "compatible_lines": 4}
+  ],
+  "wall_budgets_seconds": [1, 5, 10],
+  "deterministic_budget": 1.0,
+  "solver_seed": 42,
+  "repetitions": 2,
+  "resource_limits": {
+    "max_operations": 300,
+    "max_alternatives": 20000,
+    "max_variables": 25000,
+    "max_constraints": 90000,
+    "process_memory_mib": 768,
+    "process_wall_seconds": 60,
+    "batch_wall_seconds": 2400
+  }
+}
