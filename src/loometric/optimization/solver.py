@@ -168,7 +168,13 @@ def optimize(
         terminal_status = solver.status_name(status)
         runtimes.append(run.runtime)
         has_solution = status in (cp_model.OPTIMAL, cp_model.FEASIBLE)
-        bound = float(solver.best_objective_bound) if has_solution else None
+        # UNKNOWN can still carry a valid optimization lower bound. Even the
+        # default returned zero is valid here: all three objectives are nonnegative.
+        bound = (
+            float(solver.best_objective_bound)
+            if status in (cp_model.OPTIMAL, cp_model.FEASIBLE, cp_model.UNKNOWN)
+            else None
+        )
         if bound is not None and not isfinite(bound):
             bound = None
         value = int(solver.value(objective)) if has_solution else None

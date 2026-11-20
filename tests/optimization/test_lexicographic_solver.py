@@ -103,6 +103,8 @@ def test_real_zero_wall_budget_returns_unknown_without_fabricated_schedule(optim
     assert result.status == result.terminal_solver_status == "UNKNOWN"
     assert result.schedule is result.metrics is result.objectives is result.verification is None
     assert not result.full_lexicographic_optimal and len(result.phases) == 1
+    assert result.phases[0].objective_value is None
+    assert result.phases[0].best_objective_bound == 0.0
 
 
 @pytest.mark.parametrize("phase_index", [1, 2])
@@ -164,6 +166,10 @@ def test_first_phase_no_solution_statuses_never_read_a_fabricated_incumbent(
     assert result.status in ("UNKNOWN", "INFEASIBLE", "MODEL_INVALID")
     assert result.schedule is result.metrics is None
     assert result.proven_optimal_objectives == 0
+    if status == cp_model.UNKNOWN:
+        assert result.phases[0].best_objective_bound == 60.0
+    else:
+        assert result.phases[0].best_objective_bound is None
 
 
 def test_actual_native_infeasible_model_returns_no_schedule(optimization_instance, monkeypatch):
