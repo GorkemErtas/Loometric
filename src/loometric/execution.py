@@ -251,7 +251,11 @@ def guarded_child(
     import json
     from time import perf_counter
 
-    if worker_module not in ("loometric.benchmarks.worker", "loometric.scenarios.worker"):
+    if worker_module not in (
+        "loometric.benchmarks.worker",
+        "loometric.scenarios.worker",
+        "loometric.api.worker",
+    ):
         raise ValueError("Unsupported bounded worker module.")
     started = perf_counter()
     process = subprocess.Popen(

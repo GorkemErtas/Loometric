@@ -1,0 +1,16 @@
+{
+  "max_body_bytes": 262144,
+  "max_depth": 24,
+  "max_nodes": 10000,
+  "max_collection_items": 256,
+  "max_string_length": 4096,
+  "max_number_length": 128,
+  "max_decimal_exponent": 100,
+  "max_orders": 32,
+  "max_operations": 96,
+  "max_changes": 64,
+  "max_concurrent_requests": 2,
+  "body_timeout_seconds": 3,
+  "execution_timeout_seconds": 5,
+  "process_memory_mib": 256
+}

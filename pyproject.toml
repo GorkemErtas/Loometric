@@ -11,15 +11,19 @@ requires-python = ">=3.11"
 dependencies = ["pandas>=2.2,<4"]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<10", "ruff>=0.9,<1"]
+dev = ["pytest>=8,<10", "ruff>=0.9,<1", "httpx==0.28.1"]
 ml = ["scikit-learn>=1.6,<2"]
 optimization = ["ortools==9.15.6755"]
+api = ["fastapi==0.165.0", "pydantic==2.14.4", "uvicorn==0.54.0"]
 
 [project.scripts]
 loometric = "loometric.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"loometric.api" = ["default_limits.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
