@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "scenario_id": "synthetic:m02-invalid-quantity",
+  "synthetic": true,
+  "assumptions": [
+    "Entirely synthetic example; no actual factory observations or performance claims.",
+    "Dedicated qualified crews have constant headcount within each shift; capacity is additive labor only.",
+    "Stage standards and efficiency fractions are hypothetical inputs independent of all ML predictions.",
+    "Calendar dates use the supplied shift start offset; overnight shifts belong to their start date.",
+    "Each order is assessed independently against each full slot; no reservations, splitting, stage scheduling or global feasibility."
+  ],
+  "styles": [
+    {
+      "style_id": "TEE",
+      "output_unit": "piece",
+      "standards": [
+        {
+          "stage": "sewing",
+          "standard_minutes_per_unit": 12,
+          "measurement_unit": "worker_minutes_per_piece"
+        },
+        {
+          "stage": "finishing",
+          "standard_minutes_per_unit": 4,
+          "measurement_unit": "worker_minutes_per_piece"
+        },
+        {
+          "stage": "quality_control",
+          "standard_minutes_per_unit": 1,
+          "measurement_unit": "worker_minutes_per_piece"
+        }
+      ]
+    }
+  ],
+  "orders": [
+    {
+      "order_id": "O-INVALID",
+      "style_id": "TEE",
+      "quantity": 0,
+      "priority": 1,
+      "release_date": "2030-01-07",
+      "due_date": "2030-01-07",
+      "required_stages": [
+        "sewing"
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "line_id": "SEW-01",
+      "stage": "sewing",
+      "worker_count": 4,
+      "availability": "available"
+    }
+  ],
+  "shifts": [
+    {
+      "shift_id": "DAY",
+      "interval": {
+        "start": "2030-01-07T08:00:00+03:00",
+        "end": "2030-01-07T16:00:00+03:00"
+      },
+      "breaks": [
+        {
+          "start": "2030-01-07T12:00:00+03:00",
+          "end": "2030-01-07T12:30:00+03:00"
+        }
+      ]
+    }
+  ],
+  "capacity_profiles": [
+    {
+      "profile_id": "P-SEW-01",
+      "line_id": "SEW-01",
+      "effective_date": "2030-01-07",
+      "assumed_efficiency": 0.8,
+      "source_id": "synthetic:m02-demo",
+      "evidence_status": "synthetic"
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_id": "C-SEW-01",
+      "line_id": "SEW-01",
+      "style_id": "TEE",
+      "stage": "sewing",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    }
+  ],
+  "calendar": {
+    "calendar_id": "SYNTHETIC-CALENDAR",
+    "working_dates": [
+      "2030-01-07"
+    ],
+    "assignments": [
+      {
+        "assignment_id": "A-DAY-SEW-01",
+        "line_id": "SEW-01",
+        "shift_id": "DAY",
+        "profile_id": "P-SEW-01"
+      }
+    ],
+    "planned_downtime": [],
+    "unavailable_periods": []
+  }
+}
