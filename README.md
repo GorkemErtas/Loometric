@@ -6,7 +6,8 @@ partitions, two naive mean baselines, Linear Regression, Random Forest Regressio
 an expanding-window temporal audit, saved-prediction error/readiness analysis, and
 an experimental offline prediction contract with explicit artifact generation.
 A separate planning foundation validates synthetic production scenarios and calculates
-deterministic shift capacity without forecasting or allocating orders.
+deterministic shift capacity. Its reference scheduler now reserves finite capacity
+and independently verifies complete or partial schedules without forecasting.
 Models are selected on validation only; the final test remains reserved. Application
 services, databases, optimization, and further ML algorithms are deferred.
 
@@ -334,7 +335,7 @@ shift after downtime and **120 pieces** on the evening shift. Finishing supports
 **202 pieces**; zero-worker and unavailable lines yield zero. Structured reason codes
 explain incompatible or insufficient slots. A second executable
 `examples/planning/invalid-quantity.json` demonstrates strict rejection (exit 2).
-Two complete report runs are byte-identical; the full suite passes **483 tests**.
+Two complete report runs are byte-identical.
 
 Each order/stage/slot assessment is independent: capacity is never reserved or
 summed across orders, and every result states `schedule_feasibility=NOT_ASSESSED`.
@@ -344,7 +345,43 @@ experimental ML predictions never become operating capacity automatically.
 
 See the [domain, units, formulas, measured examples and limitations](docs/architecture/production-planning-domain.md)
 and [ADR 0008](docs/decisions/0008-independent-planning-capacity-foundation.md).
-Scheduling, OR-Tools, APIs, databases and frontend remain deferred.
+The reference scheduling layer is described below. OR-Tools, APIs, databases and
+frontend remain deferred.
+
+## M03A: Reference scheduling and independent verification
+
+The `loometric.scheduling` CLI allocates competing orders under the frozen
+`whole-stage-minute-v1` policy: full-quantity, nonpreemptive stages within a single
+uninterrupted shift fragment, one-minute granularity, hard release dates and soft
+due dates. The deterministic reference ranks priority, due date and order ID, respects
+precedence and reserves each selected line/crew interval before continuing.
+
+```powershell
+.\.venv\Scripts\python.exe -m loometric.scheduling dispatch `
+  --instance examples/scheduling/competition.json
+
+.\.venv\Scripts\python.exe -m loometric.scheduling verify `
+  --instance examples/scheduling/competition.json `
+  --schedule examples/scheduling/invalid-overlap.json
+```
+
+The independent verifier recomputes processing/availability and rejects wrong units,
+quantities, overlaps, calendar violations and broken precedence. Only verified
+proposals receive completion, tardiness, utilization, unused-capacity and makespan
+metrics. VALID_PARTIAL remains distinct from INVALID; unfinished upstream work is
+visible without being counted as finished goods. No optimality claim is made.
+
+Five synthetic benchmarks reproduced byte-for-byte. The competition case completes
+**60 units** and leaves **80 units** unscheduled despite both orders independently
+fitting M02's slot. Parallel routing completes **90 units**, including two late
+orders, with **1,237 minutes** total tardiness. Calendar fragments, unsupported
+large operations, zero capacity and corrupted proposals are covered. The full suite
+passes **580 tests**; no new dependency or OR-Tools installation is introduced.
+
+See the [frozen scheduling contract, complete measured results and M03B requirements](docs/architecture/scheduling-contract.md)
+and [ADR 0009](docs/decisions/0009-reference-scheduling-policy.md).
+Splitting, preemption, shared crews, material/WIP constraints and setups are deferred.
+M03B CP-SAT, APIs, databases and frontend have not been started.
 
 ## Checks
 
@@ -372,6 +409,9 @@ deterministic artifacts/inference, training-only label loading and explicit abst
 Planning checks cover dimensional capacity arithmetic, interval unions, references,
 capabilities, zero capacity, independent-order scope and operation without ML packages
 or protected data access.
+Scheduling checks cover exact rounded durations, finite reservations, precedence,
+strict proposal accounting, corrupted-schedule rejection, finished-goods metrics,
+deterministic benchmarks and isolation from ML/solver/protected data dependencies.
 Install the `ml` extra or EXP-002 snapshot to run the complete test suite.
 Type hints are used throughout; no static type checker is configured for this task.
 
@@ -399,6 +439,7 @@ src/loometric/
   experiments/               # Local experiment runners and saved-prediction audit CLI
   prediction/                # Offline contracts, policy, artifacts, inference and CLI
   planning/                  # Independent domain, availability, capacity and scenario CLI
+  scheduling/                # Frozen contracts, reference dispatch, verifier, metrics and CLI
   data/
     schema.py                # Expected columns and domain constraints
     loading.py               # Strict CSV ingestion and normalization
@@ -412,9 +453,10 @@ docs/
   prediction_problem.md      # Cutoff, grain, eligibility, and evaluation contract
   decisions/                 # Architecture decisions and rationale
   experiments/               # Measured experiment reports
-  architecture/              # Prediction and planning contracts/lifecycles
+  architecture/              # Prediction, planning and scheduling contracts/lifecycles
 examples/offline-prediction/  # Synthetic request and non-operational review policy
 examples/planning/            # Synthetic capacity and invalid-input scenarios
+examples/scheduling/          # Synthetic benchmarks and deliberately invalid proposals
 ```
 
 See [architecture decisions](docs/decisions/0001-local-data-foundation.md).
