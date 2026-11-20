@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "baseline_instance_id": "synthetic:m04-routing",
+  "baseline_fingerprint": "fcd2eab555d5b409f30bb5afd255881f9d1473f905162b9d179d6051daccf5d6",
+  "scenario_id": "capacity-greedy-regression",
+  "label": "capacity greedy regression",
+  "provenance": {
+    "source_id": "synthetic:m04-worked-examples",
+    "synthetic": true,
+    "assumptions": [
+      "Conditional hypothetical capacity change; no causal or factory-productivity claim."
+    ]
+  },
+  "changes": [
+    {
+      "operation": "set_workers",
+      "line_id": "X",
+      "worker_count": 2
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "baseline_instance_id": "synthetic:m04-capacity",
+  "baseline_fingerprint": "6a6410ea81529136f8df10e547672b0231255b79c614a1f34e0a37599afc438c",
+  "scenario_id": "removed-shift",
+  "label": "removed shift",
+  "provenance": {
+    "source_id": "synthetic:m04-worked-examples",
+    "synthetic": true,
+    "assumptions": [
+      "Conditional hypothetical capacity change; no causal or factory-productivity claim."
+    ]
+  },
+  "changes": [
+    {
+      "operation": "remove_assignment",
+      "assignment_id": "ASSIGNMENT"
+    },
+    {
+      "operation": "remove_downtime",
+      "downtime_id": "STOP"
+    }
+  ]
+}

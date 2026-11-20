@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "baseline_instance_id": "synthetic:m04-capacity",
+  "baseline_fingerprint": "6a6410ea81529136f8df10e547672b0231255b79c614a1f34e0a37599afc438c",
+  "scenario_id": "downtime-addition",
+  "label": "downtime addition",
+  "provenance": {
+    "source_id": "synthetic:m04-worked-examples",
+    "synthetic": true,
+    "assumptions": [
+      "Conditional hypothetical capacity change; no causal or factory-productivity claim."
+    ]
+  },
+  "changes": [
+    {
+      "operation": "add_downtime",
+      "downtime": {
+        "downtime_id": "EXTRA",
+        "assignment_id": "ASSIGNMENT",
+        "interval": {
+          "start": "2030-01-07T08:10:00+03:00",
+          "end": "2030-01-07T08:15:00+03:00"
+        },
+        "reason": "Hypothetical additional stop"
+      }
+    }
+  ]
+}
