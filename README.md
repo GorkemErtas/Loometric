@@ -14,8 +14,10 @@ An offline synthetic benchmark runner audits solver budgets, scale, proof status
 resource limits and same-instance comparisons with the reference scheduler.
 An immutable what-if engine compares explicit synthetic capacity changes, with
 same-demand deltas and verified greedy fallback for optional solver attempts.
-Models are selected on validation only; the final test remains reserved. Application
-services, databases, and further ML algorithms are deferred.
+A bounded local FastAPI layer exposes capacity, greedy scheduling, independent
+verification and scenario comparison with authentication and native process limits.
+Models are selected on validation only; the final test remains reserved. Persistent
+jobs, databases, deployment and further ML algorithms are deferred.
 
 ## Prediction problem
 
@@ -34,7 +36,8 @@ need verified pre-shift snapshots. The complete policy appears in
 
 Python 3.11 or newer is required; Python 3.13 is the initial development environment.
 Run commands from the repository root. Package installation is the only step that
-needs a package index; runtime code makes no network calls and uses no cloud services.
+needs a package index; analysis stays offline and the optional API uses loopback HTTP
+only. No cloud service is configured.
 
 ```powershell
 py -3.13 -m venv .venv
@@ -489,10 +492,52 @@ These are conditional synthetic calculations, without measured factory-productiv
 or causal claims. Utilization changes expose their capacity denominators.
 
 All 14 specifications reproduced twice (12 valid, two rejected as declared); native
-comparison excludes measured runtime. The complete suite passes **812 tests**.
+comparison excludes measured runtime. At the M04 milestone, **812 tests** passed.
 See the [schema, worked results, metrics, selection policy and limitations](docs/architecture/what-if-scenario-engine.md)
 and [ADR 0012](docs/decisions/0012-atomic-what-if-and-verified-selection.md).
-M05 API integration and all services, databases, frontend and deployment remain deferred.
+M05A now exposes bounded greedy API operations below; optimization jobs, databases,
+frontend and deployment remain deferred.
+
+## M05A: Local planning API foundation
+
+Optional FastAPI endpoints under `/api/v1`: GET `health`, GET `capabilities`, POST
+`planning/capacity`, POST `scheduling/dispatch`, POST `scheduling/verify` and POST
+`scenarios/compare`. OpenAPI JSON and self-contained documentation are at
+`/api/v1/openapi.json` and `/api/v1/docs`. Domain contracts/engines remain unchanged.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements/m05a.txt
+.\.venv\Scripts\python.exe -m pip install --no-deps -e ".[dev,ml,optimization,api]"
+$env:LOOMETRIC_API_TOKEN = & .\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_urlsafe(32))"
+.\.venv\Scripts\python.exe -m loometric.api
+```
+
+The supported server binds 127.0.0.1:8000, requires a configured Bearer token for all
+operations except health/docs, rejects nonlocal peers/Hosts and restricts CORS.
+Requests are limited to 256 KiB, 32 orders/96 stages, 64 scenario changes and two
+concurrent expensive calls. A guarded 256 MiB child performs parsing/engine work with
+a 5-second watchdog; body reading has a separate 3-second deadline. Native timeout
+actually kills/reaps the worker; disconnects retain their slot until cleanup.
+Exact Decimal numbers, fingerprints, independent verification, synthetic provenance
+and valid-partial status survive transport. No API training, artifact/data loading
+or synchronous CP-SAT is exposed; M01 stays offline and jobs belong to M05B.
+
+Run [the client](examples/api/workflow.py) in a terminal with the same token/port,
+or execute the self-contained live-server test:
+
+```powershell
+.\.venv\Scripts\python.exe examples/api/workflow.py
+.\.venv\Scripts\python.exe -m pytest tests/api/test_local_server.py -q
+```
+
+The real loopback workflow repeats twice with identical summaries: synthetic
+baseline 45 completed units versus 55 after hypothetical additional workers.
+Verification: **76 API tests** and **888 total tests** passed; Ruff lint/166-file
+format check, dependency pins, wheel contents and protected-file checks passed.
+These are conditional fixture calculations, not factory measurements. See
+[API contracts, security, limits, errors and verification evidence](docs/architecture/api-foundation.md)
+and [ADR 0013](docs/decisions/0013-local-api-and-bounded-synchronous-execution.md).
+The shared-secret policy supports local development; public hosting is unsupported.
 
 ## Checks
 
@@ -533,7 +578,11 @@ independent audit rejection and retained skip/result evidence.
 Scenario checks cover immutable baselines, atomic edits, strict provenance/schema,
 same-demand deltas, hand-calculated outcomes, unknown/feasible/proven solver states,
 strict-better selection and verified greedy fallback.
-Install the M03B snapshot or all three extras (`dev,ml,optimization`) for the complete suite.
+API checks cover all endpoints, Decimal round trips, strict input validation, auth/CORS,
+limits, real process termination, AnyIO/direct asyncio cancellation, safe errors,
+protected-data isolation and a repeated real loopback client workflow.
+Install requirements/m05a.txt and all four extras (`dev,ml,optimization,api`) for the
+complete suite. Earlier M03B/ML dependency pins remain unchanged.
 Type hints are used throughout; no static type checker is configured for this task.
 
 ## Layout
@@ -550,6 +599,7 @@ requirements/
   exp-002.txt                # EXP-001 pins plus exact ML dependency closure
   m03b.txt                   # Prior pins plus exact optional OR-Tools dependency closure
 src/loometric/
+  api/                       # Optional bounded local HTTP boundary; no jobs or model loading
   execution.py               # Shared hard process limits and bounded native workers
   cli.py                     # Local orchestration and exit codes
   leakage.py                 # Source-column availability policy
@@ -585,10 +635,11 @@ examples/offline-prediction/  # Synthetic request and non-operational review pol
 examples/planning/            # Synthetic capacity and invalid-input scenarios
 examples/scheduling/          # Synthetic benchmarks and deliberately invalid proposals
 examples/scenarios/           # Small explicit what-if inputs, including conflicts/regressions
+examples/api/                 # Exact-number synthetic HTTP client workflow
 ```
 
 See [architecture decisions](docs/decisions/0001-local-data-foundation.md).
-The future stack includes React, Node.js, PostgreSQL, FastAPI and XGBoost.
+The future stack includes React, Node.js, PostgreSQL and XGBoost.
 Those components are deferred; this package establishes the data and evaluation
 contracts they will depend on. `docs/COMMIT_PLAN.md` is an intentionally ignored local
 roadmap. Analysis commands make no network calls and use no embedded credentials
