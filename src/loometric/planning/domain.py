@@ -1,7 +1,7 @@
 """Validated immutable entities; quantities are pieces and standards are labor minutes."""
 
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from decimal import Context, Decimal, localcontext
 from enum import StrEnum
 from typing import Literal
@@ -18,6 +18,13 @@ from loometric.planning.validation import (
 )
 
 ARITHMETIC_CONTEXT = Context(prec=28)
+
+
+def duration_minutes(elapsed: timedelta) -> Decimal:
+    """Convert one exact accumulated duration, avoiding per-interval rounding drift."""
+    microseconds = (elapsed.days * 86400 + elapsed.seconds) * 1000000 + elapsed.microseconds
+    with localcontext(ARITHMETIC_CONTEXT):
+        return Decimal(microseconds) / Decimal(60000000)
 
 
 class Stage(StrEnum):
@@ -49,10 +56,7 @@ class TimeInterval:
 
     @property
     def minutes(self) -> Decimal:
-        elapsed = utc(self.end) - utc(self.start)
-        microseconds = (elapsed.days * 86400 + elapsed.seconds) * 1000000 + elapsed.microseconds
-        with localcontext(ARITHMETIC_CONTEXT):
-            return Decimal(microseconds) / Decimal(60000000)
+        return duration_minutes(utc(self.end) - utc(self.start))
 
     def contains(self, other: "TimeInterval") -> bool:
         return utc(self.start) <= utc(other.start) <= utc(other.end) <= utc(self.end)
@@ -176,8 +180,9 @@ class Shift:
 
     @property
     def break_minutes(self) -> Decimal:
-        with localcontext(ARITHMETIC_CONTEXT):
-            return sum((interval.minutes for interval in self.breaks), Decimal(0))
+        return duration_minutes(
+            sum((utc(interval.end) - utc(interval.start) for interval in self.breaks), timedelta())
+        )
 
     @property
     def effective_working_minutes(self) -> Decimal:
