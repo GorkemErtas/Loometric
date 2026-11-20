@@ -10,6 +10,8 @@ deterministic shift capacity. Its reference scheduler now reserves finite capaci
 and independently verifies complete or partial schedules without forecasting.
 An optional OR-Tools CP-SAT engine optimizes the same frozen scheduling policy,
 with independently verified results and explicit lexicographic proof status.
+An offline synthetic benchmark runner audits solver budgets, scale, proof status,
+resource limits and same-instance comparisons with the reference scheduler.
 Models are selected on validation only; the final test remains reserved. Application
 services, databases, and further ML algorithms are deferred.
 
@@ -419,8 +421,40 @@ factory readiness or general performance gains.
 
 See the [formulation, complete benchmark tables, measured runtimes, timeout policy and reproduction instructions](docs/architecture/cp-sat-optimization.md)
 and [ADR 0010](docs/decisions/0010-cp-sat-strict-lexicographic-scheduling.md).
-The final complete suite passes **639 tests**. Shared workers, setups, materials,
+At M03B completion, the suite passed **639 tests**. Shared workers, setups, materials,
 splitting, WIP, ML-derived capacity and application integration remain deferred.
+
+## M03C: Synthetic scalability and solver robustness
+
+The [predeclared audit](docs/experiments/M03C-solver-scalability.md) uses the unchanged
+solver, verifier, reference dispatcher and scheduling policy. A versioned generator
+varies orders, resources, stages, calendars, compatibility and aggregate demand.
+It makes no calibrated factory-realism claim and uses no ML inputs.
+
+```powershell
+.\.venv\Scripts\python.exe -m loometric.benchmarks `
+  --config configs/m03c_benchmark.json `
+  --output-dir data/processed/m03c-local-run
+```
+
+The fixed matrix covers 8/24/60-order cases, three load targets, three generator
+seeds, 1/5/10-second phase budgets, deterministic limit 1.0, one solver worker and
+two repetitions. The 150-order stress tier stays visible as resource-skipped.
+Native jobs run serially under hard memory and whole-process wall limits. Windows
+launch starts suspended, and the worker confirms its memory-limited job membership.
+Inputs, journals and results remain local and ignored; existing evidence is never
+overwritten. The report distinguishes missing incumbents, unproven solutions,
+complete proofs, and BETTER/TIE/WORSE comparisons. Wall-limited outcomes may differ
+between repetitions.
+
+Across 162 native runs: **90 better, 6 ties, 7 worse, 59 without an incumbent**;
+**70** completed the full lexicographic proof. All **103** returned candidates and
+all **36** reference inputs passed independent saved-result audits. Small cases
+proved all 54 runs; 60-order cases yielded no useful improvement. Ten of 81 repeated
+pairs differed under wall limits, despite fixed seeds and one worker. Peak job
+committed memory was **441.02 MiB** under a **768 MiB** cap. The full suite passes
+**716 tests**. These observations support bounded local workflows with explicit
+proof/abstention handling; they do not establish general production readiness.
 
 ## Checks
 
@@ -455,6 +489,9 @@ deterministic benchmarks and isolation from ML/solver/protected data dependencie
 Optimization checks cover optional alternatives, resource constraints, integer
 bounds, proof gates, time limits, independent verification, exhaustive small-case
 oracles, deterministic output and byte-identical reference reports.
+Scalability checks cover generated-schema validity, pressure arithmetic, input
+fingerprints, resource enforcement, wall-watchdog cleanup, incomplete-proof states,
+independent audit rejection and retained skip/result evidence.
 Install the M03B snapshot or all three extras (`dev,ml,optimization`) for the complete suite.
 Type hints are used throughout; no static type checker is configured for this task.
 
@@ -466,6 +503,7 @@ data/
   processed/                 # Local numerical experiment artifacts (ignored)
 configs/
   chronological_split.json   # Frozen source fingerprint, date ranges, and counts
+  m03c_benchmark.json         # Predeclared synthetic matrix, budgets and resource guards
 requirements/
   exp-001.txt                # Exact installed EXP-001 environment snapshot
   exp-002.txt                # EXP-001 pins plus exact ML dependency closure
@@ -485,6 +523,7 @@ src/loometric/
   planning/                  # Independent domain, availability, capacity and scenario CLI
   scheduling/                # Frozen contracts, reference dispatch, verifier, metrics and CLI
   optimization/              # CP-SAT model, proof-gated solves, adapter and comparison
+  benchmarks/                # Synthetic generator, isolated resource guards and audit CLI
   data/
     schema.py                # Expected columns and domain constraints
     loading.py               # Strict CSV ingestion and normalization
