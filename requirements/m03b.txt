@@ -1,0 +1,8 @@
+# Exact M03B additions; preserve every EXP-002/EXP-001 pin.
+# Python 3.13.14, Windows x86-64. See the M03B architecture report.
+-r exp-002.txt
+absl-py==2.5.1
+immutabledict==4.3.1
+ortools==9.15.6755
+protobuf==6.33.6
+typing-extensions==4.16.0

@@ -13,6 +13,7 @@ dependencies = ["pandas>=2.2,<4"]
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "ruff>=0.9,<1"]
 ml = ["scikit-learn>=1.6,<2"]
+optimization = ["ortools==9.15.6755"]
 
 [project.scripts]
 loometric = "loometric.cli:main"
