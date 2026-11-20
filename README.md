@@ -498,6 +498,24 @@ and [ADR 0012](docs/decisions/0012-atomic-what-if-and-verified-selection.md).
 M05A now exposes bounded greedy API operations below; optimization jobs, databases,
 frontend and deployment remain deferred.
 
+## Synthetic data CSV inspection
+
+View all tracked M02–M04 synthetic fixtures and all 36 predeclared M03C generated
+instances in one local CSV:
+
+```powershell
+.\.venv\Scripts\python.exe -m loometric.synthetic_export
+```
+
+Open `data/processed/synthetic-data-view.csv` in VS Code. Current output has
+**20,645 rows and 80 columns**, including 12 purely transformed what-if inputs.
+Filter by `source_id` and `record_type`; order quantities and resource entities
+remain separate rows with explicit relationship IDs. These are alternative input
+views, not independent orders/capacity to sum across scenarios. Invalid examples
+retain their error codes. No scheduler, CP-SAT or new performance metrics run.
+The generated CSV stays ignored; existing fixtures and benchmark definitions stay
+unchanged. See [all columns, row grain, provenance, counts and checks](docs/synthetic-data-view.md).
+
 ## M05A: Local planning API foundation
 
 Optional FastAPI endpoints under `/api/v1`: GET `health`, GET `capabilities`, POST
