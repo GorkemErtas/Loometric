@@ -14,7 +14,8 @@ denominator. Resource policy is declared independently of measured performance.
 
 Each serial child waits for the parent's start message before importing the solver
 or generating its instance. On Windows the parent first assigns a Job Object with
-a process commit-memory limit and kill-on-close; on Linux the child applies RLIMIT_AS
+a process and aggregate job commit-memory limit and kill-on-close (two processes
+allow Windows' virtual-environment launcher); on Linux the child applies RLIMIT_AS
 before solver imports. Unsupported/unavailable hard memory controls fail closed.
 A parent wall watchdog bounds the complete child, including model construction,
 verification and serialization. A total batch deadline prevents unbounded runs.

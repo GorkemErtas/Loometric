@@ -22,6 +22,12 @@ phase, always deterministic-time limit 1.0, solver seed 42, one worker, zero gap
 Two serial repetitions: 36 instances, 108 budget cells, 216 scheduled child runs.
 No seed, profile or budget is selected or removed after observing results.
 
+Resource-skipped instances receive one guarded generation/reference audit per
+instance. Their skip is reused explicitly across other budgets/repetitions, with
+source-cell metadata and no duplicated timing measurement. Thus the intended 216
+rows require 162 primary solver children plus nine stress audit children, if the
+predeclared stress skips occur. Both primary repetitions always execute separately.
+
 Limits: 300 operations, 20,000 eligible alternatives, 25,000 native variables,
 90,000 constraints, 768 MiB process committed memory (Linux: virtual address space),
 60 seconds whole-child wall time and 2,400 seconds total batch wall time. The stress
