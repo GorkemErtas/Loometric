@@ -1,5 +1,6 @@
 """Strict version-1 specification parsing using existing planning wire primitives."""
 
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -92,6 +93,18 @@ def parse_specification(source: str) -> ScenarioSpec:
             raw = fields(
                 request.get("solver", {}), (), tuple(SolverConfiguration.__dataclass_fields__)
             )
+            for key, ceiling in (
+                ("wall_time_seconds_per_phase", 10),
+                ("deterministic_time_per_phase", 1),
+            ):
+                if isinstance(raw.get(key), Decimal):
+                    value = raw[key]
+                    converted = float(value)
+                    if not 0 <= value <= ceiling or (value != 0 and converted == 0):
+                        raise PlanningError(
+                            "INVALID_SOLVER_CONFIGURATION", "Unsupported fractional solver budget."
+                        )
+                    raw[key] = converted
             settings = SolverConfiguration(**raw)
         elif "solver" in request:
             raise PlanningError(
