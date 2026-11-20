@@ -9,7 +9,8 @@ from loometric.planning.domain import ARITHMETIC_CONTEXT, Shift, TimeInterval, d
 from loometric.planning.validation import PlanningError, utc
 
 
-def union_minutes(intervals: Sequence[TimeInterval]) -> Decimal:
+def merge_intervals(intervals: Sequence[TimeInterval]) -> tuple[TimeInterval, ...]:
+    """Merge half-open intervals in UTC without changing duration or counting overlaps twice."""
     ordered = sorted((utc(item.start), utc(item.end)) for item in intervals)
     merged: list[TimeInterval] = []
     for start, end in ordered:
@@ -19,7 +20,31 @@ def union_minutes(intervals: Sequence[TimeInterval]) -> Decimal:
             merged[-1] = TimeInterval(merged[-1].start, max(merged[-1].end, end))
         else:
             merged.append(TimeInterval(start, end))
-    return duration_minutes(sum((item.end - item.start for item in merged), timedelta()))
+    return tuple(merged)
+
+
+def union_minutes(intervals: Sequence[TimeInterval]) -> Decimal:
+    return duration_minutes(
+        sum((item.end - item.start for item in merge_intervals(intervals)), timedelta())
+    )
+
+
+def subtract_intervals(
+    base: TimeInterval, blocked: Sequence[TimeInterval]
+) -> tuple[TimeInterval, ...]:
+    """Return the exact available fragments of base, intersecting external blocked periods."""
+    cursor, end = utc(base.start), utc(base.end)
+    result: list[TimeInterval] = []
+    for interval in merge_intervals(blocked):
+        left, right = max(cursor, interval.start), min(end, interval.end)
+        if left >= right:
+            continue
+        if cursor < left:
+            result.append(TimeInterval(cursor, left))
+        cursor = right
+    if cursor < end:
+        result.append(TimeInterval(cursor, end))
+    return tuple(result)
 
 
 @dataclass(frozen=True)
