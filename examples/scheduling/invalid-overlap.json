@@ -1,0 +1,41 @@
+{
+  "instance_id": "synthetic:m03a-competition",
+  "instance_fingerprint": "f84788b106e2d42de3b99adcfc53f6c24b7f7e145ba3ff8d61be74d41df5ab26",
+  "allocations": [
+    {
+      "order_id": "A",
+      "stage": "sewing",
+      "assignment_id": "A-DAY-SEW-01",
+      "line_id": "SEW-01",
+      "shift_id": "DAY",
+      "profile_id": "P-SEW-01",
+      "interval": {
+        "start": "2030-01-07T08:00:00+03:00",
+        "end": "2030-01-07T11:45:00+03:00"
+      },
+      "quantity": 60,
+      "required_standard_minutes": "720",
+      "consumed_worker_minutes": "900",
+      "consumed_standard_minutes": "720"
+    },
+    {
+      "order_id": "B",
+      "stage": "sewing",
+      "assignment_id": "A-DAY-SEW-01",
+      "line_id": "SEW-01",
+      "shift_id": "DAY",
+      "profile_id": "P-SEW-01",
+      "interval": {
+        "start": "2030-01-07T08:00:00+03:00",
+        "end": "2030-01-07T13:00:00+03:00"
+      },
+      "quantity": 80,
+      "required_standard_minutes": "960",
+      "consumed_worker_minutes": "1200",
+      "consumed_standard_minutes": "960"
+    }
+  ],
+  "unscheduled": [],
+  "schema_version": 1,
+  "policy_version": "whole-stage-minute-v1"
+}

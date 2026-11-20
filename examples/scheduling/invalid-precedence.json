@@ -1,0 +1,73 @@
+{
+  "instance_id": "synthetic:m03a-parallel-routing",
+  "instance_fingerprint": "229ed70b8d6b0724b0c82e626f8a7a6e73e1ec710fd3f86161b5d285094dbb75",
+  "allocations": [
+    {
+      "order_id": "HIGH",
+      "stage": "sewing",
+      "assignment_id": "A-DAY-SEW-02",
+      "line_id": "SEW-02",
+      "shift_id": "DAY",
+      "profile_id": "P-SEW-02",
+      "interval": {
+        "start": "2030-01-07T05:00:00+00:00",
+        "end": "2030-01-07T06:15:00+00:00"
+      },
+      "quantity": 40,
+      "required_standard_minutes": "480",
+      "consumed_worker_minutes": "600",
+      "consumed_standard_minutes": "480"
+    },
+    {
+      "order_id": "HIGH",
+      "stage": "finishing",
+      "assignment_id": "A-DAY-FIN-01",
+      "line_id": "FIN-01",
+      "shift_id": "DAY",
+      "profile_id": "P-FIN-01",
+      "interval": {
+        "start": "2030-01-07T08:00:00+03:00",
+        "end": "2030-01-07T09:29:00+03:00"
+      },
+      "quantity": 40,
+      "required_standard_minutes": "160",
+      "consumed_worker_minutes": "178",
+      "consumed_standard_minutes": "160.2"
+    },
+    {
+      "order_id": "EARLY",
+      "stage": "sewing",
+      "assignment_id": "A-DAY-SEW-01",
+      "line_id": "SEW-01",
+      "shift_id": "DAY",
+      "profile_id": "P-SEW-01",
+      "interval": {
+        "start": "2030-01-07T05:00:00+00:00",
+        "end": "2030-01-07T06:53:00+00:00"
+      },
+      "quantity": 30,
+      "required_standard_minutes": "360",
+      "consumed_worker_minutes": "452",
+      "consumed_standard_minutes": "361.6"
+    },
+    {
+      "order_id": "LATER",
+      "stage": "sewing",
+      "assignment_id": "A-DAY-SEW-02",
+      "line_id": "SEW-02",
+      "shift_id": "DAY",
+      "profile_id": "P-SEW-02",
+      "interval": {
+        "start": "2030-01-07T06:15:00+00:00",
+        "end": "2030-01-07T06:53:00+00:00"
+      },
+      "quantity": 20,
+      "required_standard_minutes": "240",
+      "consumed_worker_minutes": "304",
+      "consumed_standard_minutes": "243.2"
+    }
+  ],
+  "unscheduled": [],
+  "schema_version": 1,
+  "policy_version": "whole-stage-minute-v1"
+}

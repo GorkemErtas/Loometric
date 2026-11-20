@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "policy_version": "whole-stage-minute-v1",
+  "instance_id": "synthetic:m03a-limits",
+  "planning": {
+    "schema_version": 1,
+    "scenario_id": "synthetic:m03a-limits",
+    "synthetic": true,
+    "assumptions": [
+      "Entirely synthetic benchmark; no actual factory performance or ML capacity adjustments.",
+      "Dedicated qualified crews, additive stage labor standards and constant line efficiency are hypothetical.",
+      "Whole-stage nonpreemptive operations occupy one uninterrupted working fragment; no splitting, WIP initialization, setups or material constraints.",
+      "Fixed +03:00 calendar, hard local-midnight releases and soft next-midnight due deadlines."
+    ],
+    "styles": [
+      {
+        "style_id": "TEE",
+        "output_unit": "piece",
+        "standards": [
+          {
+            "stage": "sewing",
+            "standard_minutes_per_unit": 12,
+            "measurement_unit": "worker_minutes_per_piece"
+          },
+          {
+            "stage": "finishing",
+            "standard_minutes_per_unit": 4,
+            "measurement_unit": "worker_minutes_per_piece"
+          },
+          {
+            "stage": "quality_control",
+            "standard_minutes_per_unit": 1,
+            "measurement_unit": "worker_minutes_per_piece"
+          }
+        ]
+      }
+    ],
+    "orders": [
+      {
+        "order_id": "A-LARGE",
+        "style_id": "TEE",
+        "quantity": 129,
+        "priority": 1,
+        "release_date": "2030-01-07",
+        "due_date": "2030-01-07",
+        "required_stages": [
+          "sewing"
+        ]
+      },
+      {
+        "order_id": "B-HORIZON",
+        "style_id": "TEE",
+        "quantity": 60,
+        "priority": 2,
+        "release_date": "2030-01-07",
+        "due_date": "2030-01-07",
+        "required_stages": [
+          "sewing"
+        ]
+      },
+      {
+        "order_id": "C-ZERO",
+        "style_id": "TEE",
+        "quantity": 10,
+        "priority": 3,
+        "release_date": "2030-01-07",
+        "due_date": "2030-01-07",
+        "required_stages": [
+          "finishing"
+        ]
+      },
+      {
+        "order_id": "D-QC",
+        "style_id": "TEE",
+        "quantity": 10,
+        "priority": 4,
+        "release_date": "2030-01-07",
+        "due_date": "2030-01-07",
+        "required_stages": [
+          "quality_control"
+        ]
+      },
+      {
+        "order_id": "E-FUTURE",
+        "style_id": "TEE",
+        "quantity": 10,
+        "priority": 5,
+        "release_date": "2030-01-08",
+        "due_date": "2030-01-08",
+        "required_stages": [
+          "sewing"
+        ]
+      },
+      {
+        "order_id": "F-PARTIAL",
+        "style_id": "TEE",
+        "quantity": 20,
+        "priority": 6,
+        "release_date": "2030-01-07",
+        "due_date": "2030-01-07",
+        "required_stages": [
+          "sewing",
+          "finishing",
+          "quality_control"
+        ]
+      }
+    ],
+    "lines": [
+      {
+        "line_id": "SEW-01",
+        "stage": "sewing",
+        "worker_count": 4,
+        "availability": "available"
+      },
+      {
+        "line_id": "FIN-01",
+        "stage": "finishing",
+        "worker_count": 0,
+        "availability": "available"
+      }
+    ],
+    "shifts": [
+      {
+        "shift_id": "DAY",
+        "interval": {
+          "start": "2030-01-07T08:00:00+03:00",
+          "end": "2030-01-07T16:00:00+03:00"
+        },
+        "breaks": []
+      }
+    ],
+    "capacity_profiles": [
+      {
+        "profile_id": "P-SEW-01",
+        "line_id": "SEW-01",
+        "effective_date": "2030-01-07",
+        "assumed_efficiency": 0.8,
+        "source_id": "synthetic:m03a-limits",
+        "evidence_status": "synthetic"
+      },
+      {
+        "profile_id": "P-FIN-01",
+        "line_id": "FIN-01",
+        "effective_date": "2030-01-07",
+        "assumed_efficiency": 0.9,
+        "source_id": "synthetic:m03a-limits",
+        "evidence_status": "synthetic"
+      }
+    ],
+    "capabilities": [
+      {
+        "capability_id": "C-SEW-01",
+        "line_id": "SEW-01",
+        "style_id": "TEE",
+        "stage": "sewing",
+        "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+      },
+      {
+        "capability_id": "C-FIN-01",
+        "line_id": "FIN-01",
+        "style_id": "TEE",
+        "stage": "finishing",
+        "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+      }
+    ],
+    "calendar": {
+      "calendar_id": "SYNTHETIC-CALENDAR",
+      "working_dates": [
+        "2030-01-07"
+      ],
+      "assignments": [
+        {
+          "assignment_id": "A-DAY-SEW-01",
+          "line_id": "SEW-01",
+          "shift_id": "DAY",
+          "profile_id": "P-SEW-01"
+        },
+        {
+          "assignment_id": "A-DAY-FIN-01",
+          "line_id": "FIN-01",
+          "shift_id": "DAY",
+          "profile_id": "P-FIN-01"
+        }
+      ],
+      "planned_downtime": [],
+      "unavailable_periods": []
+    }
+  },
+  "horizon": {
+    "start": "2030-01-07T08:00:00+03:00",
+    "end": "2030-01-07T11:00:00+03:00"
+  },
+  "calendar_utc_offset_minutes": 180,
+  "allocation_granularity_minutes": 1
+}

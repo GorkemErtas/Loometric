@@ -4,6 +4,7 @@ import json
 import re
 from datetime import date, datetime
 from decimal import Decimal
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, TypeVar
 
@@ -85,7 +86,7 @@ def parse_interval(value: Any) -> TimeInterval:
     return TimeInterval(parse_timestamp(value["start"]), parse_timestamp(value["end"]))
 
 
-E = TypeVar("E", Stage, AvailabilityStatus, EvidenceStatus)
+E = TypeVar("E", bound=StrEnum)
 
 
 def enumeration(enum_type: type[E], value: Any) -> E:
@@ -95,8 +96,8 @@ def enumeration(enum_type: type[E], value: Any) -> E:
         raise PlanningError("INVALID_ENUM", f"Unsupported {enum_type.__name__} value.") from exc
 
 
-def parse_scenario(source: str) -> PlanningScenario:
-    """Parse once with Decimal numbers; reject duplicate keys and nonstandard constants."""
+def parse_json(source: str) -> Any:
+    """Shared strict JSON decoding with Decimal values and no duplicate keys/constants."""
 
     def unique_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
         result: dict[str, Any] = {}
@@ -120,6 +121,11 @@ def parse_scenario(source: str) -> PlanningScenario:
         if isinstance(exc, PlanningError):
             raise
         raise PlanningError("INVALID_JSON", "Malformed planning JSON.") from exc
+    return data
+
+
+def scenario_from_dict(data: dict[str, Any]) -> PlanningScenario:
+    """Build the existing M02 aggregate from an already strictly decoded object."""
     data = fields(
         data,
         (
@@ -280,6 +286,10 @@ def parse_scenario(source: str) -> PlanningScenario:
         calendar,
         data["schema_version"],
     )
+
+
+def parse_scenario(source: str) -> PlanningScenario:
+    return scenario_from_dict(parse_json(source))
 
 
 def load_scenario(path: Path) -> PlanningScenario:
