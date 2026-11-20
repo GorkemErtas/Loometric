@@ -5,6 +5,8 @@ validation, exploratory analysis, a pre-shift leakage assessment, frozen chronol
 partitions, two naive mean baselines, Linear Regression, Random Forest Regression,
 an expanding-window temporal audit, saved-prediction error/readiness analysis, and
 an experimental offline prediction contract with explicit artifact generation.
+A separate planning foundation validates synthetic production scenarios and calculates
+deterministic shift capacity without forecasting or allocating orders.
 Models are selected on validation only; the final test remains reserved. Application
 services, databases, optimization, and further ML algorithms are deferred.
 
@@ -313,6 +315,37 @@ See the [input/output contract, measured checks and reproduction guide](docs/arc
 and [ADR 0007](docs/decisions/0007-experimental-offline-prediction-contract.md).
 There is no HTTP endpoint, database, frontend or optimizer in this milestone.
 
+## M02: Synthetic production planning foundation
+
+The independent `loometric.planning` package models orders, per-stage style standards,
+line capabilities, shifts, calendars, efficiency profiles and planned downtime.
+It calculates available worker-minutes, effective standard-minute capacity, whole
+pieces, demand and shortfalls. Explicit interval unions prevent overlapping breaks,
+stoppages and unavailability from being subtracted twice. No new dependencies or
+ML artifacts are needed.
+
+```powershell
+.\.venv\Scripts\python.exe -m loometric.planning `
+  --scenario examples/planning/capacity-demo.json
+```
+
+The entirely synthetic example gives sewing capacity of **96 pieces** on the day
+shift after downtime and **120 pieces** on the evening shift. Finishing supports
+**202 pieces**; zero-worker and unavailable lines yield zero. Structured reason codes
+explain incompatible or insufficient slots. A second executable
+`examples/planning/invalid-quantity.json` demonstrates strict rejection (exit 2).
+Two complete report runs are byte-identical; the full suite passes **483 tests**.
+
+Each order/stage/slot assessment is independent: capacity is never reserved or
+summed across orders, and every result states `schedule_feasibility=NOT_ASSESSED`.
+The system does not establish a feasible multi-stage or multi-order schedule.
+Crew capabilities, standards and efficiencies are explicit synthetic assumptions;
+experimental ML predictions never become operating capacity automatically.
+
+See the [domain, units, formulas, measured examples and limitations](docs/architecture/production-planning-domain.md)
+and [ADR 0008](docs/decisions/0008-independent-planning-capacity-foundation.md).
+Scheduling, OR-Tools, APIs, databases and frontend remain deferred.
+
 ## Checks
 
 ```powershell
@@ -336,6 +369,9 @@ sensitivity populations, artifact drift, no refitting, and holdout isolation.
 Offline-prediction checks cover strict request/provenance contracts, source-bound
 review policy, unknown/stale inputs, trusted artifact compatibility/integrity,
 deterministic artifacts/inference, training-only label loading and explicit abstention.
+Planning checks cover dimensional capacity arithmetic, interval unions, references,
+capabilities, zero capacity, independent-order scope and operation without ML packages
+or protected data access.
 Install the `ml` extra or EXP-002 snapshot to run the complete test suite.
 Type hints are used throughout; no static type checker is configured for this task.
 
@@ -362,6 +398,7 @@ src/loometric/
   forest.py                  # Fixed forest profiles, pipeline, and importance summaries
   experiments/               # Local experiment runners and saved-prediction audit CLI
   prediction/                # Offline contracts, policy, artifacts, inference and CLI
+  planning/                  # Independent domain, availability, capacity and scenario CLI
   data/
     schema.py                # Expected columns and domain constraints
     loading.py               # Strict CSV ingestion and normalization
@@ -375,8 +412,9 @@ docs/
   prediction_problem.md      # Cutoff, grain, eligibility, and evaluation contract
   decisions/                 # Architecture decisions and rationale
   experiments/               # Measured experiment reports
-  architecture/              # Offline prediction contract and lifecycle
+  architecture/              # Prediction and planning contracts/lifecycles
 examples/offline-prediction/  # Synthetic request and non-operational review policy
+examples/planning/            # Synthetic capacity and invalid-input scenarios
 ```
 
 See [architecture decisions](docs/decisions/0001-local-data-foundation.md).
