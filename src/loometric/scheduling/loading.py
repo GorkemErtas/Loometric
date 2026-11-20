@@ -1,8 +1,12 @@
 """Strict scheduling wire format embedding the unchanged M02 planning schema."""
 
+import json
 import re
+from dataclasses import asdict
+from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 from loometric.planning.domain import Stage
 from loometric.planning.loading import (
@@ -90,3 +94,28 @@ def load_instance(path: Path) -> SchedulingInstance:
 
 def load_schedule(path: Path) -> ProposedSchedule:
     return parse_schedule(path.read_text(encoding="utf-8"))
+
+
+def instance_json(instance: SchedulingInstance) -> str:
+    """Lossless input JSON: planning decimals are numeric tokens, not report strings."""
+
+    def encode(value: Any) -> str:
+        if isinstance(value, Decimal):
+            if not value.is_finite():
+                raise ValueError("Nonfinite instance decimal")
+            return format(value, "f")
+        if isinstance(value, (datetime, date)):
+            return json.dumps(value.isoformat())
+        if isinstance(value, dict):
+            return (
+                "{"
+                + ",".join(
+                    json.dumps(key) + ":" + encode(item) for key, item in sorted(value.items())
+                )
+                + "}"
+            )
+        if isinstance(value, (list, tuple)):
+            return "[" + ",".join(encode(item) for item in value) + "]"
+        return json.dumps(value, allow_nan=False)
+
+    return encode(asdict(instance)) + "\n"

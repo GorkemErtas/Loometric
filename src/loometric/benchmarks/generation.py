@@ -30,6 +30,7 @@ from loometric.planning.reporting import json_value
 from loometric.planning.scenario import PlanningScenario
 from loometric.planning.validation import PlanningError, calendar_date, integer
 from loometric.scheduling.contracts import SchedulingInstance
+from loometric.scheduling.loading import instance_json as instance_json
 from loometric.scheduling.resources import build_slots, eligible
 
 GENERATOR_VERSION = "synthetic-scheduling-v1"
@@ -294,31 +295,6 @@ def generate_instance(config: GenerationConfig) -> SchedulingInstance:
             )
         instance = replace(instance, planning=replace(scenario, styles=styles))
     return instance
-
-
-def instance_json(instance: SchedulingInstance) -> str:
-    """Lossless input JSON: planning decimals are numeric tokens, not report strings."""
-
-    def encode(value: Any) -> str:
-        if isinstance(value, Decimal):
-            if not value.is_finite():
-                raise ValueError("Nonfinite instance decimal")
-            return format(value, "f")
-        if isinstance(value, (datetime, date)):
-            return json.dumps(value.isoformat())
-        if isinstance(value, dict):
-            return (
-                "{"
-                + ",".join(
-                    json.dumps(key) + ":" + encode(item) for key, item in sorted(value.items())
-                )
-                + "}"
-            )
-        if isinstance(value, (list, tuple)):
-            return "[" + ",".join(encode(item) for item in value) + "]"
-        return json.dumps(value, allow_nan=False)
-
-    return encode(asdict(instance)) + "\n"
 
 
 def static_dimensions(instance: SchedulingInstance) -> dict[str, Any]:

@@ -8,7 +8,7 @@ from dataclasses import asdict
 
 import pytest
 
-import loometric.benchmarks.resources as resources
+import loometric.execution as resources
 from loometric.benchmarks.design import ResourceLimits
 from loometric.benchmarks.generation import GenerationConfig
 from loometric.planning.reporting import json_value

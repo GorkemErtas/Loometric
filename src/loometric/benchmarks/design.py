@@ -3,42 +3,11 @@
 from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
 
 from loometric.benchmarks.generation import GENERATOR_VERSION, GenerationConfig
+from loometric.execution import ResourceLimits as ResourceLimits
 from loometric.planning.loading import fields, items, parse_json
 from loometric.planning.validation import PlanningError, integer, text
-
-
-@dataclass(frozen=True)
-class ResourceLimits:
-    max_operations: int = 300
-    max_alternatives: int = 20000
-    max_variables: int = 25000
-    max_constraints: int = 90000
-    process_memory_mib: int = 768
-    process_wall_seconds: int = 60
-    batch_wall_seconds: int = 2400
-
-    def __post_init__(self) -> None:
-        for name in self.__dataclass_fields__:
-            integer(getattr(self, name), name, minimum=1)
-        if self.process_memory_mib > 2048 or self.process_wall_seconds > 120:
-            raise PlanningError("INVALID_BENCHMARK", "Child limits exceed local audit safeguards.")
-        if self.batch_wall_seconds > 7200:
-            raise PlanningError("INVALID_BENCHMARK", "Batch limit exceeds two hours.")
-
-    def rejection(self, dimensions: dict[str, Any]) -> str | None:
-        for metric, ceiling in (
-            ("operations", self.max_operations),
-            ("eligible_fragment_upper_bound", self.max_alternatives),
-            ("eligible_alternatives", self.max_alternatives),
-            ("model_variables", self.max_variables),
-            ("model_constraints", self.max_constraints),
-        ):
-            if dimensions.get(metric, 0) > ceiling:
-                return f"{metric}={dimensions[metric]} exceeds declared limit {ceiling}"
-        return None
 
 
 @dataclass(frozen=True)
