@@ -1,5 +1,6 @@
 """Bounded admission and off-loop calls to the shared hard process watchdog."""
 
+import asyncio
 import json
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -47,7 +48,21 @@ class OperationService:
         # Client disconnect does not cancel a process. Keep the admission slot until
         # normal completion or the shared watchdog kills/reaps the actual child.
         with anyio.CancelScope(shield=True):
-            return await anyio.to_thread.run_sync(self._execute, operation, body)
+            work = asyncio.create_task(anyio.to_thread.run_sync(self._execute, operation, body))
+            cancelled = False
+            while True:
+                try:
+                    result = await asyncio.shield(work)
+                    break
+                except asyncio.CancelledError:
+                    if work.cancelled():
+                        raise
+                    # Raw asyncio Task.cancel bypasses AnyIO's shield. Wait for the
+                    # same bounded job to finish before propagating cancellation.
+                    cancelled = True
+            if cancelled:
+                raise asyncio.CancelledError
+            return result
 
     def _execute(self, operation: str, body: str) -> dict[str, Any]:
         request = json.dumps(

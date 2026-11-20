@@ -1,5 +1,6 @@
 """Versioned HTTP routes; CPU work and domain parsing belong to the bounded service."""
 
+import re
 from typing import Annotated
 
 import anyio
@@ -63,10 +64,14 @@ async def capabilities(request: Request, auth: AUTH) -> SuccessResponse:
 async def _run(request: Request, operation: str) -> SuccessResponse:
     headers = request.headers
     media = headers.getlist("content-type")
-    if len(media) != 1 or media[0].lower().replace(" ", "") not in (
-        "application/json",
-        "application/json;charset=utf-8",
-        'application/json;charset="utf-8"',
+    if (
+        len(media) != 1
+        or re.fullmatch(
+            r'application/json(?:[ \t]*;[ \t]*charset=(?:utf-8|"utf-8"))?',
+            media[0],
+            re.IGNORECASE,
+        )
+        is None
     ):
         raise ApiError(415, "JSON_REQUIRED", "Use application/json with UTF-8 encoding.")
     if headers.get("content-encoding", "identity").lower() != "identity":
@@ -85,7 +90,9 @@ async def _run(request: Request, operation: str) -> SuccessResponse:
                         raise ApiError(
                             413, "BODY_TOO_LARGE", "Request body exceeds the API byte limit."
                         )
-                    chunks.append(chunk)
+                    if chunk:
+                        chunks.append(chunk)
+                    await anyio.lowlevel.checkpoint()
         except TimeoutError:
             raise ApiError(
                 408, "BODY_TIMEOUT", "Request body did not arrive before its deadline."

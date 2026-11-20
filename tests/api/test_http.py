@@ -1,5 +1,6 @@
 import copy
 import json
+from decimal import Decimal
 
 import anyio
 import httpx
@@ -13,6 +14,7 @@ from loometric.planning.loading import scenario_from_dict
 from loometric.planning.reporting import report_to_dict
 from loometric.scenarios.engine import compare_scenario
 from loometric.scenarios.loading import parse_specification
+from loometric.scheduling.contracts import instance_fingerprint
 from loometric.scheduling.loading import parse_instance
 
 
@@ -85,9 +87,13 @@ def test_complete_http_workflow_matches_engines_and_is_reproducible(http, fixtur
     assert first.status_code == second.status_code == 200
     comparison = first.json()["data"]
     assert comparison == second.json()["data"]
-    assert comparison == compare_scenario(
+    expected = compare_scenario(
         parse_instance(input_json(instance)), parse_specification(input_json(specification))
     )
+    assert {**comparison, "resource_policy": expected["resource_policy"]} == expected
+    assert comparison["resource_policy"]["process_memory_mib"] == 256
+    assert comparison["resource_policy"]["process_wall_seconds"] == 5
+    assert comparison["resource_policy"]["max_operations"] == 96
     assert comparison["synthetic"] and comparison["provenance"]["synthetic"]
     assert comparison["baseline"]["evaluation"]["metrics"]["scheduled_units"] == 45
     assert comparison["scenario"]["evaluation"]["metrics"]["scheduled_units"] == 55
@@ -245,3 +251,41 @@ def test_openapi_documents_authentication_envelopes_and_errors(http):
     docs = http("GET", "/api/v1/docs", authorized=False)
     assert docs.status_code == 200 and "openapi.json" in docs.text
     assert "https://" not in docs.text
+
+
+def test_http_decimal_precision_matches_existing_instance_fingerprint(http, fixture_json):
+    instance = fixture_json("scenarios/capacity-baseline.json")
+    precision = "0.1234567890123456789012345678"
+    instance["planning"]["capacity_profiles"][0]["assumed_efficiency"] = Decimal(precision)
+    response = http("POST", "/api/v1/scheduling/dispatch", body={"instance": instance})
+    assert response.status_code == 200, response.text
+    expected = instance_fingerprint(parse_instance(input_json(instance)))
+    assert response.json()["data"]["instance_fingerprint"] == expected
+    planning = fixture_json("planning/capacity-demo.json")
+    planning["capacity_profiles"][0]["assumed_efficiency"] = Decimal(precision)
+    capacity = http("POST", "/api/v1/planning/capacity", body={"scenario": planning})
+    assert precision in capacity.text
+
+
+def test_cp_sat_api_request_rejected_without_solver_execution(http, fixture_json):
+    body = {
+        "baseline": fixture_json("scenarios/routing-baseline.json"),
+        "specification": fixture_json("scenarios/capacity-optimizer-recovery.json"),
+    }
+    assert_error(http("POST", "/api/v1/scenarios/compare", body=body), 422, "UNSUPPORTED_METHOD")
+
+
+def test_invalid_unicode_and_malformed_content_type_are_not_normalized(http):
+    assert_error(
+        http("POST", "/api/v1/planning/capacity", content=b'{"x":"\\ud800"}'), 400, "INVALID_JSON"
+    )
+    assert_error(
+        http(
+            "POST",
+            "/api/v1/planning/capacity",
+            content=b"{}",
+            headers={"Content-Type": "app lication/json"},
+        ),
+        415,
+        "JSON_REQUIRED",
+    )

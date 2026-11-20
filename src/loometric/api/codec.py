@@ -53,6 +53,10 @@ def decode_body(source: str, limits: Limits) -> Any:
         elif isinstance(item, str):
             if len(item) > limits.max_string_length:
                 raise complexity_error()
+            try:
+                item.encode("utf-8", errors="strict")
+            except UnicodeError:
+                raise ApiError(400, "INVALID_JSON", "JSON strings require valid Unicode.") from None
         elif type(item) is int:
             if len(str(item)) > limits.max_number_length:
                 raise complexity_error()

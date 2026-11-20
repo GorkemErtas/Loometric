@@ -9,6 +9,7 @@ from loometric.api.codec import decode_body, input_json
 from loometric.api.errors import ApiError, complexity_error
 from loometric.api.schemas import REQUEST_MODELS
 from loometric.api.settings import Limits
+from loometric.execution import ResourceLimits
 from loometric.planning.capacity import assess_scenario
 from loometric.planning.loading import scenario_from_dict
 from loometric.planning.reporting import json_value, report_to_dict
@@ -71,7 +72,15 @@ def execute(operation: str, source: str, limits: Limits) -> dict[str, Any]:
         if len(spec.changes) > limits.max_changes:
             raise complexity_error()
         # M04 alone owns atomic edits, same-demand checks, verification and selection.
-        return compare_scenario(baseline, spec)
+        return compare_scenario(
+            baseline,
+            spec,
+            ResourceLimits(
+                max_operations=limits.max_operations,
+                process_memory_mib=limits.process_memory_mib,
+                process_wall_seconds=limits.execution_timeout_seconds,
+            ),
+        )
     instance = _instance(request.instance, limits)
     schedule = (
         dispatch(instance)

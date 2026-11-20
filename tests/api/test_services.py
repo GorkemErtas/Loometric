@@ -1,3 +1,4 @@
+import asyncio
 import json
 import threading
 
@@ -90,6 +91,48 @@ def test_admission_off_loop_and_cancel_keeps_slot_until_work_stops(monkeypatch):
             assert caught.value.status == 429
             finish.set()
         assert done.is_set()
+        async with service.admit():
+            pass
+
+    anyio.run(run)
+
+
+def test_direct_asyncio_cancellation_cannot_release_running_worker_slot(monkeypatch):
+    entered, finish = threading.Event(), threading.Event()
+
+    def fake_worker(*args, **kwargs):
+        entered.set()
+        assert finish.wait(3)
+        return {"data": {}}, {}
+
+    monkeypatch.setattr(services, "guarded_child", fake_worker)
+
+    async def run():
+        service = OperationService(
+            default_limits().model_copy(update={"max_concurrent_requests": 1})
+        )
+
+        async def request():
+            async with service.admit():
+                await service.execute("capacity", "{}")
+
+        task = asyncio.create_task(request())
+        try:
+            with anyio.fail_after(3):
+                while not entered.is_set():
+                    await anyio.sleep(0.001)
+            task.cancel()
+            await anyio.sleep(0.01)
+            assert not task.done(), "Raw cancellation abandoned the live child thread"
+            with pytest.raises(ApiError, match="occupied"):
+                async with service.admit():
+                    pytest.fail("Live child lost its admission slot")
+        finally:
+            finish.set()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
         async with service.admit():
             pass
 
