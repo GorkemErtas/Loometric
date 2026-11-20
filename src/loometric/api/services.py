@@ -15,6 +15,7 @@ WORKER_ERRORS = {
     "INVALID_JSON": (400, "Expected strict UTF-8 JSON with unique keys."),
     "INVALID_ENVELOPE": (422, "Request must match the closed endpoint envelope."),
     "INPUT_LIMIT_EXCEEDED": (422, "Input exceeds the synchronous API envelope."),
+    "RESPONSE_LIMIT_EXCEEDED": (422, "The resulting report exceeds the synchronous API envelope."),
     "SYNTHETIC_REQUIRED": (422, "Only explicitly synthetic inputs are supported."),
     "UNSUPPORTED_OPERATION": (422, "Operation is not supported by this API."),
     "UNSUPPORTED_METHOD": (422, "M05A supports greedy scheduling only."),
@@ -76,14 +77,24 @@ class OperationService:
             raise ApiError(500, "EXECUTION_FAILED", "The bounded operation failed.")
         if "error" in payload:
             error = payload["error"]
-            status, message = WORKER_ERRORS.get(
-                error.get("code"), WORKER_ERRORS["EXECUTION_FAILED"]
-            )
-            details = error.get("details", [])
+            code = error.get("code")
+            if code not in WORKER_ERRORS:
+                code = "EXECUTION_FAILED"
+            status, message = WORKER_ERRORS[code]
+            details = []
+            if code == "INVALID_ENVELOPE":
+                details = [{"rule": "required_object_fields_only"}]
             domain_code = error.get("domain_code")
-            if isinstance(domain_code, str) and domain_code.isupper() and len(domain_code) < 80:
+            if (
+                code == "DOMAIN_VALIDATION_FAILED"
+                and isinstance(domain_code, str)
+                and domain_code.isascii()
+                and domain_code.isupper()
+                and domain_code.replace("_", "").isalpha()
+                and len(domain_code) < 80
+            ):
                 details = [{"domain_code": domain_code}]
-            raise ApiError(status, error.get("code", "EXECUTION_FAILED"), message, details)
+            raise ApiError(status, code, message, details)
         if not isinstance(payload.get("data"), dict):
             raise ApiError(500, "EXECUTION_FAILED", "The bounded operation failed.")
         return payload["data"]

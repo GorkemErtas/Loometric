@@ -39,7 +39,10 @@ def main() -> int:
         result = {"error": {"status": 503, "code": "MEMORY_LIMIT_EXCEEDED"}}
     except Exception:
         result = {"error": {"status": 500, "code": "EXECUTION_FAILED"}}
-    print(json.dumps(result, allow_nan=False))
+    encoded = json.dumps(result, allow_nan=False)
+    if len(encoded.encode("utf-8")) > request["limits"]["max_response_bytes"]:
+        encoded = json.dumps({"error": {"code": "RESPONSE_LIMIT_EXCEEDED"}})
+    print(encoded)
     return 0
 
 

@@ -17,8 +17,9 @@ Server-generated correlation IDs and sanitized error envelopes replace exception
 
 Declare limits in packaged `default_limits.json`: 256 KiB body, depth24, 10,000 nodes,
 256 items per collection, 4,096 characters per string, 128 significant numeric digits,
-Decimal exponent magnitude100, 32 orders/96 stages per instance, 64 changes. At most
-two admitted POST requests, including body reading; 3 seconds to read a body, then
+Decimal exponent magnitude100, 32 orders/96 stages per instance, 64 changes.
+Accept at most2 MiB of encoded child response, bounding parent-side report handling.
+Allow two admitted POST requests, including body reading; 3 seconds to read a body, then
 5 seconds for the entire child and 256 MiB hard memory per child. Bounds may only be
 reduced through trusted application construction, never raised by HTTP callers.
 

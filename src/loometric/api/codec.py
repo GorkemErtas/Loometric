@@ -1,7 +1,7 @@
 """Bounded, strict JSON without passing planning numbers through binary floats."""
 
 import json
-from decimal import Decimal
+from decimal import Decimal, DecimalException
 from typing import Any
 
 from loometric.api.errors import ApiError, complexity_error
@@ -31,7 +31,7 @@ def decode_body(source: str, limits: Limits) -> Any:
             depth -= 1
     try:
         value = parse_json(source)
-    except (PlanningError, ValueError, RecursionError):
+    except (PlanningError, ValueError, RecursionError, DecimalException):
         raise ApiError(
             400, "INVALID_JSON", "Expected strict UTF-8 JSON with unique keys."
         ) from None

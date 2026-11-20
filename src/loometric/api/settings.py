@@ -11,6 +11,7 @@ class Limits(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
 
     max_body_bytes: int = Field(ge=1024, le=262144)
+    max_response_bytes: int = Field(ge=1024, le=2097152)
     max_depth: int = Field(ge=2, le=24)
     max_nodes: int = Field(ge=1, le=10000)
     max_collection_items: int = Field(ge=1, le=256)
