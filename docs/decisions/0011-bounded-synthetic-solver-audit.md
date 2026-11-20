@@ -21,6 +21,13 @@ A parent wall watchdog bounds the complete child, including model construction,
 verification and serialization. A total batch deadline prevents unbounded runs.
 Resource rejection is not mathematical infeasibility. No native search changes.
 
+Windows launch is suspended until job assignment succeeds, preventing the venv
+launcher from creating an unassigned interpreter. The child opens the parent's
+uniquely named job and checks its own membership and exact aggregate memory limit
+before native imports. Querying the unnamed current job can report an outer nested
+job in this environment, so an explicit job identity is required. The name is
+ephemeral process metadata and never part of deterministic benchmark identity.
+
 Model dimensions are measured by a separate construction using the existing builder,
 then that model is discarded before the unchanged optimizer constructs its own.
 Record this sizing time separately. Peak memory includes interpreter, imports,

@@ -166,7 +166,8 @@ def main() -> int:
     request = json.loads(sys.stdin.read())  # Parent releases work only after the hard guard.
     try:
         backend = apply_child_memory_limit(
-            request["resource_limits"]["process_memory_mib"] * 1024**2
+            request["resource_limits"]["process_memory_mib"] * 1024**2,
+            request.get("windows_job_name"),
         )
     except OSError as exc:
         print(

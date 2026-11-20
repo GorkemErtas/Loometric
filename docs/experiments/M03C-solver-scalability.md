@@ -48,6 +48,16 @@ BETTER/TIE/WORSE from NO_COMPARABLE_INCUMBENT and complete proofs from feasible 
 The repeated-run audit compares all deterministic fields, but cannot promise identical
 wall-limited native outcomes. Report mismatches and quality regressions explicitly.
 
+## Resource-boundary correction before the completed audit
+
+An initial execution under commit 128b3a6 was interrupted during resource review.
+Its partial journal is retained locally in data/processed/m03c-audit; it is not
+merged into the completed study. Launch could race ahead of parent job assignment.
+The corrected launcher starts suspended, attaches the memory-limited job before
+resuming, and the child checks membership/limits using the explicit named job.
+This correction changes no instances, solver constraints, seeds, budgets or matrix
+selection. The entire unchanged matrix is rerun in data/processed/m03c-verified.
+
 ## Measured results
 
 Pending implementation and execution; no performance or scalability claim yet.

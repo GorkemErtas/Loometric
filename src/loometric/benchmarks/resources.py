@@ -4,6 +4,7 @@ import ctypes
 import os
 import subprocess
 import sys
+import uuid
 from ctypes import wintypes
 from typing import Any
 
@@ -31,6 +32,54 @@ class _ExtendedLimits(ctypes.Structure):
         ("peak_process_memory", ctypes.c_size_t),
         ("peak_job_memory", ctypes.c_size_t),
     ]
+
+
+def _resume_windows_child(pid: int) -> None:
+    """Resume the sole primary thread after attaching the suspended launcher."""
+
+    class ThreadEntry(ctypes.Structure):
+        _fields_ = [
+            (name, wintypes.DWORD) for name in ("size", "usage", "thread_id", "owner_pid")
+        ] + [
+            ("base_priority", wintypes.LONG),
+            ("delta_priority", wintypes.LONG),
+            ("flags", wintypes.DWORD),
+        ]
+
+    api = ctypes.WinDLL("kernel32", use_last_error=True)
+    api.CreateToolhelp32Snapshot.argtypes = [wintypes.DWORD, wintypes.DWORD]
+    api.CreateToolhelp32Snapshot.restype = wintypes.HANDLE
+    api.Thread32First.argtypes = [wintypes.HANDLE, ctypes.POINTER(ThreadEntry)]
+    api.Thread32First.restype = wintypes.BOOL
+    api.Thread32Next.argtypes = [wintypes.HANDLE, ctypes.POINTER(ThreadEntry)]
+    api.Thread32Next.restype = wintypes.BOOL
+    api.OpenThread.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+    api.OpenThread.restype = wintypes.HANDLE
+    api.ResumeThread.argtypes = [wintypes.HANDLE]
+    api.ResumeThread.restype = wintypes.DWORD
+    api.CloseHandle.argtypes = [wintypes.HANDLE]
+    snapshot = api.CreateToolhelp32Snapshot(4, 0)  # TH32CS_SNAPTHREAD
+    if snapshot == wintypes.HANDLE(-1).value:
+        raise ctypes.WinError(ctypes.get_last_error())
+    try:
+        entry = ThreadEntry()
+        entry.size = ctypes.sizeof(entry)
+        found = api.Thread32First(snapshot, ctypes.byref(entry))
+        while found:
+            if entry.owner_pid == pid:
+                thread = api.OpenThread(2, False, entry.thread_id)  # THREAD_SUSPEND_RESUME
+                if not thread:
+                    raise ctypes.WinError(ctypes.get_last_error())
+                try:
+                    if api.ResumeThread(thread) != 1:
+                        raise OSError("Suspended child did not have exactly one suspension.")
+                    return
+                finally:
+                    api.CloseHandle(thread)
+            found = api.Thread32Next(snapshot, ctypes.byref(entry))
+        raise OSError("Suspended child primary thread was not found.")
+    finally:
+        api.CloseHandle(snapshot)
 
 
 class WindowsJob:
@@ -61,7 +110,8 @@ class WindowsJob:
         self.api.AssignProcessToJobObject.restype = wintypes.BOOL
         self.api.CloseHandle.argtypes = [wintypes.HANDLE]
         self.api.CloseHandle.restype = wintypes.BOOL
-        self.handle = self.api.CreateJobObjectW(None, None)
+        self.name = f"Loometric-M03C-{uuid.uuid4().hex}"
+        self.handle = self.api.CreateJobObjectW(None, self.name)
         if not self.handle:
             raise ctypes.WinError(ctypes.get_last_error())
         child = None
@@ -101,9 +151,46 @@ class WindowsJob:
             self.handle = None
 
 
-def apply_child_memory_limit(memory_bytes: int) -> str:
+def apply_child_memory_limit(memory_bytes: int, windows_job_name: str | None = None) -> str:
     if os.name == "nt":
-        # Assigned by the parent before it sends the request. This is not a self-asserted limit.
+        api = ctypes.WinDLL("kernel32", use_last_error=True)
+        api.QueryInformationJobObject.argtypes = [
+            wintypes.HANDLE,
+            ctypes.c_int,
+            ctypes.c_void_p,
+            wintypes.DWORD,
+            ctypes.c_void_p,
+        ]
+        api.QueryInformationJobObject.restype = wintypes.BOOL
+        if not windows_job_name:
+            raise OSError("No parent resource job identity was supplied.")
+        api.OpenJobObjectW.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.LPCWSTR]
+        api.OpenJobObjectW.restype = wintypes.HANDLE
+        api.IsProcessInJob.argtypes = [
+            wintypes.HANDLE,
+            wintypes.HANDLE,
+            ctypes.POINTER(wintypes.BOOL),
+        ]
+        api.IsProcessInJob.restype = wintypes.BOOL
+        api.CloseHandle.argtypes = [wintypes.HANDLE]
+        job = api.OpenJobObjectW(4, False, windows_job_name)
+        if not job:
+            raise ctypes.WinError(ctypes.get_last_error())
+        try:
+            info = _ExtendedLimits()
+            member = wintypes.BOOL()
+            if (
+                not api.IsProcessInJob(wintypes.HANDLE(-1), job, ctypes.byref(member))
+                or not member.value
+                or not api.QueryInformationJobObject(
+                    job, 9, ctypes.byref(info), ctypes.sizeof(info), None
+                )
+                or not info.basic.flags & 0x200
+                or info.job_memory != memory_bytes
+            ):
+                raise OSError("Worker is not inside the requested hard memory-limited Job Object.")
+        finally:
+            api.CloseHandle(job)
         return "windows-job-aggregate-commit"
     if sys.platform.startswith("linux"):
         import resource
@@ -166,12 +253,15 @@ def guarded_child(
         text=True,
         encoding="utf-8",
         errors="replace",
+        creationflags=0x4 | 0x08000000 if os.name == "nt" else 0,
     )
     job = None
     measurements: dict[str, Any] = {"peak_committed_bytes": None}
     try:
         if os.name == "nt":
             job = WindowsJob(process.pid, memory_mib * 1024**2)
+            _resume_windows_child(process.pid)
+            request = json.dumps({**json.loads(request), "windows_job_name": job.name})
         elif not sys.platform.startswith("linux"):
             raise OSError("Hard memory limits unavailable on this platform.")
         try:

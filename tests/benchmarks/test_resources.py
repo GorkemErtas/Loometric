@@ -2,6 +2,8 @@
 
 import json
 import os
+import subprocess
+import sys
 from dataclasses import asdict
 
 import pytest
@@ -53,3 +55,18 @@ def test_unavailable_hard_memory_guard_fails_closed(monkeypatch):
     payload, measurements = resources.guarded_child(_request(), 768, 5)
     assert payload is None and measurements["status"] == "SKIPPED_RESOURCE_LIMIT"
     assert "injected job assignment failure" in measurements["reason"]
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows-specific guard assertion")
+def test_worker_refuses_native_work_outside_requested_job():
+    code = """
+from loometric.benchmarks.resources import apply_child_memory_limit
+try:
+    apply_child_memory_limit(768*1024**2)
+except OSError:
+    print('guard rejected')
+else:
+    raise AssertionError('Unguarded worker was accepted')
+"""
+    result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+    assert result.returncode == 0 and "guard rejected" in result.stdout
