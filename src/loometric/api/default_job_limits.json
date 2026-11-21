@@ -1,0 +1,19 @@
+{
+  "max_active_jobs": 1,
+  "max_waiting_jobs": 2,
+  "max_stored_jobs": 32,
+  "max_retained_result_bytes": 8388608,
+  "max_result_bytes": 2097152,
+  "terminal_ttl_seconds": 300,
+  "expired_ttl_seconds": 300,
+  "queue_timeout_seconds": 30,
+  "wall_seconds": 15,
+  "process_memory_mib": 768,
+  "optimizer_memory_mib": 512,
+  "optimizer_wall_seconds": 5,
+  "solver_wall_seconds_per_phase": 1,
+  "solver_deterministic_time_per_phase": 1,
+  "max_alternatives": 2000,
+  "max_variables": 6000,
+  "max_constraints": 15000
+}

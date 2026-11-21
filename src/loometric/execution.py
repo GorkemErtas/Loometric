@@ -5,8 +5,10 @@ import os
 import subprocess
 import sys
 import uuid
+from collections.abc import Callable
 from ctypes import wintypes
 from dataclasses import dataclass
+from threading import Event
 from typing import Any
 
 from loometric.planning.validation import PlanningError, integer
@@ -88,7 +90,7 @@ def _resume_windows_child(pid: int) -> None:
 class WindowsJob:
     """One child per job. No child benchmark work starts until assignment succeeds."""
 
-    def __init__(self, pid: int, memory_bytes: int):
+    def __init__(self, pid: int, memory_bytes: int, *, process_limit: int = 2):
         self.api = ctypes.WinDLL("kernel32", use_last_error=True)
         self.api.CreateJobObjectW.argtypes = [ctypes.c_void_p, wintypes.LPCWSTR]
         self.api.CreateJobObjectW.restype = wintypes.HANDLE
@@ -123,7 +125,7 @@ class WindowsJob:
             # PROCESS_MEMORY | JOB_MEMORY | ACTIVE_PROCESS | KILL_ON_JOB_CLOSE.
             # Windows venv's launcher creates one underlying interpreter process.
             info.basic.flags = 0x100 | 0x200 | 0x8 | 0x2000
-            info.basic.active_processes = 2
+            info.basic.active_processes = process_limit
             info.process_memory = memory_bytes
             info.job_memory = memory_bytes
             if not self.api.SetInformationJobObject(
@@ -246,6 +248,8 @@ def guarded_child(
     timeout: float,
     *,
     worker_module: str = "loometric.benchmarks.worker",
+    cancel_event: Event | None = None,
+    on_started: Callable[[int], None] | None = None,
 ) -> tuple[dict[str, Any] | None, dict[str, Any]]:
     """Start waiting stdlib-only child, enforce limits, then release one request."""
     import json
@@ -255,9 +259,17 @@ def guarded_child(
         "loometric.benchmarks.worker",
         "loometric.scenarios.worker",
         "loometric.api.worker",
+        "loometric.api.job_worker",
     ):
         raise ValueError("Unsupported bounded worker module.")
     started = perf_counter()
+    if cancel_event is not None and cancel_event.is_set():
+        return None, {
+            "status": "CANCELLED",
+            "whole_child_wall_seconds": 0.0,
+            "peak_committed_bytes": None,
+        }
+    tree = worker_module == "loometric.api.job_worker"
     process = subprocess.Popen(
         [sys.executable, "-m", worker_module],
         stdin=subprocess.PIPE,
@@ -267,26 +279,70 @@ def guarded_child(
         encoding="utf-8",
         errors="replace",
         creationflags=0x4 | 0x08000000 if os.name == "nt" else 0,
+        start_new_session=tree and sys.platform.startswith("linux"),
     )
     job = None
     measurements: dict[str, Any] = {"peak_committed_bytes": None}
+
+    def stop_tree() -> None:
+        nonlocal job
+        if job:
+            try:
+                measurements["peak_committed_bytes"] = job.peak_committed_bytes()
+            except OSError:
+                measurements["peak_committed_bytes"] = None
+            finally:
+                job.close()
+                job = None
+        if tree and sys.platform.startswith("linux"):
+            import signal
+
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        if process.poll() is None:
+            process.kill()
+        process.communicate()
+
     try:
         if os.name == "nt":
-            job = WindowsJob(process.pid, memory_mib * 1024**2)
+            job = (
+                WindowsJob(process.pid, memory_mib * 1024**2, process_limit=4)
+                if tree
+                else WindowsJob(process.pid, memory_mib * 1024**2)
+            )
+            if cancel_event is not None and cancel_event.is_set():
+                measurements["status"] = "CANCELLED"
+                return None, measurements
             _resume_windows_child(process.pid)
             request = json.dumps({**json.loads(request), "windows_job_name": job.name})
         elif not sys.platform.startswith("linux"):
             raise OSError("Hard memory limits unavailable on this platform.")
+        if on_started is not None:
+            on_started(process.pid)
         try:
-            stdout, stderr = process.communicate(request, timeout=timeout)
+            if cancel_event is None:
+                stdout, stderr = process.communicate(request, timeout=timeout)
+            else:
+                pending_input: str | None = request
+                while True:
+                    if cancel_event.is_set():
+                        measurements["status"] = "CANCELLED"
+                        stop_tree()
+                        return None, measurements
+                    remaining = timeout - (perf_counter() - started)
+                    if remaining <= 0:
+                        raise subprocess.TimeoutExpired(process.args, timeout)
+                    try:
+                        stdout, stderr = process.communicate(
+                            pending_input, timeout=min(0.05, remaining)
+                        )
+                        break
+                    except subprocess.TimeoutExpired:
+                        pending_input = None
         except subprocess.TimeoutExpired:
-            if job:
-                measurements["peak_committed_bytes"] = job.peak_committed_bytes()
-                job.close()  # Kill the launcher AND its interpreter before draining pipes.
-                job = None
-            if process.poll() is None:
-                process.kill()
-            stdout, stderr = process.communicate()
+            stop_tree()
             measurements.update(
                 status="TERMINATED_RESOURCE_LIMIT", reason="Whole-child wall watchdog exceeded."
             )
@@ -309,13 +365,8 @@ def guarded_child(
         )
         return None, measurements
     finally:
-        if process.poll() is None:
-            if job:
-                measurements["peak_committed_bytes"] = job.peak_committed_bytes()
-                job.close()
-                job = None
-            process.kill()
-            process.communicate()
+        if process.poll() is None or (tree and sys.platform.startswith("linux")):
+            stop_tree()
         if job:
             try:
                 measurements["peak_committed_bytes"] = job.peak_committed_bytes()

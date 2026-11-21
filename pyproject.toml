@@ -23,7 +23,7 @@ loometric = "loometric.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"loometric.api" = ["default_limits.json"]
+"loometric.api" = ["default_limits.json", "default_job_limits.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

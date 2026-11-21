@@ -6,6 +6,8 @@ from importlib.resources import files
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
+from loometric.api.job_settings import JobLimits, default_job_limits
+
 
 class Limits(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
@@ -38,6 +40,7 @@ class Settings(BaseModel):
 
     token: SecretStr
     limits: Limits = Field(default_factory=default_limits)
+    job_limits: JobLimits = Field(default_factory=default_job_limits)
     port: int = Field(default=8000, ge=1024, le=65535)
     # Explicit browser development origins; neither wildcard nor credentialed CORS.
     cors_origins: tuple[str, ...] = ("http://localhost:5173", "http://127.0.0.1:5173")
