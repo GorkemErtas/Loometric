@@ -1,5 +1,11 @@
 # M06A: Local production inspection dashboard
 
+M06B now extends this foundation with [interactive scheduling, what-if and jobs](interactive-planning-workspace.md).
+The record below describes M06A's original scope/results. Explicit M06B correction:
+priority **1 is highest**, as frozen in ADR0009; the earlier M06A prose/UI footnote
+reversed that description. Only presentation is corrected; scheduling policy/code
+and historical measured results were unchanged.
+
 M06A is a read-only React dashboard for the existing synthetic planning contracts.
 It inspects orders, declared resources, independent capacity assessments and an
 explicitly loaded existing schedule. It does not train models, generate schedules,
@@ -116,8 +122,8 @@ is **Not applicable**, not zero. Unknown/malformed contracts are rejected.
 Bar widths use a deliberately quantized, bounded basis-point ratio only for CSS
 layout. Exact values/units remain in adjacent text and tables. No metric is clipped
 or replaced to improve presentation. Dates show the declared date/offset without
-browser timezone conversion. A larger input priority has the existing policy's
-declared higher-priority meaning; no risk score is invented.
+browser timezone conversion. Priority 1 is highest under the frozen scheduling policy (corrected in M06B as
+noted above); no risk score is invented.
 
 The M02 demo actually reports totals of **2,160 elapsed minutes**, **5,490
 worker-minutes**, and **4,414.5 standard worker-minutes** across six unique slots.

@@ -18,14 +18,14 @@ A bounded local FastAPI layer exposes capacity, greedy scheduling, independent
 verification and scenario comparison with authentication and native process limits.
 Its bounded asynchronous CP-SAT jobs support polling, verified results and real
 native cancellation, with volatile local retention.
-A local React dashboard now provides five read-only inspection pages for synthetic
-orders, resources, independent capacity reports and actual API status. Existing
-saved schedules can be explicitly loaded and verified; inputs and report provenance
-remain visible throughout the workspace.
+A local React dashboard provides eight views: five inspection pages plus interactive
+reference scheduling, verified Gantt schedules, reviewed what-if comparisons and
+bounded optimization jobs with explicit cancellation. Synthetic inputs, independent
+verification, producer selection and proof provenance stay visible throughout.
 Models are selected on validation only; the final test remains reserved. Persistent
 jobs, databases, deployment and further ML algorithms are deferred.
 
-## Local dashboard (M06A)
+## Local dashboard (M06A–M06B)
 
 Use Node 22.12+ in the 22.x line, 24.x or 26+ (verified: Node 26.13.0/npm 11.20.0).
 From the repository root:
@@ -38,15 +38,35 @@ npm run dev
 
 Open **http://127.0.0.1:5173**. **Fixture preview** explicitly loads the existing
 synthetic M02 capacity demo or M03A competing-orders example; no backend is needed
-for that mode. The pages are Overview, Orders, Production resources, Capacity and
-API & system. Search/sort orders, inspect declared routes and calendar restrictions,
-and read independent order-stage-slot capacity with exact values and units.
+for that mode. Overview, Orders, Production resources, Capacity and API & system
+retain their inspection flows. Production scheduling, What-if scenarios and
+Optimization jobs add explicit execution through the existing local backend.
 
 For actual backend reports, follow the [local API session setup](frontend/README.md)
 and use **Configure API**. Tokens stay in tab memory and are cleared on disconnect
 or reload. API failures never silently substitute preview results. **Competing
 orders → Load saved outcome** inspects a saved proposal, reverified by the backend
 in API mode; it does not run a scheduler. All sample values are labeled SYNTHETIC.
+
+For an interactive demo, select **Capacity what-if**, connect the API and use
+**Production scheduling → Run reference scheduling**. Inspect the verified Gantt
+and unfinished work. In **What-if scenarios**, add `set workers` for LINE = 3,
+review the exact versioned specification, then run the greedy comparison: the
+worked example finishes **45 → 55 pieces**. Check the explicit CP-SAT option to
+submit a bounded comparison job, or submit a scheduling job from Scheduling.
+**Optimization jobs** provides status, pause/resume, explicit Cancel and verified
+results. UNKNOWN, partial results, strict-better selection and proof stay separate.
+
+**Routing trade-off** demonstrates why extra capacity need not improve greedy:
+X workers 1 → 2 changes finished pieces **28 → 18**; the measured bounded CP-SAT
+comparison recovers **28**. A zero-wall diagnostic explicitly retains UNKNOWN /
+greedy fallback. These are synthetic conditional examples, not factory performance.
+
+Jobs and tokens are memory-only. Leaving the jobs view stops polling; changing the
+dataset/session loses local receipts and may leave server work running. Copy job
+IDs first. Only explicit Cancel requests server termination. POST is not idempotent
+and is never automatically retried. The unchanged HTTP envelope is 32 orders /
+96 operations / 64 changes; larger benchmark inputs are not silently truncated.
 
 The M02 demo reports 2,160 available elapsed minutes, 5,490 worker-minutes and
 4,414.5 standard worker-minutes across six unique slots. These are independent
@@ -55,12 +75,12 @@ is VALID_PARTIAL: 60 completed / 80 unfinished pieces; line utilization is
 225 / 480 net line-minutes (46.875%). No factory telemetry or ML serving is implied.
 
 Frontend checks: `npm run typecheck`, `npm run check`, `npm test`, `npm run build`,
-`npm run test:browser`. Verified results: **38 frontend tests**, **4 real-backend
+`npm run test:browser`. Verified results: **87 frontend tests**, **8 real-backend
 browser workflows**, **940 preserved Python tests**, passing lint/type/build and
-zero npm audit findings. See [architecture and verification evidence](docs/architecture/frontend-foundation.md)
-for exact scope, dependency versions, accessible desktop/tablet/mobile checks and
-ignored screenshots. Interactive scheduling, optimizer jobs and what-if workflows
-remain reserved for M06B; no deployment or persistent frontend storage is added.
+zero npm audit findings. See [M06B architecture and measured evidence](docs/architecture/interactive-planning-workspace.md),
+[ADR 0016](docs/decisions/0016-interactive-planning-and-job-tracking.md) and the
+[original M06A record](docs/architecture/frontend-foundation.md). No new dependency,
+backend contract, deployment or persistent storage was added. M07 remains separate.
 
 ## Prediction problem
 
@@ -398,7 +418,7 @@ experimental ML predictions never become operating capacity automatically.
 See the [domain, units, formulas, measured examples and limitations](docs/architecture/production-planning-domain.md)
 and [ADR 0008](docs/decisions/0008-independent-planning-capacity-foundation.md).
 The reference scheduling, optional CP-SAT and local API layers are described below;
-the M06A inspection dashboard is described above. M02 itself adds only the planning domain.
+the M06A/M06B dashboard is described above. M02 itself adds only the planning domain.
 
 ## M03A: Reference scheduling and independent verification
 
@@ -433,7 +453,7 @@ verify remain independent of OR-Tools and ML packages.
 See the [frozen scheduling contract, complete measured results and M03B requirements](docs/architecture/scheduling-contract.md)
 and [ADR 0009](docs/decisions/0009-reference-scheduling-policy.md).
 Splitting, preemption, shared crews, material/WIP constraints and setups are deferred.
-The M03B optimizer and local API layers are described below. The M06A dashboard
+The M03B optimizer and local API layers are described below. The M06A/M06B dashboard
 consumes these unchanged contracts; databases remain deferred.
 
 ## M03B: CP-SAT scheduling optimization
@@ -540,7 +560,7 @@ comparison excludes measured runtime. At the M04 milestone, **812 tests** passed
 See the [schema, worked results, metrics, selection policy and limitations](docs/architecture/what-if-scenario-engine.md)
 and [ADR 0012](docs/decisions/0012-atomic-what-if-and-verified-selection.md).
 M05A exposes bounded greedy API operations and M05B adds bounded optimization jobs
-below. The M06A dashboard above adds read-only inspection; interactive what-if,
+below. M06B now exposes reviewed interactive planning through those frozen APIs;
 databases and deployment remain deferred.
 
 ## Synthetic data CSV inspection
@@ -634,11 +654,11 @@ and native cancellation/shutdown evidence are documented in the
 [ADR 0014](docs/decisions/0014-bounded-local-optimization-jobs.md).
 The frozen optimizer/scenario/ML contracts remain unchanged. No dependencies added;
 Linux execution remains unverified on this Windows host. The M06A read-only
-dashboard is described above; interactive M06B workflows remain deferred.
+foundation and interactive M06B workflows are described above; M07 remains separate.
 
 ## Checks
 
-Frontend commands and real-backend browser evidence appear in the M06A section
+Frontend commands and real-backend browser evidence appear in the M06A/M06B section
 above and the [frontend architecture record](docs/architecture/frontend-foundation.md).
 The following existing Python checks remain required and unchanged.
 
@@ -697,7 +717,7 @@ data/
 configs/
   chronological_split.json   # Frozen source fingerprint, date ranges, and counts
   m03c_benchmark.json         # Predeclared synthetic matrix, budgets and resource guards
-frontend/                    # Local React/TypeScript inspection workspace, exact API client and tests
+frontend/                    # Local React/TypeScript planning workspace, exact API client and tests
 requirements/
   exp-001.txt                # Exact installed EXP-001 environment snapshot
   exp-002.txt                # EXP-001 pins plus exact ML dependency closure
