@@ -2,9 +2,9 @@
 
 import asyncio
 import json
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
-from typing import Any
+from typing import Any, TypeVar
 
 import anyio
 
@@ -48,24 +48,7 @@ class OperationService:
             self._admission.release()
 
     async def execute(self, operation: str, body: str) -> dict[str, Any]:
-        # Client disconnect does not cancel a process. Keep the admission slot until
-        # normal completion or the shared watchdog kills/reaps the actual child.
-        with anyio.CancelScope(shield=True):
-            work = asyncio.create_task(anyio.to_thread.run_sync(self._execute, operation, body))
-            cancelled = False
-            while True:
-                try:
-                    result = await asyncio.shield(work)
-                    break
-                except asyncio.CancelledError:
-                    if work.cancelled():
-                        raise
-                    # Raw asyncio Task.cancel bypasses AnyIO's shield. Wait for the
-                    # same bounded job to finish before propagating cancellation.
-                    cancelled = True
-            if cancelled:
-                raise asyncio.CancelledError
-            return result
+        return await wait_for_cleanup(self._execute, operation, body)
 
     def _execute(self, operation: str, body: str) -> dict[str, Any]:
         request = json.dumps(
@@ -124,3 +107,26 @@ def worker_data(payload: dict[str, Any] | None, measurements: dict[str, Any]) ->
     if not isinstance(payload.get("data"), dict):
         raise ApiError(500, "EXECUTION_FAILED", "The bounded operation failed.")
     return payload["data"]
+
+
+T = TypeVar("T")
+
+
+async def wait_for_cleanup(function: Callable[..., T], *args: Any) -> T:
+    """Retain ownership of bounded blocking cleanup through AnyIO/raw task cancellation."""
+    with anyio.CancelScope(shield=True):
+        work = asyncio.create_task(anyio.to_thread.run_sync(function, *args))
+        cancelled = False
+        while True:
+            try:
+                result = await asyncio.shield(work)
+                break
+            except asyncio.CancelledError:
+                if work.cancelled():
+                    raise
+                # Raw asyncio Task.cancel bypasses AnyIO's shield. Wait for the
+                # same bounded job to finish before propagating cancellation.
+                cancelled = True
+        if cancelled:
+            raise asyncio.CancelledError
+        return result

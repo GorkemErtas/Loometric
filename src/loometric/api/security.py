@@ -112,6 +112,7 @@ class LocalBoundaryMiddleware:
                 if headers.get("access-control-request-method") not in {
                     "GET",
                     "POST",
+                    "DELETE",
                 } or not requested <= {"authorization", "content-type"}:
                     raise ApiError(
                         403, "CORS_REJECTED", "Preflight method or headers are not allowed."
@@ -119,7 +120,7 @@ class LocalBoundaryMiddleware:
                 response = Response(
                     status_code=204,
                     headers={
-                        "Access-Control-Allow-Methods": "GET, POST",
+                        "Access-Control-Allow-Methods": "GET, POST, DELETE",
                         "Access-Control-Allow-Headers": "Authorization, Content-Type",
                         "Access-Control-Max-Age": "600",
                     },

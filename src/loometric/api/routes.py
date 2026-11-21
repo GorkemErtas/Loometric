@@ -1,6 +1,8 @@
 """Versioned HTTP routes; CPU work and domain parsing belong to the bounded service."""
 
 import re
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Annotated
 
 import anyio
@@ -47,21 +49,28 @@ async def capabilities(request: Request, auth: AUTH) -> SuccessResponse:
             ],
             "scheduling_methods": ["greedy"],
             "synthetic_only": True,
+            "optimization_jobs": {
+                "endpoints": ["/api/v1/jobs/scheduling", "/api/v1/jobs/scenarios"],
+                "scheduling_methods": ["greedy_with_cp_sat"],
+                "limits": request.app.state.settings.job_limits.model_dump(),
+                "durable": False,
+            },
             "limits": request.app.state.settings.limits.model_dump(),
             "deferred": {
-                "cp_sat": "M05B job lifecycle is not implemented; no synchronous solver endpoint.",
+                "cp_sat": "CP-SAT is available only through bounded optimization jobs.",
                 "prediction": "M01 offline; artifact registry and HTTP policy deferred.",
             },
             "limitations": [
                 "Loopback development API with one shared secret; no public hosting.",
                 "Synthetic conditional results require human review.",
-                "No database, jobs, ML data/artifacts or automatic production decisions.",
+                "No database, durable jobs, ML data/artifacts or automatic production decisions.",
             ],
         },
     )
 
 
-async def _run(request: Request, operation: str) -> SuccessResponse:
+@asynccontextmanager
+async def bounded_request_body(request: Request) -> AsyncIterator[str]:
     headers = request.headers
     media = headers.getlist("content-type")
     if (
@@ -109,7 +118,12 @@ async def _run(request: Request, operation: str) -> SuccessResponse:
             raise ApiError(
                 400, "INVALID_JSON", "Expected strict UTF-8 JSON with unique keys."
             ) from None
-        data = await service.execute(operation, body)
+        yield body
+
+
+async def _run(request: Request, operation: str) -> SuccessResponse:
+    async with bounded_request_body(request) as body:
+        data = await request.app.state.operations.execute(operation, body)
     return _success(request, data)
 
 

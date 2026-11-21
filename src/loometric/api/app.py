@@ -1,23 +1,38 @@
 """Explicit application construction; importing domain/CLI code never starts HTTP."""
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
 from starlette.responses import HTMLResponse, JSONResponse
 
 from loometric.api.errors import ApiError
+from loometric.api.job_routes import JOB_ROUTER
+from loometric.api.jobs import JobRegistry
 from loometric.api.routes import ROUTER
 from loometric.api.security import LocalBoundaryMiddleware, error_response
-from loometric.api.services import OperationService
+from loometric.api.services import OperationService, wait_for_cleanup
 from loometric.api.settings import Settings, settings_from_environment
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or settings_from_environment()
+    jobs = JobRegistry(settings.limits, settings.job_limits)
+
+    @asynccontextmanager
+    async def lifespan(application: FastAPI):
+        jobs.start()
+        try:
+            yield
+        finally:
+            await wait_for_cleanup(jobs.close)
+
     app = FastAPI(
         title="Loometric local planning API",
         version="1.0.0",
-        description="Bounded synthetic planning only. M01 prediction and CP-SAT HTTP are deferred.",
+        description="Local synthetic planning and bounded jobs; M01 prediction remains offline.",
+        lifespan=lifespan,
         docs_url=None,
         redoc_url=None,
         openapi_url="/api/v1/openapi.json",
@@ -25,9 +40,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         swagger_ui_oauth2_redirect_url=None,
     )
     app.state.settings = settings
-    app.state.operations = OperationService(settings.limits)
+    app.state.operations = OperationService(settings.limits, settings.job_limits)
+    app.state.jobs = jobs
     app.add_middleware(LocalBoundaryMiddleware, settings=settings)
     app.include_router(ROUTER)
+    app.include_router(JOB_ROUTER)
 
     @app.get("/api/v1/docs", include_in_schema=False, response_class=HTMLResponse)
     async def docs() -> str:
@@ -40,10 +57,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 <li>POST /api/v1/planning/capacity — {"scenario": M02 object}</li>
 <li>POST /api/v1/scheduling/dispatch — {"instance": M03 object}</li>
 <li>POST /api/v1/scheduling/verify — {"instance": M03 object, "schedule": proposal}</li>
-<li>POST /api/v1/scenarios/compare — {"baseline": M03 object, "specification": M04 object}</li></ul>
+<li>POST /api/v1/scenarios/compare — {"baseline": M03 object, "specification": M04 object}</li>
+<li>POST /api/v1/jobs/scheduling — {"instance": M03 object}</li>
+<li>POST /api/v1/jobs/scenarios — {"baseline": M03 object, "specification": M04 object}</li>
+<li>GET /api/v1/jobs/{job_id} — lifecycle status</li>
+<li>GET /api/v1/jobs/{job_id}/result — verified result</li>
+<li>DELETE /api/v1/jobs/{job_id} — request native cancellation</li></ul>
 <p>Planning decimals are JSON numbers; reported decimals are strings. Only synthetic,
-bounded greedy planning is supported. No CP-SAT, prediction, jobs or file paths.</p>
+bounded planning is supported. CP-SAT uses jobs. No prediction or file paths.</p>
 <p>See docs/architecture/api-foundation.md and examples/api/workflow.py in the repository.</p>
+<p>Jobs: docs/architecture/optimization-jobs-api.md and examples/api/jobs_workflow.py.</p>
 </html>"""
 
     @app.exception_handler(ApiError)
