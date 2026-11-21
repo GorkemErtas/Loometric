@@ -150,7 +150,7 @@ export interface Dataset {
   sourceHash: string;
   planning: Planning;
   instance: JsonObject | null;
-  previewCapacity: CapacityReport;
+  previewCapacity: CapacityReport | null;
   previewSchedule: ScheduleReport | null;
   savedProposal: JsonObject | null;
 }

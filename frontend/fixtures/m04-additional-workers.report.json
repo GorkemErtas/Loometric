@@ -1,0 +1,1011 @@
+{
+  "schema_version": 1,
+  "status": "VALID_COMPARISON",
+  "synthetic": true,
+  "scenario_id": "additional-workers",
+  "label": "additional workers",
+  "provenance": {
+    "source_id": "synthetic:m04-worked-examples",
+    "synthetic": true,
+    "assumptions": [
+      "Conditional hypothetical capacity change; no causal or factory-productivity claim."
+    ]
+  },
+  "specification_fingerprint": "2db7eb1c8f6c54b2ca1423051370ddaf7f53a80f1214898050de21b4760dd5c1",
+  "same_demand_fingerprint": "dea3b9109ecbf57955bb23eec51ae146993dba540bf1c11ebd96190aee8631f5",
+  "same_demand_verified": true,
+  "scheduling_request": {
+    "method": "greedy",
+    "solver": null
+  },
+  "resource_policy": {
+    "max_operations": 300,
+    "max_alternatives": 20000,
+    "max_variables": 25000,
+    "max_constraints": 90000,
+    "process_memory_mib": 768,
+    "process_wall_seconds": 60
+  },
+  "baseline": {
+    "identity": {
+      "instance_id": "synthetic:m04-capacity",
+      "instance_fingerprint": "6a6410ea81529136f8df10e547672b0231255b79c614a1f34e0a37599afc438c",
+      "policy_version": "whole-stage-minute-v1",
+      "horizon": {
+        "start": "2030-01-07T08:00:00+03:00",
+        "end": "2030-01-07T10:00:00+03:00"
+      },
+      "assumptions": [
+        "Entirely synthetic; additive qualified labor and declared efficiency are uncalibrated assumptions.",
+        "One full batch per uninterrupted fragment; no material, setup, sharing or ML assumptions."
+      ]
+    },
+    "evaluation": {
+      "selected_producer": "greedy",
+      "selected_schedule": {
+        "instance_id": "synthetic:m04-capacity",
+        "instance_fingerprint": "6a6410ea81529136f8df10e547672b0231255b79c614a1f34e0a37599afc438c",
+        "allocations": [
+          {
+            "order_id": "A",
+            "stage": "sewing",
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "profile_id": "PROFILE",
+            "interval": {
+              "start": "2030-01-07T05:00:00+00:00",
+              "end": "2030-01-07T05:20:00+00:00"
+            },
+            "quantity": 20,
+            "required_standard_minutes": "20",
+            "consumed_worker_minutes": "40",
+            "consumed_standard_minutes": "20"
+          },
+          {
+            "order_id": "B",
+            "stage": "sewing",
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "profile_id": "PROFILE",
+            "interval": {
+              "start": "2030-01-07T05:35:00+00:00",
+              "end": "2030-01-07T06:00:00+00:00"
+            },
+            "quantity": 25,
+            "required_standard_minutes": "25",
+            "consumed_worker_minutes": "50",
+            "consumed_standard_minutes": "25"
+          }
+        ],
+        "unscheduled": [
+          {
+            "order_id": "C",
+            "stage": "sewing",
+            "quantity": 10,
+            "reason": "CAPACITY_RESERVED"
+          }
+        ],
+        "schema_version": 1,
+        "policy_version": "whole-stage-minute-v1"
+      },
+      "verification": {
+        "feasible": true,
+        "complete": false,
+        "violations": []
+      },
+      "metrics": {
+        "scheduled_orders": 2,
+        "unscheduled_orders": 1,
+        "partial_orders": 0,
+        "scheduled_units": 45,
+        "unscheduled_units": 10,
+        "scheduled_operations": 2,
+        "unscheduled_operations": 1,
+        "allocated_stage_units": 45,
+        "on_time_completed_orders": 2,
+        "late_completed_orders": 0,
+        "total_tardiness_minutes": 0,
+        "priority_weighted_tardiness_minutes": 0,
+        "makespan_minutes": 60,
+        "available_line_minutes": "45",
+        "occupied_line_minutes": "45",
+        "line_utilization": "1",
+        "available_worker_minutes": "90",
+        "consumed_worker_minutes": "90",
+        "unused_worker_minutes": "0",
+        "available_standard_minutes": "45",
+        "consumed_standard_minutes": "45",
+        "unused_standard_minutes": "0",
+        "standard_capacity_utilization": "1",
+        "rounding_slack_standard_minutes": "0",
+        "orders": [
+          {
+            "order_id": "A",
+            "status": "COMPLETED",
+            "quantity": 20,
+            "completed_units": 20,
+            "unscheduled_units": 0,
+            "allocated_stages": [
+              "sewing"
+            ],
+            "completion_at": "2030-01-07T05:20:00+00:00",
+            "tardiness_minutes": 0,
+            "priority_weight": 3,
+            "unscheduled_reasons": []
+          },
+          {
+            "order_id": "B",
+            "status": "COMPLETED",
+            "quantity": 25,
+            "completed_units": 25,
+            "unscheduled_units": 0,
+            "allocated_stages": [
+              "sewing"
+            ],
+            "completion_at": "2030-01-07T06:00:00+00:00",
+            "tardiness_minutes": 0,
+            "priority_weight": 2,
+            "unscheduled_reasons": []
+          },
+          {
+            "order_id": "C",
+            "status": "UNSCHEDULED",
+            "quantity": 10,
+            "completed_units": 0,
+            "unscheduled_units": 10,
+            "allocated_stages": [],
+            "completion_at": null,
+            "tardiness_minutes": null,
+            "priority_weight": 1,
+            "unscheduled_reasons": [
+              "CAPACITY_RESERVED"
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "stage": "sewing",
+            "available_elapsed_minutes": "45",
+            "occupied_elapsed_minutes": "45",
+            "line_utilization": "1",
+            "available_worker_minutes": "90",
+            "consumed_worker_minutes": "90",
+            "unused_worker_minutes": "0",
+            "available_standard_minutes": "45",
+            "consumed_standard_minutes": "45",
+            "unused_standard_minutes": "0",
+            "standard_capacity_utilization": "1"
+          }
+        ],
+        "tardiness_scope": "COMPLETED_ORDERS_ONLY",
+        "quantity_unit": "piece",
+        "elapsed_time_unit": "minute",
+        "labor_unit": "worker_minute",
+        "capacity_unit": "standard_worker_minute"
+      },
+      "selected_proven_objectives": 0,
+      "selected_full_lexicographic_optimal": false,
+      "fallback_reason": "CP_SAT_NOT_REQUESTED",
+      "greedy_schedule": {
+        "instance_id": "synthetic:m04-capacity",
+        "instance_fingerprint": "6a6410ea81529136f8df10e547672b0231255b79c614a1f34e0a37599afc438c",
+        "allocations": [
+          {
+            "order_id": "A",
+            "stage": "sewing",
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "profile_id": "PROFILE",
+            "interval": {
+              "start": "2030-01-07T05:00:00+00:00",
+              "end": "2030-01-07T05:20:00+00:00"
+            },
+            "quantity": 20,
+            "required_standard_minutes": "20",
+            "consumed_worker_minutes": "40",
+            "consumed_standard_minutes": "20"
+          },
+          {
+            "order_id": "B",
+            "stage": "sewing",
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "profile_id": "PROFILE",
+            "interval": {
+              "start": "2030-01-07T05:35:00+00:00",
+              "end": "2030-01-07T06:00:00+00:00"
+            },
+            "quantity": 25,
+            "required_standard_minutes": "25",
+            "consumed_worker_minutes": "50",
+            "consumed_standard_minutes": "25"
+          }
+        ],
+        "unscheduled": [
+          {
+            "order_id": "C",
+            "stage": "sewing",
+            "quantity": 10,
+            "reason": "CAPACITY_RESERVED"
+          }
+        ],
+        "schema_version": 1,
+        "policy_version": "whole-stage-minute-v1"
+      },
+      "greedy_verification": {
+        "feasible": true,
+        "complete": false,
+        "violations": []
+      },
+      "greedy_metrics": {
+        "scheduled_orders": 2,
+        "unscheduled_orders": 1,
+        "partial_orders": 0,
+        "scheduled_units": 45,
+        "unscheduled_units": 10,
+        "scheduled_operations": 2,
+        "unscheduled_operations": 1,
+        "allocated_stage_units": 45,
+        "on_time_completed_orders": 2,
+        "late_completed_orders": 0,
+        "total_tardiness_minutes": 0,
+        "priority_weighted_tardiness_minutes": 0,
+        "makespan_minutes": 60,
+        "available_line_minutes": "45",
+        "occupied_line_minutes": "45",
+        "line_utilization": "1",
+        "available_worker_minutes": "90",
+        "consumed_worker_minutes": "90",
+        "unused_worker_minutes": "0",
+        "available_standard_minutes": "45",
+        "consumed_standard_minutes": "45",
+        "unused_standard_minutes": "0",
+        "standard_capacity_utilization": "1",
+        "rounding_slack_standard_minutes": "0",
+        "orders": [
+          {
+            "order_id": "A",
+            "status": "COMPLETED",
+            "quantity": 20,
+            "completed_units": 20,
+            "unscheduled_units": 0,
+            "allocated_stages": [
+              "sewing"
+            ],
+            "completion_at": "2030-01-07T05:20:00+00:00",
+            "tardiness_minutes": 0,
+            "priority_weight": 3,
+            "unscheduled_reasons": []
+          },
+          {
+            "order_id": "B",
+            "status": "COMPLETED",
+            "quantity": 25,
+            "completed_units": 25,
+            "unscheduled_units": 0,
+            "allocated_stages": [
+              "sewing"
+            ],
+            "completion_at": "2030-01-07T06:00:00+00:00",
+            "tardiness_minutes": 0,
+            "priority_weight": 2,
+            "unscheduled_reasons": []
+          },
+          {
+            "order_id": "C",
+            "status": "UNSCHEDULED",
+            "quantity": 10,
+            "completed_units": 0,
+            "unscheduled_units": 10,
+            "allocated_stages": [],
+            "completion_at": null,
+            "tardiness_minutes": null,
+            "priority_weight": 1,
+            "unscheduled_reasons": [
+              "CAPACITY_RESERVED"
+            ]
+          }
+        ],
+        "resources": [
+          {
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "stage": "sewing",
+            "available_elapsed_minutes": "45",
+            "occupied_elapsed_minutes": "45",
+            "line_utilization": "1",
+            "available_worker_minutes": "90",
+            "consumed_worker_minutes": "90",
+            "unused_worker_minutes": "0",
+            "available_standard_minutes": "45",
+            "consumed_standard_minutes": "45",
+            "unused_standard_minutes": "0",
+            "standard_capacity_utilization": "1"
+          }
+        ],
+        "tardiness_scope": "COMPLETED_ORDERS_ONLY",
+        "quantity_unit": "piece",
+        "elapsed_time_unit": "minute",
+        "labor_unit": "worker_minute",
+        "capacity_unit": "standard_worker_minute"
+      },
+      "optimizer": {
+        "status": "NOT_REQUESTED",
+        "solver_status": null,
+        "solver_version": null,
+        "phases": [],
+        "proven_objectives": 0,
+        "full_lexicographic_optimal": false,
+        "incumbent_phase": null,
+        "used_previous_phase_incumbent": false,
+        "dimensions": null,
+        "candidate_schedule": null,
+        "verification": null,
+        "metrics": null,
+        "comparison_with_greedy": null,
+        "diagnostics": []
+      },
+      "selected_algorithm": "serial-priority-due-id-v1"
+    }
+  },
+  "scenario": {
+    "identity": {
+      "instance_id": "whatif:additional-workers:639ea186e2d08f1b92db",
+      "instance_fingerprint": "d5ae33ba7ca56dbd97be1f82e64e8c518ee7179f89848f01e688220ad665e785",
+      "policy_version": "whole-stage-minute-v1",
+      "horizon": {
+        "start": "2030-01-07T08:00:00+03:00",
+        "end": "2030-01-07T10:00:00+03:00"
+      },
+      "assumptions": [
+        "Entirely synthetic; additive qualified labor and declared efficiency are uncalibrated assumptions.",
+        "One full batch per uninterrupted fragment; no material, setup, sharing or ML assumptions.",
+        "Conditional hypothetical capacity change; no causal or factory-productivity claim.",
+        "Conditional scenario additional-workers; source synthetic:m04-worked-examples."
+      ]
+    },
+    "evaluation": {
+      "selected_producer": "greedy",
+      "selected_schedule": {
+        "instance_id": "whatif:additional-workers:639ea186e2d08f1b92db",
+        "instance_fingerprint": "d5ae33ba7ca56dbd97be1f82e64e8c518ee7179f89848f01e688220ad665e785",
+        "allocations": [
+          {
+            "order_id": "A",
+            "stage": "sewing",
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "profile_id": "PROFILE",
+            "interval": {
+              "start": "2030-01-07T05:00:00+00:00",
+              "end": "2030-01-07T05:14:00+00:00"
+            },
+            "quantity": 20,
+            "required_standard_minutes": "20",
+            "consumed_worker_minutes": "42",
+            "consumed_standard_minutes": "21"
+          },
+          {
+            "order_id": "B",
+            "stage": "sewing",
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "profile_id": "PROFILE",
+            "interval": {
+              "start": "2030-01-07T05:35:00+00:00",
+              "end": "2030-01-07T05:52:00+00:00"
+            },
+            "quantity": 25,
+            "required_standard_minutes": "25",
+            "consumed_worker_minutes": "51",
+            "consumed_standard_minutes": "25.5"
+          },
+          {
+            "order_id": "C",
+            "stage": "sewing",
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "profile_id": "PROFILE",
+            "interval": {
+              "start": "2030-01-07T05:52:00+00:00",
+              "end": "2030-01-07T05:59:00+00:00"
+            },
+            "quantity": 10,
+            "required_standard_minutes": "10",
+            "consumed_worker_minutes": "21",
+            "consumed_standard_minutes": "10.5"
+          }
+        ],
+        "unscheduled": [],
+        "schema_version": 1,
+        "policy_version": "whole-stage-minute-v1"
+      },
+      "verification": {
+        "feasible": true,
+        "complete": true,
+        "violations": []
+      },
+      "metrics": {
+        "scheduled_orders": 3,
+        "unscheduled_orders": 0,
+        "partial_orders": 0,
+        "scheduled_units": 55,
+        "unscheduled_units": 0,
+        "scheduled_operations": 3,
+        "unscheduled_operations": 0,
+        "allocated_stage_units": 55,
+        "on_time_completed_orders": 3,
+        "late_completed_orders": 0,
+        "total_tardiness_minutes": 0,
+        "priority_weighted_tardiness_minutes": 0,
+        "makespan_minutes": 59,
+        "available_line_minutes": "45",
+        "occupied_line_minutes": "38",
+        "line_utilization": "0.8444444444444444444444444444",
+        "available_worker_minutes": "135",
+        "consumed_worker_minutes": "114",
+        "unused_worker_minutes": "21",
+        "available_standard_minutes": "67.5",
+        "consumed_standard_minutes": "57",
+        "unused_standard_minutes": "10.5",
+        "standard_capacity_utilization": "0.8444444444444444444444444444",
+        "rounding_slack_standard_minutes": "2",
+        "orders": [
+          {
+            "order_id": "A",
+            "status": "COMPLETED",
+            "quantity": 20,
+            "completed_units": 20,
+            "unscheduled_units": 0,
+            "allocated_stages": [
+              "sewing"
+            ],
+            "completion_at": "2030-01-07T05:14:00+00:00",
+            "tardiness_minutes": 0,
+            "priority_weight": 3,
+            "unscheduled_reasons": []
+          },
+          {
+            "order_id": "B",
+            "status": "COMPLETED",
+            "quantity": 25,
+            "completed_units": 25,
+            "unscheduled_units": 0,
+            "allocated_stages": [
+              "sewing"
+            ],
+            "completion_at": "2030-01-07T05:52:00+00:00",
+            "tardiness_minutes": 0,
+            "priority_weight": 2,
+            "unscheduled_reasons": []
+          },
+          {
+            "order_id": "C",
+            "status": "COMPLETED",
+            "quantity": 10,
+            "completed_units": 10,
+            "unscheduled_units": 0,
+            "allocated_stages": [
+              "sewing"
+            ],
+            "completion_at": "2030-01-07T05:59:00+00:00",
+            "tardiness_minutes": 0,
+            "priority_weight": 1,
+            "unscheduled_reasons": []
+          }
+        ],
+        "resources": [
+          {
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "stage": "sewing",
+            "available_elapsed_minutes": "45",
+            "occupied_elapsed_minutes": "38",
+            "line_utilization": "0.8444444444444444444444444444",
+            "available_worker_minutes": "135",
+            "consumed_worker_minutes": "114",
+            "unused_worker_minutes": "21",
+            "available_standard_minutes": "67.5",
+            "consumed_standard_minutes": "57",
+            "unused_standard_minutes": "10.5",
+            "standard_capacity_utilization": "0.8444444444444444444444444444"
+          }
+        ],
+        "tardiness_scope": "COMPLETED_ORDERS_ONLY",
+        "quantity_unit": "piece",
+        "elapsed_time_unit": "minute",
+        "labor_unit": "worker_minute",
+        "capacity_unit": "standard_worker_minute"
+      },
+      "selected_proven_objectives": 0,
+      "selected_full_lexicographic_optimal": false,
+      "fallback_reason": "CP_SAT_NOT_REQUESTED",
+      "greedy_schedule": {
+        "instance_id": "whatif:additional-workers:639ea186e2d08f1b92db",
+        "instance_fingerprint": "d5ae33ba7ca56dbd97be1f82e64e8c518ee7179f89848f01e688220ad665e785",
+        "allocations": [
+          {
+            "order_id": "A",
+            "stage": "sewing",
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "profile_id": "PROFILE",
+            "interval": {
+              "start": "2030-01-07T05:00:00+00:00",
+              "end": "2030-01-07T05:14:00+00:00"
+            },
+            "quantity": 20,
+            "required_standard_minutes": "20",
+            "consumed_worker_minutes": "42",
+            "consumed_standard_minutes": "21"
+          },
+          {
+            "order_id": "B",
+            "stage": "sewing",
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "profile_id": "PROFILE",
+            "interval": {
+              "start": "2030-01-07T05:35:00+00:00",
+              "end": "2030-01-07T05:52:00+00:00"
+            },
+            "quantity": 25,
+            "required_standard_minutes": "25",
+            "consumed_worker_minutes": "51",
+            "consumed_standard_minutes": "25.5"
+          },
+          {
+            "order_id": "C",
+            "stage": "sewing",
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "profile_id": "PROFILE",
+            "interval": {
+              "start": "2030-01-07T05:52:00+00:00",
+              "end": "2030-01-07T05:59:00+00:00"
+            },
+            "quantity": 10,
+            "required_standard_minutes": "10",
+            "consumed_worker_minutes": "21",
+            "consumed_standard_minutes": "10.5"
+          }
+        ],
+        "unscheduled": [],
+        "schema_version": 1,
+        "policy_version": "whole-stage-minute-v1"
+      },
+      "greedy_verification": {
+        "feasible": true,
+        "complete": true,
+        "violations": []
+      },
+      "greedy_metrics": {
+        "scheduled_orders": 3,
+        "unscheduled_orders": 0,
+        "partial_orders": 0,
+        "scheduled_units": 55,
+        "unscheduled_units": 0,
+        "scheduled_operations": 3,
+        "unscheduled_operations": 0,
+        "allocated_stage_units": 55,
+        "on_time_completed_orders": 3,
+        "late_completed_orders": 0,
+        "total_tardiness_minutes": 0,
+        "priority_weighted_tardiness_minutes": 0,
+        "makespan_minutes": 59,
+        "available_line_minutes": "45",
+        "occupied_line_minutes": "38",
+        "line_utilization": "0.8444444444444444444444444444",
+        "available_worker_minutes": "135",
+        "consumed_worker_minutes": "114",
+        "unused_worker_minutes": "21",
+        "available_standard_minutes": "67.5",
+        "consumed_standard_minutes": "57",
+        "unused_standard_minutes": "10.5",
+        "standard_capacity_utilization": "0.8444444444444444444444444444",
+        "rounding_slack_standard_minutes": "2",
+        "orders": [
+          {
+            "order_id": "A",
+            "status": "COMPLETED",
+            "quantity": 20,
+            "completed_units": 20,
+            "unscheduled_units": 0,
+            "allocated_stages": [
+              "sewing"
+            ],
+            "completion_at": "2030-01-07T05:14:00+00:00",
+            "tardiness_minutes": 0,
+            "priority_weight": 3,
+            "unscheduled_reasons": []
+          },
+          {
+            "order_id": "B",
+            "status": "COMPLETED",
+            "quantity": 25,
+            "completed_units": 25,
+            "unscheduled_units": 0,
+            "allocated_stages": [
+              "sewing"
+            ],
+            "completion_at": "2030-01-07T05:52:00+00:00",
+            "tardiness_minutes": 0,
+            "priority_weight": 2,
+            "unscheduled_reasons": []
+          },
+          {
+            "order_id": "C",
+            "status": "COMPLETED",
+            "quantity": 10,
+            "completed_units": 10,
+            "unscheduled_units": 0,
+            "allocated_stages": [
+              "sewing"
+            ],
+            "completion_at": "2030-01-07T05:59:00+00:00",
+            "tardiness_minutes": 0,
+            "priority_weight": 1,
+            "unscheduled_reasons": []
+          }
+        ],
+        "resources": [
+          {
+            "assignment_id": "ASSIGNMENT",
+            "line_id": "LINE",
+            "shift_id": "SHIFT",
+            "stage": "sewing",
+            "available_elapsed_minutes": "45",
+            "occupied_elapsed_minutes": "38",
+            "line_utilization": "0.8444444444444444444444444444",
+            "available_worker_minutes": "135",
+            "consumed_worker_minutes": "114",
+            "unused_worker_minutes": "21",
+            "available_standard_minutes": "67.5",
+            "consumed_standard_minutes": "57",
+            "unused_standard_minutes": "10.5",
+            "standard_capacity_utilization": "0.8444444444444444444444444444"
+          }
+        ],
+        "tardiness_scope": "COMPLETED_ORDERS_ONLY",
+        "quantity_unit": "piece",
+        "elapsed_time_unit": "minute",
+        "labor_unit": "worker_minute",
+        "capacity_unit": "standard_worker_minute"
+      },
+      "optimizer": {
+        "status": "NOT_REQUESTED",
+        "solver_status": null,
+        "solver_version": null,
+        "phases": [],
+        "proven_objectives": 0,
+        "full_lexicographic_optimal": false,
+        "incumbent_phase": null,
+        "used_previous_phase_incumbent": false,
+        "dimensions": null,
+        "candidate_schedule": null,
+        "verification": null,
+        "metrics": null,
+        "comparison_with_greedy": null,
+        "diagnostics": []
+      },
+      "selected_algorithm": "serial-priority-due-id-v1"
+    }
+  },
+  "applied_changes": [
+    {
+      "index": 1,
+      "operation": "set_workers",
+      "target_id": "LINE",
+      "before": {
+        "line_id": "LINE",
+        "stage": "sewing",
+        "worker_count": 2,
+        "availability": "available"
+      },
+      "after": {
+        "line_id": "LINE",
+        "stage": "sewing",
+        "worker_count": 3,
+        "availability": "available"
+      },
+      "changed": true
+    }
+  ],
+  "metric_deltas": {
+    "scheduled_orders": {
+      "baseline": 2,
+      "scenario": 3,
+      "absolute_change": 1,
+      "percentage_change": "50",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "order"
+    },
+    "unscheduled_orders": {
+      "baseline": 1,
+      "scenario": 0,
+      "absolute_change": -1,
+      "percentage_change": "-100",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "order"
+    },
+    "partial_orders": {
+      "baseline": 0,
+      "scenario": 0,
+      "absolute_change": 0,
+      "percentage_change": null,
+      "percentage_status": "BASELINE_ZERO",
+      "percentage_point_change": null,
+      "unit": "order"
+    },
+    "scheduled_units": {
+      "baseline": 45,
+      "scenario": 55,
+      "absolute_change": 10,
+      "percentage_change": "22.22222222222222222222222222",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "piece"
+    },
+    "unscheduled_units": {
+      "baseline": 10,
+      "scenario": 0,
+      "absolute_change": -10,
+      "percentage_change": "-100",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "piece"
+    },
+    "scheduled_operations": {
+      "baseline": 2,
+      "scenario": 3,
+      "absolute_change": 1,
+      "percentage_change": "50",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "operation"
+    },
+    "unscheduled_operations": {
+      "baseline": 1,
+      "scenario": 0,
+      "absolute_change": -1,
+      "percentage_change": "-100",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "operation"
+    },
+    "allocated_stage_units": {
+      "baseline": 45,
+      "scenario": 55,
+      "absolute_change": 10,
+      "percentage_change": "22.22222222222222222222222222",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "stage_piece"
+    },
+    "on_time_completed_orders": {
+      "baseline": 2,
+      "scenario": 3,
+      "absolute_change": 1,
+      "percentage_change": "50",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "order"
+    },
+    "late_completed_orders": {
+      "baseline": 0,
+      "scenario": 0,
+      "absolute_change": 0,
+      "percentage_change": null,
+      "percentage_status": "BASELINE_ZERO",
+      "percentage_point_change": null,
+      "unit": "order"
+    },
+    "total_tardiness_minutes": {
+      "baseline": 0,
+      "scenario": 0,
+      "absolute_change": 0,
+      "percentage_change": null,
+      "percentage_status": "BASELINE_ZERO",
+      "percentage_point_change": null,
+      "unit": "minute"
+    },
+    "priority_weighted_tardiness_minutes": {
+      "baseline": 0,
+      "scenario": 0,
+      "absolute_change": 0,
+      "percentage_change": null,
+      "percentage_status": "BASELINE_ZERO",
+      "percentage_point_change": null,
+      "unit": "priority_weighted_minute"
+    },
+    "makespan_minutes": {
+      "baseline": 60,
+      "scenario": 59,
+      "absolute_change": -1,
+      "percentage_change": "-1.666666666666666666666666667",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "minute"
+    },
+    "available_line_minutes": {
+      "baseline": "45",
+      "scenario": "45",
+      "absolute_change": "0",
+      "percentage_change": "0",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "line_minute"
+    },
+    "occupied_line_minutes": {
+      "baseline": "45",
+      "scenario": "38",
+      "absolute_change": "-7",
+      "percentage_change": "-15.55555555555555555555555556",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "line_minute"
+    },
+    "line_utilization": {
+      "baseline": "1",
+      "scenario": "0.8444444444444444444444444444",
+      "absolute_change": "-0.1555555555555555555555555556",
+      "percentage_change": "-15.55555555555555555555555556",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": "-15.55555555555555555555555556",
+      "unit": "ratio"
+    },
+    "available_worker_minutes": {
+      "baseline": "90",
+      "scenario": "135",
+      "absolute_change": "45",
+      "percentage_change": "50",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "worker_minute"
+    },
+    "consumed_worker_minutes": {
+      "baseline": "90",
+      "scenario": "114",
+      "absolute_change": "24",
+      "percentage_change": "26.66666666666666666666666667",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "worker_minute"
+    },
+    "unused_worker_minutes": {
+      "baseline": "0",
+      "scenario": "21",
+      "absolute_change": "21",
+      "percentage_change": null,
+      "percentage_status": "BASELINE_ZERO",
+      "percentage_point_change": null,
+      "unit": "worker_minute"
+    },
+    "available_standard_minutes": {
+      "baseline": "45",
+      "scenario": "67.5",
+      "absolute_change": "22.5",
+      "percentage_change": "50",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "standard_worker_minute"
+    },
+    "consumed_standard_minutes": {
+      "baseline": "45",
+      "scenario": "57",
+      "absolute_change": "12",
+      "percentage_change": "26.66666666666666666666666667",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": null,
+      "unit": "standard_worker_minute"
+    },
+    "unused_standard_minutes": {
+      "baseline": "0",
+      "scenario": "10.5",
+      "absolute_change": "10.5",
+      "percentage_change": null,
+      "percentage_status": "BASELINE_ZERO",
+      "percentage_point_change": null,
+      "unit": "standard_worker_minute"
+    },
+    "standard_capacity_utilization": {
+      "baseline": "1",
+      "scenario": "0.8444444444444444444444444444",
+      "absolute_change": "-0.1555555555555555555555555556",
+      "percentage_change": "-15.55555555555555555555555556",
+      "percentage_status": "DEFINED",
+      "percentage_point_change": "-15.55555555555555555555555556",
+      "unit": "ratio"
+    },
+    "rounding_slack_standard_minutes": {
+      "baseline": "0",
+      "scenario": "2",
+      "absolute_change": "2",
+      "percentage_change": null,
+      "percentage_status": "BASELINE_ZERO",
+      "percentage_point_change": null,
+      "unit": "standard_worker_minute"
+    }
+  },
+  "selected_comparison": {
+    "relation": "BETTER",
+    "baseline_objectives": {
+      "unfinished_units": 10,
+      "priority_weighted_tardiness_minutes": 0,
+      "makespan_minutes": 60
+    },
+    "scenario_objectives": {
+      "unfinished_units": 0,
+      "priority_weighted_tardiness_minutes": 0,
+      "makespan_minutes": 59
+    },
+    "deciding_objective": "unfinished_units",
+    "absolute_changes": {
+      "unfinished_units": -10,
+      "priority_weighted_tardiness_minutes": 0,
+      "makespan_minutes": -1
+    }
+  },
+  "greedy_comparison": {
+    "relation": "BETTER",
+    "baseline_objectives": {
+      "unfinished_units": 10,
+      "priority_weighted_tardiness_minutes": 0,
+      "makespan_minutes": 60
+    },
+    "scenario_objectives": {
+      "unfinished_units": 0,
+      "priority_weighted_tardiness_minutes": 0,
+      "makespan_minutes": 59
+    },
+    "deciding_objective": "unfinished_units",
+    "absolute_changes": {
+      "unfinished_units": -10,
+      "priority_weighted_tardiness_minutes": 0,
+      "makespan_minutes": -1
+    }
+  },
+  "interpretation": {
+    "conditional_planning_only": true,
+    "causal_productivity_estimate": false,
+    "standard_capacity_increased": true,
+    "unfinished_demand_reduced": true,
+    "utilization_denominators_changed": {
+      "available_line_minutes": false,
+      "available_worker_minutes": true,
+      "available_standard_minutes": true
+    },
+    "same_instance_scheduling_gain": {
+      "baseline": false,
+      "scenario": false
+    }
+  },
+  "limitations": [
+    "Conditional synthetic planning; no causal, forecast or financial guarantee.",
+    "Declared qualified labor, standards and efficiency are uncalibrated assumptions.",
+    "No sharing, setups, materials, splitting, rework, WIP or ML-derived capacity.",
+    "Wall-limited optimizer outcomes may differ; candidate proof remains explicit.",
+    "Completed-order tardiness excludes unfinished demand; denominators can change."
+  ],
+  "runtime": {
+    "baseline": null,
+    "scenario": null
+  }
+}

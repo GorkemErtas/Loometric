@@ -17,7 +17,7 @@ function interval(value: unknown): Interval {
   const item = object(value);
   return { start: text(item.start), end: text(item.end) };
 }
-function requireCapacityUnits(raw: JsonObject): void {
+export function requireCapacityUnits(raw: JsonObject): void {
   if (
     raw.quantity_unit !== "piece" ||
     raw.elapsed_time_unit !== "minute" ||

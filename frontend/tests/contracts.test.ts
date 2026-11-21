@@ -15,6 +15,8 @@ import { ContractError, encodeExact, object, parseExact } from "../src/domain/js
 
 const fixture = datasets[0];
 if (!fixture) throw new Error("Missing explicit synthetic fixture");
+const preview = fixture.previewCapacity;
+if (!preview) throw new Error("Missing original capacity report fixture");
 const secret = () => globalThis.crypto.randomUUID().replaceAll("-", "");
 const envelope = (data: unknown) =>
   encodeExact({ api_version: "v1", request_id: "00000000-0000-4000-8000-000000000001", data });
@@ -38,8 +40,8 @@ describe("exact transport and presentation", () => {
     },
   );
   it("retains zero, null and independent report scope", () => {
-    expect(fixture.previewCapacity.slots.some((s) => s.standardMinutes === "0")).toBe(true);
-    expect(fixture.previewCapacity.assessments.some((a) => a.potentialUnits === null)).toBe(true);
+    expect(preview.slots.some((s) => s.standardMinutes === "0")).toBe(true);
+    expect(preview.assessments.some((a) => a.potentialUnits === null)).toBe(true);
     expect(sumExact(fixture.planning.orders.map((o) => o.quantity))).toBe("480");
     const raw = object(parseExact(encodeExact(fixture.planning.raw)));
     raw.synthetic = false;

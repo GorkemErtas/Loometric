@@ -8,5 +8,20 @@
     "sha256": "e4be25ddbd4794bda3baece93e4f268e196263b7ace6e0856d9f9f9ed26eb20e",
     "file": "examples/scheduling/competition.json",
     "hash_basis": "UTF-8 JSON text with LF line endings"
+  },
+  "capacityScenario": {
+    "file": "examples/scenarios/capacity-baseline.json",
+    "sha256": "b326e0fd917e5bae0d69d67c9e9eca88bc35d03a2f1393f7204464684aabe3c8",
+    "hash_basis": "UTF-8 JSON text with LF line endings"
+  },
+  "routingScenario": {
+    "file": "examples/scenarios/routing-baseline.json",
+    "sha256": "1dd8e9a7d827a799d4a6a58f1f156ebeec7cf48c87d71f32a7e3bde8bf7f3655",
+    "hash_basis": "UTF-8 JSON text with LF line endings"
+  },
+  "parallel": {
+    "file": "examples/scheduling/parallel-routing.json",
+    "sha256": "b224b8c6adca7268791b7ad8f20aa09d96226025a42ea402385faa1833dcb269",
+    "hash_basis": "UTF-8 JSON text with LF line endings"
   }
 }

@@ -99,8 +99,26 @@ for (const signal of ["SIGINT", "SIGTERM"])
   });
 let code = 1;
 let apiPort;
+let frontendOwned = false;
+const reuseFrontend = process.env.LOOMETRIC_TEST_REUSE_FRONTEND === "1";
 try {
-  await freePort(5173); // Strict CORS origin; fail rather than move to a different port.
+  if (reuseFrontend) {
+    const packageReply = await fetch("http://127.0.0.1:5173/package.json", {
+      signal: AbortSignal.timeout(1500),
+    });
+    const metadata = await packageReply.json();
+    const path = join(frontend, "src/domain/scenario.ts").replaceAll("\\", "/");
+    const moduleReply = await fetch(`http://127.0.0.1:5173/@fs/${path}`, {
+      signal: AbortSignal.timeout(1500),
+    });
+    if (
+      !packageReply.ok ||
+      metadata.name !== "loometric-dashboard" ||
+      !moduleReply.ok ||
+      !(await moduleReply.text()).includes("baseline_instance_id")
+    )
+      throw new Error("Existing frontend does not match this workspace. No listener was changed.");
+  } else await freePort(5173); // Strict CORS origin; never move ports or take over another process.
   apiPort = await freePort(0);
   const python = join(
     root,
@@ -115,13 +133,19 @@ try {
     LOOMETRIC_API_TOKEN: token,
     LOOMETRIC_API_PORT: String(apiPort),
   });
-  const vite = start(
-    process.execPath,
-    [join(frontend, "node_modules/vite/bin/vite.js")],
-    frontend,
-    cleanEnv,
-  );
-  await Promise.all([ready(`${origin}/api/v1/health`, api), ready("http://127.0.0.1:5173", vite)]);
+  const vite = reuseFrontend
+    ? null
+    : start(
+        process.execPath,
+        [join(frontend, "node_modules/vite/bin/vite.js")],
+        frontend,
+        cleanEnv,
+      );
+  frontendOwned = vite !== null;
+  await Promise.all([
+    ready(`${origin}/api/v1/health`, api),
+    ...(vite ? [ready("http://127.0.0.1:5173", vite)] : []),
+  ]);
   const browser = start(
     process.execPath,
     [join(frontend, "node_modules/@playwright/test/cli.js"), "test"],
@@ -144,9 +168,11 @@ try {
   redactEvidence(evidence);
   await pause(300);
   try {
-    await freePort(5173);
+    if (frontendOwned) await freePort(5173);
     if (apiPort) await freePort(apiPort);
-    process.stdout.write("Owned frontend/API listeners closed. Session credentials discarded.\n");
+    process.stdout.write(
+      `${reuseFrontend ? "Owned API listener closed; existing frontend left untouched." : "Owned frontend/API listeners closed."} Session credentials discarded.\n`,
+    );
   } catch {
     process.stderr.write("An owned local listener did not close.\n");
     code = 1;

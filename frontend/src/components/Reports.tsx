@@ -32,7 +32,7 @@ export function CapacityContent({ children }: { children: (report: CapacityRepor
       <Empty title="No capacity report loaded">
         {mode === "api"
           ? "Connect the local API to request a report for the selected dataset."
-          : "Choose a bundled synthetic dataset to inspect its saved report."}
+          : "This input has no saved capacity preview. Connect the local API to assess it."}
       </Empty>
     );
   return children(capacity);

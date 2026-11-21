@@ -70,3 +70,6 @@ export function dateLabel(date: string): string {
 }
 export const clockLabel = (value: string) =>
   `${dateLabel(value)}, ${value.slice(11, 16)} ${value.slice(19)}`;
+
+export const formatSignedExact = (value: string) =>
+  value.startsWith("-") ? `-${formatExact(value.slice(1))}` : formatExact(value);

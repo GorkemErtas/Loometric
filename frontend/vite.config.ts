@@ -17,6 +17,7 @@ export default defineConfig({
         here,
         fileURLToPath(new URL("../examples/planning", import.meta.url)),
         fileURLToPath(new URL("../examples/scheduling", import.meta.url)),
+        fileURLToPath(new URL("../examples/scenarios", import.meta.url)),
       ],
     },
   },

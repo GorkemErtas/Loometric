@@ -14,6 +14,9 @@ import type { Capabilities, CapacityReport, Dataset, ScheduleReport } from "../d
 type Mode = "preview" | "api";
 type Status = "disconnected" | "loading" | "connected" | "error";
 interface WorkspaceValue {
+  api: ApiClient | null;
+  sessionId: number;
+  rejectSession: (error: ApiError) => void;
   catalog: readonly Dataset[];
   dataset: Dataset | null;
   mode: Mode;
@@ -44,6 +47,8 @@ export function WorkspaceProvider({
   catalog?: readonly Dataset[];
 }) {
   const [dataset, setDataset] = useState<Dataset | null>(catalog[0] ?? null);
+  const [api, setApi] = useState<ApiClient | null>(null);
+  const [sessionId, setSessionId] = useState(0);
   const [mode, setMode] = useState<Mode>("preview");
   const [status, setStatus] = useState<Status>("disconnected");
   const [origin, setOrigin] = useState<string | null>(null);
@@ -108,6 +113,8 @@ export function WorkspaceProvider({
     if (client.current && health) void fetchCapacity(client.current, next, stamp);
   };
   const enterPreview = () => {
+    setApi(null);
+    setSessionId((value) => value + 1);
     generation.current++;
     client.current?.disconnect();
     client.current = null;
@@ -122,6 +129,8 @@ export function WorkspaceProvider({
     setCapacity(dataset?.previewCapacity ?? null);
   };
   const connect = async (address: string, token: string) => {
+    setApi(null);
+    setSessionId((value) => value + 1);
     generation.current++;
     client.current?.disconnect();
     client.current = null;
@@ -144,6 +153,7 @@ export function WorkspaceProvider({
       setOrigin(api.origin);
       setHealth(checkedHealth.data);
       setCapabilities(checkedCapabilities.data);
+      setApi(api);
       if (selected.current) await fetchCapacity(api, selected.current, ++generation.current);
       else setStatus("connected");
     } catch (failure) {
@@ -153,6 +163,20 @@ export function WorkspaceProvider({
       setError(asError(failure));
       setStatus("error");
     }
+  };
+  const rejectSession = (failure: ApiError) => {
+    if (failure.kind !== "authentication") return;
+    generation.current++;
+    client.current?.disconnect();
+    client.current = null;
+    setApi(null);
+    setSessionId((value) => value + 1);
+    setStatus("error");
+    setError(failure);
+    setHealth(null);
+    setCapabilities(null);
+    setCapacity(null);
+    clearSchedule();
   };
   const refresh = () => {
     if (!client.current || !dataset) return;
@@ -183,6 +207,9 @@ export function WorkspaceProvider({
   return (
     <Context.Provider
       value={{
+        api,
+        sessionId,
+        rejectSession,
         catalog,
         dataset,
         mode,

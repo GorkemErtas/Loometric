@@ -2,6 +2,13 @@ import { capabilities, capacityReport, scheduleReport, unwrap } from "../domain/
 import type { JsonObject } from "../domain/json";
 import { ContractError, encodeExact, object, parseExact, text } from "../domain/json";
 import type { Planning } from "../domain/models";
+import {
+  comparisonReport,
+  dispatchReport,
+  type JobKind,
+  jobInfo,
+  jobResult,
+} from "../domain/planning";
 
 export type ApiFailure =
   | "network"
@@ -11,6 +18,9 @@ export type ApiFailure =
   | "timeout"
   | "contract"
   | "server"
+  | "missing"
+  | "expired"
+  | "not_ready"
   | "cancelled";
 const messages: Record<ApiFailure, string> = {
   network: "The local backend is unreachable. Check the server and configured origin.",
@@ -21,12 +31,18 @@ const messages: Record<ApiFailure, string> = {
   contract: "The backend response does not match the supported API contract.",
   server: "The backend could not complete this request. No replacement result was invented.",
   cancelled: "The local request was cancelled.",
+  missing:
+    "The job is missing. Its record may have expired or the local server may have restarted.",
+  expired: "The server's volatile result retention has expired. No result is available.",
+  not_ready: "The job result is unavailable in its current state. Inspect its actual status.",
 };
 export class ApiError extends Error {
   constructor(
     readonly kind: ApiFailure,
     readonly status: number | null = null,
     readonly requestId: string | null = null,
+    readonly retryAfterMs: number | null = null,
+    readonly code: string | null = null,
   ) {
     super(messages[kind]);
   }
@@ -86,7 +102,37 @@ async function responseText(response: Response): Promise<string> {
 export interface ApiResult<T> {
   data: T;
   requestId: string;
+  retryAfterMs: number | null;
 }
+
+export function retryAfter(value: string | null): number | null {
+  if (value === null) return null;
+  if (/^\d{1,6}$/.test(value)) return Number(value) * 1000;
+  const date = Date.parse(value);
+  return Number.isFinite(date) ? Math.max(0, date - Date.now()) : null;
+}
+const publicCodes = new Set([
+  "JOB_QUEUE_FULL",
+  "JOB_REGISTRY_FULL",
+  "JOB_RESULT_CAPACITY",
+  "JOB_SOLVER_POLICY",
+  "JOB_NOT_FOUND",
+  "JOB_EXPIRED",
+  "JOB_NOT_READY",
+  "JOB_FAILED",
+  "JOB_CANCELLED",
+  "SERVER_BUSY",
+  "COMPLEXITY_LIMIT_EXCEEDED",
+  "SCENARIO_CONFLICT",
+  "INVALID_INPUT",
+  "BODY_TOO_LARGE",
+  "EXECUTION_TIMEOUT",
+  "JOB_SERVICE_UNAVAILABLE",
+]);
+const jobPath = (id: string) => {
+  if (!/^[a-f0-9]{32}$/.test(id)) throw new ApiError("validation");
+  return `/jobs/${id}`;
+};
 
 export class ApiClient {
   readonly origin: string;
@@ -111,12 +157,15 @@ export class ApiClient {
     path: string,
     adapt: (value: unknown) => T,
     body?: JsonObject,
+    signal?: AbortSignal,
+    method?: "DELETE",
   ): Promise<ApiResult<T>> {
-    if (this.#session.signal.aborted) throw new ApiError("cancelled");
+    if (this.#session.signal.aborted || signal?.aborted) throw new ApiError("cancelled");
     const controller = new AbortController();
     let timedOut = false;
     const cancel = () => controller.abort();
     this.#session.signal.addEventListener("abort", cancel, { once: true });
+    signal?.addEventListener("abort", cancel, { once: true });
     const timer = setTimeout(() => {
       timedOut = true;
       controller.abort();
@@ -130,7 +179,7 @@ export class ApiClient {
         ...(encoded ? { "Content-Type": "application/json" } : {}),
       };
       const response = await this.transport(`${this.origin}/api/v1${path}`, {
-        method: encoded ? "POST" : "GET",
+        method: method ?? (encoded ? "POST" : "GET"),
         headers,
         ...(encoded ? { body: encoded } : {}),
         credentials: "omit",
@@ -140,6 +189,7 @@ export class ApiClient {
         signal: controller.signal,
       });
       const raw = parseExact(await responseText(response));
+      const retry = retryAfter(response.headers.get("Retry-After"));
       if (!response.ok) {
         const envelope = object(raw);
         const id = typeof envelope.request_id === "string" ? envelope.request_id : "";
@@ -147,20 +197,38 @@ export class ApiClient {
         const kind =
           response.status === 401 || response.status === 403
             ? "authentication"
-            : response.status === 429
-              ? "busy"
-              : response.status === 408 || response.status === 504
-                ? "timeout"
-                : response.status === 413 ||
-                    response.status === 415 ||
-                    response.status === 422 ||
-                    response.status === 400
-                  ? "validation"
-                  : "server";
-        throw new ApiError(kind, response.status, safeId);
+            : response.status === 404
+              ? "missing"
+              : response.status === 410
+                ? "expired"
+                : response.status === 409
+                  ? "not_ready"
+                  : response.status === 429
+                    ? "busy"
+                    : response.status === 408 || response.status === 504
+                      ? "timeout"
+                      : response.status === 413 ||
+                          response.status === 415 ||
+                          response.status === 422 ||
+                          response.status === 400
+                        ? "validation"
+                        : "server";
+        let code = "";
+        try {
+          code = text(object(envelope.error).code);
+        } catch {
+          /* Optional safe error category. */
+        }
+        throw new ApiError(
+          kind,
+          response.status,
+          safeId,
+          retry,
+          publicCodes.has(code) ? code : null,
+        );
       }
       const result = unwrap(raw);
-      return { data: adapt(result.data), requestId: result.requestId };
+      return { data: adapt(result.data), requestId: result.requestId, retryAfterMs: retry };
     } catch (error) {
       if (error instanceof ApiError) throw error;
       if (controller.signal.aborted) throw new ApiError(timedOut ? "timeout" : "cancelled");
@@ -168,6 +236,7 @@ export class ApiClient {
     } finally {
       clearTimeout(timer);
       this.#session.signal.removeEventListener("abort", cancel);
+      signal?.removeEventListener("abort", cancel);
     }
   }
   health() {
@@ -195,5 +264,51 @@ export class ApiClient {
     });
     if (response.data.instanceId !== text(instance.instance_id)) throw new ApiError("contract");
     return response;
+  }
+  async dispatch(instance: JsonObject, signal?: AbortSignal) {
+    const r = await this.request("/scheduling/dispatch", dispatchReport, { instance }, signal);
+    if (r.data.instanceId !== text(instance.instance_id)) throw new ApiError("contract");
+    return r;
+  }
+  async compare(baseline: JsonObject, specification: JsonObject, signal?: AbortSignal) {
+    const r = await this.request(
+      "/scenarios/compare",
+      comparisonReport,
+      { baseline, specification },
+      signal,
+    );
+    if (
+      r.data.baselineId !== text(baseline.instance_id) ||
+      r.data.baselineFingerprint !== text(specification.baseline_fingerprint) ||
+      r.data.id !== text(specification.scenario_id)
+    )
+      throw new ApiError("contract");
+    return r;
+  }
+  async submitScheduling(instance: JsonObject, signal?: AbortSignal) {
+    return this.submit("scheduling", { instance }, signal);
+  }
+  async submitScenario(baseline: JsonObject, specification: JsonObject, signal?: AbortSignal) {
+    return this.submit("scenarios", { baseline, specification }, signal);
+  }
+  private async submit(kind: JobKind, body: JsonObject, signal?: AbortSignal) {
+    const r = await this.request(`/jobs/${kind}`, jobInfo, body, signal);
+    if (r.data.kind !== kind) throw new ApiError("contract");
+    return r;
+  }
+  async job(id: string, signal?: AbortSignal) {
+    const r = await this.request(jobPath(id), jobInfo, undefined, signal);
+    if (r.data.id !== id) throw new ApiError("contract");
+    return r;
+  }
+  async cancelJob(id: string, signal?: AbortSignal) {
+    const r = await this.request(jobPath(id), jobInfo, undefined, signal, "DELETE");
+    if (r.data.id !== id) throw new ApiError("contract");
+    return r;
+  }
+  async result(id: string, signal?: AbortSignal) {
+    const r = await this.request(`${jobPath(id)}/result`, jobResult, undefined, signal);
+    if (r.data.id !== id) throw new ApiError("contract");
+    return r;
   }
 }
