@@ -16,6 +16,8 @@ An immutable what-if engine compares explicit synthetic capacity changes, with
 same-demand deltas and verified greedy fallback for optional solver attempts.
 A bounded local FastAPI layer exposes capacity, greedy scheduling, independent
 verification and scenario comparison with authentication and native process limits.
+Its bounded asynchronous CP-SAT jobs support polling, verified results and real
+native cancellation, with volatile local retention.
 Models are selected on validation only; the final test remains reserved. Persistent
 jobs, databases, deployment and further ML algorithms are deferred.
 
@@ -495,8 +497,8 @@ All 14 specifications reproduced twice (12 valid, two rejected as declared); nat
 comparison excludes measured runtime. At the M04 milestone, **812 tests** passed.
 See the [schema, worked results, metrics, selection policy and limitations](docs/architecture/what-if-scenario-engine.md)
 and [ADR 0012](docs/decisions/0012-atomic-what-if-and-verified-selection.md).
-M05A now exposes bounded greedy API operations below; optimization jobs, databases,
-frontend and deployment remain deferred.
+M05A exposes bounded greedy API operations and M05B adds bounded optimization jobs
+below; databases, frontend and deployment remain deferred.
 
 ## Synthetic data CSV inspection
 
@@ -538,7 +540,7 @@ a 5-second watchdog; body reading has a separate 3-second deadline. Native timeo
 actually kills/reaps the worker; disconnects retain their slot until cleanup.
 Exact Decimal numbers, fingerprints, independent verification, synthetic provenance
 and valid-partial status survive transport. No API training, artifact/data loading
-or synchronous CP-SAT is exposed; M01 stays offline and jobs belong to M05B.
+or synchronous CP-SAT is exposed; M01 stays offline. M05B job endpoints appear below.
 
 Run [the client](examples/api/workflow.py) in a terminal with the same token/port,
 or execute the self-contained live-server test:
@@ -550,12 +552,45 @@ or execute the self-contained live-server test:
 
 The real loopback workflow repeats twice with identical summaries: synthetic
 baseline 45 completed units versus 55 after hypothetical additional workers.
-Verification: **76 API tests** and **888 total tests** passed; Ruff lint/166-file
+M05A verification record: **76 API tests** and **888 total tests** passed; Ruff lint/166-file
 format check, dependency pins, wheel contents and protected-file checks passed.
 These are conditional fixture calculations, not factory measurements. See
 [API contracts, security, limits, errors and verification evidence](docs/architecture/api-foundation.md)
 and [ADR 0013](docs/decisions/0013-local-api-and-bounded-synchronous-execution.md).
 The shared-secret policy supports local development; public hosting is unsupported.
+
+## M05B: Bounded asynchronous optimization jobs
+
+Authenticated endpoints: POST `/api/v1/jobs/scheduling`, POST `/api/v1/jobs/scenarios`,
+GET `/api/v1/jobs/{job_id}`, GET `/api/v1/jobs/{job_id}/result`, and DELETE
+`/api/v1/jobs/{job_id}`. Submissions return 202 with opaque IDs; lifecycle states are
+QUEUED, RUNNING, SUCCEEDED, FAILED, CANCELLED and EXPIRED. Results retain the existing
+independent verifier, greedy baseline, strict-better selection and proof distinctions.
+
+One active job and two waiting entries use a fixed supervisor, separate from M05A's
+two synchronous slots. Defaults: 15s whole-job watchdog, 768 MiB outer Windows aggregate
+memory, 512 MiB/5s nested optimizer, 1s wall/1 deterministic unit per phase, seed 42 and
+one solver worker. Storage is bounded to 32 records and 8 MiB retained plus reserved
+result bytes, 2 MiB per result; terminal results expire after 300s and tombstones after
+another 300s. Cancellation stops the native process tree before releasing capacity.
+Restart loses all job records; no durable-job or crash-recovery claim is made.
+
+With the same server/token environment as M05A:
+
+```powershell
+.\.venv\Scripts\python.exe examples/api/jobs_workflow.py
+.\.venv\Scripts\python.exe -m pytest tests/api/test_job_live.py -q
+```
+
+The real local HTTP workflow ran twice. In the modified synthetic routing input,
+greedy finishes 18 units and CP-SAT recovers 28 with all three objectives proven;
+the original baseline already finishes 28. Both cancellation examples ended CANCELLED.
+Verification: **940 tests passed**, including 117 API tests; Ruff/pins/packaging checks
+and native cancellation/shutdown evidence are documented in the
+[job API architecture](docs/architecture/optimization-jobs-api.md) and
+[ADR 0014](docs/decisions/0014-bounded-local-optimization-jobs.md).
+The frozen optimizer/scenario/ML contracts remain unchanged. No dependencies added;
+Linux execution remains unverified on this Windows host. M06 is not started.
 
 ## Checks
 
@@ -599,6 +634,8 @@ strict-better selection and verified greedy fallback.
 API checks cover all endpoints, Decimal round trips, strict input validation, auth/CORS,
 limits, real process termination, AnyIO/direct asyncio cancellation, safe errors,
 protected-data isolation and a repeated real loopback client workflow.
+Job checks add atomic queue/result admission, lifecycle races, retention/expiry,
+native cancellation/shutdown, proof/objective/fallback evidence and restart semantics.
 Install requirements/m05a.txt and all four extras (`dev,ml,optimization,api`) for the
 complete suite. Earlier M03B/ML dependency pins remain unchanged.
 Type hints are used throughout; no static type checker is configured for this task.
@@ -617,7 +654,7 @@ requirements/
   exp-002.txt                # EXP-001 pins plus exact ML dependency closure
   m03b.txt                   # Prior pins plus exact optional OR-Tools dependency closure
 src/loometric/
-  api/                       # Optional bounded local HTTP boundary; no jobs or model loading
+  api/                       # Local sync operations and bounded volatile jobs; no model serving
   execution.py               # Shared hard process limits and bounded native workers
   cli.py                     # Local orchestration and exit codes
   leakage.py                 # Source-column availability policy

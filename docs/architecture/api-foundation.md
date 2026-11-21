@@ -1,5 +1,10 @@
 # M05A: Bounded local FastAPI foundation
 
+M05B now adds [bounded asynchronous optimization jobs](optimization-jobs-api.md),
+including DELETE cancellation on the same local authentication/transport boundary.
+The synchronous budgets and M05A verification record below remain preserved; statements
+about deferring jobs describe this original milestone's scope.
+
 The optional API exposes existing synthetic planning engines. It does not train or
 load models, touch protected ML data, schedule jobs, or authorize production.
 See [ADR 0013](../decisions/0013-local-api-and-bounded-synchronous-execution.md).
