@@ -73,11 +73,11 @@ export function WorkspaceProvider({
     [],
   );
 
-  const clearSchedule = () => {
+  const clearSchedule = useCallback(() => {
     setSchedule(null);
     setScheduleError(null);
     setScheduleLoading(false);
-  };
+  }, []);
   const fetchCapacity = useCallback(async (api: ApiClient, source: Dataset, stamp: number) => {
     setStatus("loading");
     setCapacity(null);
@@ -164,20 +164,23 @@ export function WorkspaceProvider({
       setStatus("error");
     }
   };
-  const rejectSession = (failure: ApiError) => {
-    if (failure.kind !== "authentication") return;
-    generation.current++;
-    client.current?.disconnect();
-    client.current = null;
-    setApi(null);
-    setSessionId((value) => value + 1);
-    setStatus("error");
-    setError(failure);
-    setHealth(null);
-    setCapabilities(null);
-    setCapacity(null);
-    clearSchedule();
-  };
+  const rejectSession = useCallback(
+    (failure: ApiError) => {
+      if (failure.kind !== "authentication") return;
+      generation.current++;
+      client.current?.disconnect();
+      client.current = null;
+      setApi(null);
+      setSessionId((value) => value + 1);
+      setStatus("error");
+      setError(failure);
+      setHealth(null);
+      setCapabilities(null);
+      setCapacity(null);
+      clearSchedule();
+    },
+    [clearSchedule],
+  );
   const refresh = () => {
     if (!client.current || !dataset) return;
     const stamp = ++generation.current;

@@ -1,0 +1,462 @@
+.sidebar {
+  overflow-y: auto;
+}
+.context-change-warning {
+  display: block;
+  color: #805919;
+  font-size: 10px;
+  max-width: 235px;
+  margin-top: 7px;
+}
+.workflow-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 18px 22px;
+  border-top: 1px solid var(--line);
+}
+.report-receipt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  font-size: 11px;
+  color: #596b7e;
+  overflow-wrap: anywhere;
+}
+.report-receipt code {
+  font-size: 10px;
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.gantt-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 15px 22px 0;
+  font-size: 11px;
+  color: #596b7e;
+}
+.gantt-source {
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.gantt-figure {
+  padding: 22px;
+}
+.gantt-axis {
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  gap: 14px;
+  font-size: 10px;
+  color: #596b7e;
+  margin-bottom: 13px;
+}
+.gantt-axis > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+.gantt-axis time:last-child {
+  text-align: right;
+}
+.gantt-row {
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  margin: 9px 0;
+}
+.gantt-line {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.gantt-line span {
+  display: block;
+  font-size: 10px;
+  color: #596b7e;
+  margin-top: 3px;
+}
+.gantt-track {
+  position: relative;
+  height: 58px;
+  background: repeating-linear-gradient(
+    to right,
+    #f8fafc 0,
+    #f8fafc calc(25% - 1px),
+    #dce5ec calc(25% - 1px),
+    #dce5ec 25%
+  );
+  border: 1px solid #e5eaf0;
+  border-radius: 4px;
+}
+.gantt-shift,
+.gantt-interruption,
+.gantt-operation {
+  position: absolute;
+}
+.gantt-shift {
+  inset-block: 4px;
+  background: #e1edf4;
+  border: 1px solid #bbcfdc;
+  border-radius: 3px;
+}
+.gantt-interruption {
+  inset-block: 3px;
+  background: repeating-linear-gradient(135deg, #e9c9ba 0, #e9c9ba 3px, #f7e6df 3px, #f7e6df 7px);
+  border-inline: 1px solid #bf8f7a;
+}
+.gantt-operation {
+  top: 12px;
+  height: 32px;
+  min-width: 0;
+  border: 0;
+  border-radius: 3px;
+  color: white;
+  padding: 0 7px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: left;
+  box-shadow: 0 1px 2px #15263322;
+}
+.gantt-operation:hover {
+  filter: brightness(0.92);
+}
+.gantt-operation strong {
+  font-size: 10px;
+  font-weight: 600;
+}
+.gantt-operation span {
+  font-size: 9px;
+  margin-left: 7px;
+}
+.gantt-operation:focus-visible {
+  outline: 3px solid #152633;
+  outline-offset: 3px;
+  z-index: 5;
+}
+.gantt-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding-top: 16px;
+  font-size: 10px;
+  color: #596b7e;
+}
+.gantt-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.gantt-key {
+  display: inline-block;
+  height: 9px;
+  width: 15px;
+  border-radius: 2px;
+}
+.gantt-key-operation {
+  background: #08776c;
+}
+.gantt-key-shift {
+  background: #e1edf4;
+  border: 1px solid #bbcfdc;
+}
+.gantt-key-stop {
+  background: #e9c9ba;
+  border: 1px solid #bf8f7a;
+}
+.gantt-table {
+  border-top: 1px solid var(--line);
+}
+.gantt-table > summary {
+  padding: 16px 22px;
+  font-size: 11px;
+  color: #385a6b;
+  cursor: pointer;
+}
+.unfinished-list {
+  padding: 7px 22px 18px;
+}
+.unfinished-list > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px 15px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+}
+.unfinished-list > p {
+  color: #596b7e;
+  font-size: 11px;
+  margin-top: 10px;
+}
+.unfinished-list code {
+  font-size: 10px;
+}
+.producer-summary {
+  padding: 18px 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 11px;
+}
+.producer-summary > p {
+  width: 100%;
+  color: #596b7e;
+}
+.producer-summary code {
+  font-size: 10px;
+}
+.objective-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+  margin-top: 16px;
+}
+.objective-grid dd {
+  font-size: 11px;
+  margin-top: 7px;
+}
+.objective-grid dt {
+  overflow-wrap: anywhere;
+}
+.comparison-headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 22px;
+  font-size: 11px;
+  color: #596b7e;
+}
+.audit-record {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.audit-record > strong {
+  display: block;
+  font-size: 11px;
+}
+.schedule-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 13px;
+  font-size: 12px;
+}
+.schedule-switch select {
+  font-size: 12px;
+  min-width: 200px;
+}
+.advanced-comparisons > summary {
+  padding: 18px 22px;
+  cursor: pointer;
+  color: #385a6b;
+  font-size: 12px;
+}
+.advanced-comparisons > .page-stack {
+  padding: 0 18px 18px;
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.scenario-form {
+  padding: 20px 22px;
+}
+.scenario-form fieldset,
+.scenario-metadata {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+.scenario-metadata {
+  padding: 20px 22px;
+}
+.scenario-form label,
+.scenario-metadata > label,
+.job-identity label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #526477;
+  font-size: 11px;
+}
+.scenario-form input,
+.scenario-metadata input,
+.scenario-metadata textarea,
+.job-identity input {
+  border: 1px solid #cdd6e0;
+  border-radius: 6px;
+  background: white;
+  color: #202d3b;
+  padding: 9px 11px;
+  font: inherit;
+  width: 100%;
+  min-width: 0;
+}
+.scenario-metadata > label.checkbox-field {
+  flex-direction: row;
+  align-items: center;
+}
+.scenario-optimizer-toggle {
+  width: 16px;
+  padding: 0;
+}
+.scenario-metadata textarea {
+  resize: vertical;
+  line-height: 1.8;
+}
+.scenario-form select {
+  font-size: 12px;
+  min-width: 0;
+}
+.form-submit {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  padding-top: 5px;
+}
+.form-submit > span {
+  font-size: 10px;
+  color: #596b7e;
+}
+.change-list {
+  list-style: decimal;
+  padding: 0 22px 15px 43px;
+  margin: 0;
+}
+.change-list li {
+  border-top: 1px solid var(--line);
+  padding: 14px 0;
+  font-size: 11px;
+}
+.change-list li > div {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.change-list code {
+  display: block;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+  color: #596b7e;
+}
+.change-actions {
+  margin-top: 10px;
+}
+.review-json {
+  padding: 5px 22px;
+  background: #f9fbfc;
+}
+.job-identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 22px;
+  padding: 18px 22px 0;
+  font-size: 11px;
+  color: #526477;
+}
+.job-identity input {
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 11px;
+  min-width: 275px;
+}
+.tracking-note {
+  margin: 0 22px 20px;
+  padding: 12px;
+  background: #edf5f6;
+  border: 1px solid #dbe9ed;
+  color: #405f6c;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.button-danger {
+  color: #a53d32;
+  border-color: #dcb1a9;
+}
+.button-danger:hover {
+  background: #fdf0ed;
+  border-color: #b46e61;
+}
+@media (max-width: 1000px) {
+  .objective-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 550px) {
+  .gantt-figure {
+    padding: 16px;
+  }
+  .gantt-axis,
+  .gantt-row {
+    grid-template-columns: 67px minmax(0, 1fr);
+    gap: 9px;
+  }
+  .gantt-axis {
+    font-size: 9px;
+  }
+  .gantt-axis > div {
+    gap: 10px;
+  }
+  .gantt-operation {
+    padding: 0 3px;
+  }
+  .gantt-operation span {
+    display: none;
+  }
+  .gantt-heading {
+    padding-inline: 16px;
+  }
+  .scenario-form fieldset,
+  .scenario-metadata {
+    grid-template-columns: 1fr;
+  }
+  .scenario-form,
+  .scenario-metadata {
+    padding: 17px 16px;
+  }
+  .workflow-actions {
+    padding-inline: 16px;
+  }
+  .workflow-actions .button {
+    max-width: 100%;
+    white-space: normal;
+  }
+  .job-identity {
+    padding-inline: 16px;
+  }
+  .job-identity input {
+    min-width: 0;
+    width: 100%;
+  }
+  .job-identity label {
+    width: 100%;
+  }
+  .gantt-source {
+    width: 100%;
+  }
+  .report-receipt {
+    font-size: 10px;
+  }
+}
+
+.json-scroll {
+  max-height: 380px;
+  overflow: auto;
+}

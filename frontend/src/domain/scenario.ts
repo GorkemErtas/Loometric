@@ -25,6 +25,7 @@ export type Operation = (typeof operations)[number];
 export type Change = JsonObject & { operation: Operation };
 export class EditorError extends Error {}
 export interface ScenarioDraft {
+  optimizer: boolean;
   id: string;
   label: string;
   sourceId: string;
@@ -34,6 +35,7 @@ export interface ScenarioDraft {
   deterministic: string;
 }
 export const emptyDraft = (): ScenarioDraft => ({
+  optimizer: false,
   id: "planner-scenario",
   label: "Hypothetical capacity change",
   sourceId: "synthetic:local-planner",

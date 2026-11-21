@@ -1,0 +1,173 @@
+{
+  "scenario_id": "synthetic:m04-capacity",
+  "synthetic": true,
+  "assumptions": [
+    "Entirely synthetic; additive qualified labor and declared efficiency are uncalibrated assumptions.",
+    "One full batch per uninterrupted fragment; no material, setup, sharing or ML assumptions."
+  ],
+  "slots": [
+    {
+      "assignment_id": "ASSIGNMENT",
+      "line_id": "LINE",
+      "shift_id": "SHIFT",
+      "stage": "sewing",
+      "shift_start": "2030-01-07T08:00:00+03:00",
+      "shift_end": "2030-01-07T09:00:00+03:00",
+      "profile_id": "PROFILE",
+      "profile_source_id": "synthetic:m04",
+      "profile_evidence_status": "synthetic",
+      "profile_evidence_reference": null,
+      "assumed_efficiency": "0.5",
+      "worker_count": 2,
+      "availability": {
+        "gross_elapsed_minutes": "60",
+        "break_minutes": "0",
+        "planned_downtime_additional_minutes": "15",
+        "unavailable_additional_minutes": "0",
+        "blocked_union_minutes": "15",
+        "available_elapsed_minutes": "45"
+      },
+      "available_worker_minutes": "90",
+      "effective_capacity_standard_minutes": "45"
+    }
+  ],
+  "assessments": [
+    {
+      "order_id": "A",
+      "style_id": "STYLE",
+      "stage": "sewing",
+      "assignment_id": "ASSIGNMENT",
+      "line_id": "LINE",
+      "compatible": true,
+      "workforce_basis": "Hypothetical dedicated qualified crew",
+      "standard_minutes_per_unit": "1",
+      "required_standard_minutes": "20",
+      "required_worker_minutes": "40",
+      "potential_units": 45,
+      "shortfall_standard_minutes": "0",
+      "shortfall_worker_minutes": "0",
+      "capacity_sufficient": true,
+      "independent_slot_feasible": true,
+      "reason_codes": []
+    },
+    {
+      "order_id": "B",
+      "style_id": "STYLE",
+      "stage": "sewing",
+      "assignment_id": "ASSIGNMENT",
+      "line_id": "LINE",
+      "compatible": true,
+      "workforce_basis": "Hypothetical dedicated qualified crew",
+      "standard_minutes_per_unit": "1",
+      "required_standard_minutes": "25",
+      "required_worker_minutes": "50",
+      "potential_units": 45,
+      "shortfall_standard_minutes": "0",
+      "shortfall_worker_minutes": "0",
+      "capacity_sufficient": true,
+      "independent_slot_feasible": true,
+      "reason_codes": []
+    },
+    {
+      "order_id": "C",
+      "style_id": "STYLE",
+      "stage": "sewing",
+      "assignment_id": "ASSIGNMENT",
+      "line_id": "LINE",
+      "compatible": true,
+      "workforce_basis": "Hypothetical dedicated qualified crew",
+      "standard_minutes_per_unit": "1",
+      "required_standard_minutes": "10",
+      "required_worker_minutes": "20",
+      "potential_units": 45,
+      "shortfall_standard_minutes": "0",
+      "shortfall_worker_minutes": "0",
+      "capacity_sufficient": true,
+      "independent_slot_feasible": true,
+      "reason_codes": []
+    }
+  ],
+  "orders": [
+    {
+      "order_id": "A",
+      "style_id": "STYLE",
+      "quantity": 20,
+      "priority": 1,
+      "release_date": "2030-01-07",
+      "due_date": "2030-01-07",
+      "required_stages": [
+        "sewing"
+      ],
+      "required_standard_minutes_total": "20",
+      "stage_checks": [
+        {
+          "stage": "sewing",
+          "independently_sufficient_assignment_ids": [
+            "ASSIGNMENT"
+          ],
+          "reason_codes": []
+        }
+      ],
+      "all_stages_have_independent_slot": true
+    },
+    {
+      "order_id": "B",
+      "style_id": "STYLE",
+      "quantity": 25,
+      "priority": 2,
+      "release_date": "2030-01-07",
+      "due_date": "2030-01-07",
+      "required_stages": [
+        "sewing"
+      ],
+      "required_standard_minutes_total": "25",
+      "stage_checks": [
+        {
+          "stage": "sewing",
+          "independently_sufficient_assignment_ids": [
+            "ASSIGNMENT"
+          ],
+          "reason_codes": []
+        }
+      ],
+      "all_stages_have_independent_slot": true
+    },
+    {
+      "order_id": "C",
+      "style_id": "STYLE",
+      "quantity": 10,
+      "priority": 3,
+      "release_date": "2030-01-07",
+      "due_date": "2030-01-07",
+      "required_stages": [
+        "sewing"
+      ],
+      "required_standard_minutes_total": "10",
+      "stage_checks": [
+        {
+          "stage": "sewing",
+          "independently_sufficient_assignment_ids": [
+            "ASSIGNMENT"
+          ],
+          "reason_codes": []
+        }
+      ],
+      "all_stages_have_independent_slot": true
+    }
+  ],
+  "schema_version": 1,
+  "status": "CAPACITY_ASSESSED",
+  "assessment_scope": "INDEPENDENT_ORDER_STAGE_SLOT",
+  "allocation_performed": false,
+  "schedule_feasibility": "NOT_ASSESSED",
+  "quantity_unit": "piece",
+  "elapsed_time_unit": "minute",
+  "labor_unit": "worker_minute",
+  "capacity_unit": "standard_worker_minute",
+  "limitations": [
+    "Each order is assessed independently; capacity is never reserved or summed across orders.",
+    "Stage precedence is declared, but stage timing, WIP, materials and shared resources are not scheduled.",
+    "Dedicated qualified line crews and stage labor standards are scenario assumptions; no cross-line interchangeability is inferred.",
+    "Efficiency is a declared capacity derating fraction, not an experimental ML prediction."
+  ]
+}

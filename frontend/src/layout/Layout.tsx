@@ -1,5 +1,6 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { Badge, Icon, Modal } from "../components/ui";
+import { usePlanning } from "../state/PlanningWorkspace";
 import { useWorkspace } from "../state/Workspace";
 
 export const routes = [
@@ -22,6 +23,21 @@ export const routes = [
     key: "capacity",
     label: "Capacity",
     description: "Explore independent order-stage-slot assessments from M02.",
+  },
+  {
+    key: "scheduling",
+    label: "Production scheduling",
+    description: "Run the reference scheduler and inspect verified production allocations.",
+  },
+  {
+    key: "scenarios",
+    label: "What-if scenarios",
+    description: "Review explicit capacity assumptions and compare verified same-demand results.",
+  },
+  {
+    key: "jobs",
+    label: "Optimization jobs",
+    description: "Track bounded jobs, cancel explicitly and inspect verified solver evidence.",
   },
   {
     key: "system",
@@ -99,6 +115,7 @@ function ConnectionDialog({ onClose }: { onClose: () => void }) {
 }
 export function Layout({ route, children }: { route: Route; children: React.ReactNode }) {
   const { catalog, dataset, mode, status, selectDataset } = useWorkspace();
+  const { jobs } = usePlanning();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [connectionOpen, setConnectionOpen] = useState(false);
   const current = routes.find((item) => item.key === route) ?? routes[0];
@@ -163,7 +180,7 @@ export function Layout({ route, children }: { route: Route; children: React.Reac
           <p>
             Synthetic planning data
             <br />
-            M06A · Read-only foundation
+            M06B · Planning workspace
           </p>
           <span className="sidebar-version">No live factory connection</span>
         </div>
@@ -227,6 +244,12 @@ export function Layout({ route, children }: { route: Route; children: React.Reac
                   </option>
                 ))}
               </select>
+              {jobs.length > 0 && (
+                <small className="context-change-warning">
+                  Changing dataset/session discards local job IDs. Copy them first; server jobs may
+                  continue.
+                </small>
+              )}
             </div>
           </div>
           <div className="source-strip">
@@ -235,8 +258,12 @@ export function Layout({ route, children }: { route: Route; children: React.Reac
             <span>{dataset?.planning.id ?? "No dataset selected"}</span>
             <span className="source-strip-end">
               {mode === "preview"
-                ? "Saved M02 report · explicit demo mode"
-                : "M05A · read-only inspection"}
+                ? dataset?.previewCapacity
+                  ? "Saved M02 report · explicit demo mode"
+                  : "Input-only preview · connect API for reports"
+                : ["scheduling", "scenarios", "jobs"].includes(route)
+                  ? "M05A / M05B · interactive planning"
+                  : "M05A · read-only inspection"}
             </span>
           </div>
           {children}

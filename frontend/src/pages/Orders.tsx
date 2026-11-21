@@ -146,8 +146,8 @@ export function Orders() {
           <Empty title="No matching orders">Try another order ID, style or required stage.</Empty>
         )}
         <p className="table-footnote">
-          Priority is the declared input value; a larger value is more important in the existing
-          scheduling policy.
+          Priority is the declared input value; 1 is highest priority in the existing scheduling
+          policy.
         </p>
       </Panel>
       <Notice>

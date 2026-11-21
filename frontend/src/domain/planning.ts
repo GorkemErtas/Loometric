@@ -339,8 +339,22 @@ export function evaluation(value: unknown): Evaluation {
     full = flag(r.selected_full_lexicographic_optimal);
   if (
     BigInt(proven) > 3n ||
-    (full && proven !== "3") ||
+    full !== (proven === "3") ||
     (producer === "greedy" && (full || proven !== "0"))
+  )
+    throw new ContractError();
+  const candidate =
+    o.metrics === null ? null : plan(o.candidate_schedule, o.verification, o.metrics);
+  const candidateProven = integer(o.proven_objectives),
+    candidateFull = flag(o.full_lexicographic_optimal);
+  if (
+    BigInt(candidateProven) > 3n ||
+    candidateFull !== (candidateProven === "3") ||
+    (candidateFull && !candidate) ||
+    (candidate &&
+      (!candidate.feasible ||
+        candidate.fingerprint !== selected.fingerprint ||
+        candidate.instanceId !== selected.instanceId))
   )
     throw new ContractError();
   return {
@@ -355,11 +369,11 @@ export function evaluation(value: unknown): Evaluation {
       status: text(o.status),
       solverStatus: nullableText(o.solver_status),
       version: nullableText(o.solver_version),
-      proven: integer(o.proven_objectives),
-      full: flag(o.full_lexicographic_optimal),
+      proven: candidateProven,
+      full: candidateFull,
       retained: flag(o.used_previous_phase_incumbent),
       incumbentPhase: o.incumbent_phase === null ? null : integer(o.incumbent_phase),
-      candidate: o.metrics === null ? null : plan(o.candidate_schedule, o.verification, o.metrics),
+      candidate,
       comparison:
         o.comparison_with_greedy === null ? null : objectiveComparison(o.comparison_with_greedy),
       phases: list(o.phases).map((item) => {

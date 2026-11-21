@@ -58,7 +58,7 @@ export function System() {
             )}
           </div>
         </Panel>
-        <Panel title="Workspace boundaries" description="Local-only M06A foundation">
+        <Panel title="Workspace boundaries" description="Local-only M06B workspace">
           <div className="boundary-list">
             <div>
               <IconText label="Planning & capacity" detail="M02 independent assessment reports" />
@@ -78,7 +78,7 @@ export function System() {
             <div>
               <IconText
                 label="Interactive scheduling & what-if"
-                detail="Reserved for M06B; controls are not exposed"
+                detail="Available in dedicated scheduling, scenarios and jobs views"
               />
             </div>
           </div>
@@ -118,7 +118,7 @@ export function System() {
           </Panel>
           <Panel
             title="Bounded job limits"
-            description="M05B server metadata only; this milestone does not submit or manage jobs"
+            description="M05B server metadata only; dedicated job views submit, track and cancel bounded work"
           >
             <LimitTable values={capabilities.jobLimits} />
           </Panel>

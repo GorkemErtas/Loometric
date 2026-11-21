@@ -66,6 +66,20 @@ describe("frozen planning report adapters", () => {
     object(d.verification).feasible = false;
     expect(() => dispatchReport(d)).toThrow(ContractError);
   });
+  it("rejects proof without an incumbent and candidate metrics from another instance", () => {
+    const raw = object(object(source().baseline).evaluation),
+      optimizer = object(raw.optimizer);
+    optimizer.proven_objectives = parseExact("3");
+    optimizer.full_lexicographic_optimal = true;
+    expect(() => evaluation(raw)).toThrow(ContractError);
+    optimizer.proven_objectives = parseExact("0");
+    optimizer.full_lexicographic_optimal = false;
+    optimizer.metrics = raw.metrics;
+    optimizer.verification = raw.verification;
+    optimizer.candidate_schedule = object(parseExact(encodeExact(raw.selected_schedule)));
+    object(optimizer.candidate_schedule).instance_fingerprint = "b".repeat(64);
+    expect(() => evaluation(raw)).toThrow(ContractError);
+  });
   it.each(["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED", "EXPIRED"] as const)(
     "parses actual lifecycle metadata %s",
     (status) => {

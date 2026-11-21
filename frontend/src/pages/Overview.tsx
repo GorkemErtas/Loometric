@@ -175,7 +175,7 @@ export function Overview() {
           <Empty title="No schedule outcome loaded">
             {dataset.savedProposal
               ? "This dataset has a saved M03A proposal. Load it explicitly to inspect its verified partial outcome."
-              : "This capacity fixture has no saved schedule. Scheduling and what-if controls belong to M06B."}
+              : "This capacity fixture has no saved schedule. Use Production scheduling to run a verified reference schedule."}
           </Empty>
         )}
         {schedule && (

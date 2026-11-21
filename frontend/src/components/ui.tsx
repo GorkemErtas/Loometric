@@ -35,6 +35,25 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
       </>
     ),
     arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
+    scheduling: (
+      <>
+        <path d="M4 4v16h17M8 7h9v4H8zm3 7h9v4h-9z" />
+      </>
+    ),
+    scenarios: (
+      <>
+        <path d="M5 4v16m7-16v16m7-16v16M2 8h6m1 8h6m1-9h6" />
+        <circle cx="5" cy="8" r="2" />
+        <circle cx="12" cy="16" r="2" />
+        <circle cx="19" cy="7" r="2" />
+      </>
+    ),
+    jobs: (
+      <>
+        <rect x="4" y="3" width="16" height="18" rx="2" />
+        <path d="m8 8 2 2 4-4M8 15h8m-8 3h5" />
+      </>
+    ),
     search: (
       <>
         <circle cx="10.5" cy="10.5" r="6.5" />
@@ -152,6 +171,14 @@ export function TableScroll({ label, children }: { label: string; children: Reac
     </section>
   );
 }
+export function JsonBlock({ label, children }: { label: string; children: string }) {
+  return (
+    // biome-ignore lint/a11y/noNoninteractiveTabindex: A named JSON scroll region needs keyboard access to its complete contents.
+    <section className="json-scroll" tabIndex={0} aria-label={label}>
+      <pre>{children}</pre>
+    </section>
+  );
+}
 export function ErrorNotice({ error }: { error: ApiError }) {
   return (
     <div className="notice notice-error" role="alert">
@@ -159,6 +186,16 @@ export function ErrorNotice({ error }: { error: ApiError }) {
       <div>
         <strong>Request unavailable</strong>
         <p>{error.message}</p>
+        {error.code && (
+          <p>
+            <code>{error.code}</code>
+          </p>
+        )}
+        {error.retryAfterMs !== null && (
+          <small>
+            Retry guidance: wait at least {Math.ceil(error.retryAfterMs / 1000)} seconds.
+          </small>
+        )}
         {error.requestId && <small>Request ID: {error.requestId}</small>}
       </div>
     </div>
