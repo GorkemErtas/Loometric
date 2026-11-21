@@ -7,6 +7,7 @@ from pydantic import ValidationError
 
 from loometric.api.codec import decode_body, input_json
 from loometric.api.errors import ApiError, complexity_error
+from loometric.api.job_settings import JobLimits
 from loometric.api.schemas import REQUEST_MODELS
 from loometric.api.settings import Limits
 from loometric.execution import ResourceLimits
@@ -45,8 +46,17 @@ def _instance(raw: dict[str, Any], limits: Limits) -> SchedulingInstance:
     return instance
 
 
-def execute(operation: str, source: str, limits: Limits) -> dict[str, Any]:
+def execute(
+    operation: str, source: str, limits: Limits, job_limits: JobLimits | None = None
+) -> dict[str, Any]:
     """Called in the bounded child, never in an event-loop thread."""
+    if operation in ("prepare_scheduling_job", "prepare_scenarios_job"):
+        from loometric.api.job_operations import validate_job
+        from loometric.api.job_settings import default_job_limits
+
+        kind = "scheduling" if operation == "prepare_scheduling_job" else "scenarios"
+        validate_job(kind, source, limits, job_limits or default_job_limits())
+        return {"validated": True}
     if operation not in REQUEST_MODELS:
         raise ApiError(422, "UNSUPPORTED_OPERATION", "Operation is not supported by this API.")
     value = decode_body(source, limits)
