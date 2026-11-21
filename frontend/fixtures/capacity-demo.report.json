@@ -1,0 +1,1165 @@
+{
+  "allocation_performed": false,
+  "assessment_scope": "INDEPENDENT_ORDER_STAGE_SLOT",
+  "assessments": [
+    {
+      "assignment_id": "A-DAY-FIN-01",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "FIN-01",
+      "order_id": "O-LARGE",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH"
+      ],
+      "required_standard_minutes": "2400",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-01",
+      "capacity_sufficient": false,
+      "compatible": true,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-01",
+      "order_id": "O-LARGE",
+      "potential_units": 96,
+      "reason_codes": [
+        "INSUFFICIENT_CAPACITY"
+      ],
+      "required_standard_minutes": "2400",
+      "required_worker_minutes": "3000",
+      "shortfall_standard_minutes": "1248",
+      "shortfall_worker_minutes": "1560",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-SEW-B",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-B",
+      "order_id": "O-LARGE",
+      "potential_units": null,
+      "reason_codes": [
+        "STYLE_NOT_SUPPORTED"
+      ],
+      "required_standard_minutes": "2400",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-OFF",
+      "capacity_sufficient": false,
+      "compatible": true,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-OFF",
+      "order_id": "O-LARGE",
+      "potential_units": 0,
+      "reason_codes": [
+        "LINE_UNAVAILABLE",
+        "NO_WORKING_TIME",
+        "INSUFFICIENT_CAPACITY"
+      ],
+      "required_standard_minutes": "2400",
+      "required_worker_minutes": "3000",
+      "shortfall_standard_minutes": "2400",
+      "shortfall_worker_minutes": "3000",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-SEW-ZERO",
+      "capacity_sufficient": false,
+      "compatible": true,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-ZERO",
+      "order_id": "O-LARGE",
+      "potential_units": 0,
+      "reason_codes": [
+        "NO_WORKERS",
+        "INSUFFICIENT_CAPACITY"
+      ],
+      "required_standard_minutes": "2400",
+      "required_worker_minutes": "3000",
+      "shortfall_standard_minutes": "2400",
+      "shortfall_worker_minutes": "3000",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-EVE-SEW-01",
+      "capacity_sufficient": false,
+      "compatible": true,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-01",
+      "order_id": "O-LARGE",
+      "potential_units": 120,
+      "reason_codes": [
+        "INSUFFICIENT_CAPACITY"
+      ],
+      "required_standard_minutes": "2400",
+      "required_worker_minutes": "3000",
+      "shortfall_standard_minutes": "960",
+      "shortfall_worker_minutes": "1200",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-FIN-01",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "FIN-01",
+      "order_id": "O-MULTI",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH"
+      ],
+      "required_standard_minutes": "600",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-01",
+      "capacity_sufficient": true,
+      "compatible": true,
+      "independent_slot_feasible": true,
+      "line_id": "SEW-01",
+      "order_id": "O-MULTI",
+      "potential_units": 96,
+      "reason_codes": [],
+      "required_standard_minutes": "600",
+      "required_worker_minutes": "750",
+      "shortfall_standard_minutes": "0",
+      "shortfall_worker_minutes": "0",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-SEW-B",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-B",
+      "order_id": "O-MULTI",
+      "potential_units": null,
+      "reason_codes": [
+        "STYLE_NOT_SUPPORTED"
+      ],
+      "required_standard_minutes": "600",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-OFF",
+      "capacity_sufficient": false,
+      "compatible": true,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-OFF",
+      "order_id": "O-MULTI",
+      "potential_units": 0,
+      "reason_codes": [
+        "LINE_UNAVAILABLE",
+        "NO_WORKING_TIME",
+        "INSUFFICIENT_CAPACITY"
+      ],
+      "required_standard_minutes": "600",
+      "required_worker_minutes": "750",
+      "shortfall_standard_minutes": "600",
+      "shortfall_worker_minutes": "750",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-SEW-ZERO",
+      "capacity_sufficient": false,
+      "compatible": true,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-ZERO",
+      "order_id": "O-MULTI",
+      "potential_units": 0,
+      "reason_codes": [
+        "NO_WORKERS",
+        "INSUFFICIENT_CAPACITY"
+      ],
+      "required_standard_minutes": "600",
+      "required_worker_minutes": "750",
+      "shortfall_standard_minutes": "600",
+      "shortfall_worker_minutes": "750",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-EVE-SEW-01",
+      "capacity_sufficient": true,
+      "compatible": true,
+      "independent_slot_feasible": true,
+      "line_id": "SEW-01",
+      "order_id": "O-MULTI",
+      "potential_units": 120,
+      "reason_codes": [],
+      "required_standard_minutes": "600",
+      "required_worker_minutes": "750",
+      "shortfall_standard_minutes": "0",
+      "shortfall_worker_minutes": "0",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-FIN-01",
+      "capacity_sufficient": true,
+      "compatible": true,
+      "independent_slot_feasible": true,
+      "line_id": "FIN-01",
+      "order_id": "O-MULTI",
+      "potential_units": 202,
+      "reason_codes": [],
+      "required_standard_minutes": "200",
+      "required_worker_minutes": "222.2222222222222222222222222",
+      "shortfall_standard_minutes": "0",
+      "shortfall_worker_minutes": "0",
+      "stage": "finishing",
+      "standard_minutes_per_unit": "4",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-SEW-01",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-01",
+      "order_id": "O-MULTI",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH"
+      ],
+      "required_standard_minutes": "200",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "finishing",
+      "standard_minutes_per_unit": "4",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-B",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-B",
+      "order_id": "O-MULTI",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH"
+      ],
+      "required_standard_minutes": "200",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "finishing",
+      "standard_minutes_per_unit": "4",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-OFF",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-OFF",
+      "order_id": "O-MULTI",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH",
+        "LINE_UNAVAILABLE",
+        "NO_WORKING_TIME"
+      ],
+      "required_standard_minutes": "200",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "finishing",
+      "standard_minutes_per_unit": "4",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-ZERO",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-ZERO",
+      "order_id": "O-MULTI",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH",
+        "NO_WORKERS"
+      ],
+      "required_standard_minutes": "200",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "finishing",
+      "standard_minutes_per_unit": "4",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-EVE-SEW-01",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-01",
+      "order_id": "O-MULTI",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH"
+      ],
+      "required_standard_minutes": "200",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "finishing",
+      "standard_minutes_per_unit": "4",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-FIN-01",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "FIN-01",
+      "order_id": "O-NORMAL",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH"
+      ],
+      "required_standard_minutes": "1200",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-01",
+      "capacity_sufficient": false,
+      "compatible": true,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-01",
+      "order_id": "O-NORMAL",
+      "potential_units": 96,
+      "reason_codes": [
+        "INSUFFICIENT_CAPACITY"
+      ],
+      "required_standard_minutes": "1200",
+      "required_worker_minutes": "1500",
+      "shortfall_standard_minutes": "48",
+      "shortfall_worker_minutes": "60",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-SEW-B",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-B",
+      "order_id": "O-NORMAL",
+      "potential_units": null,
+      "reason_codes": [
+        "STYLE_NOT_SUPPORTED"
+      ],
+      "required_standard_minutes": "1200",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-OFF",
+      "capacity_sufficient": false,
+      "compatible": true,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-OFF",
+      "order_id": "O-NORMAL",
+      "potential_units": 0,
+      "reason_codes": [
+        "LINE_UNAVAILABLE",
+        "NO_WORKING_TIME",
+        "INSUFFICIENT_CAPACITY"
+      ],
+      "required_standard_minutes": "1200",
+      "required_worker_minutes": "1500",
+      "shortfall_standard_minutes": "1200",
+      "shortfall_worker_minutes": "1500",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-SEW-ZERO",
+      "capacity_sufficient": false,
+      "compatible": true,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-ZERO",
+      "order_id": "O-NORMAL",
+      "potential_units": 0,
+      "reason_codes": [
+        "NO_WORKERS",
+        "INSUFFICIENT_CAPACITY"
+      ],
+      "required_standard_minutes": "1200",
+      "required_worker_minutes": "1500",
+      "shortfall_standard_minutes": "1200",
+      "shortfall_worker_minutes": "1500",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-EVE-SEW-01",
+      "capacity_sufficient": true,
+      "compatible": true,
+      "independent_slot_feasible": true,
+      "line_id": "SEW-01",
+      "order_id": "O-NORMAL",
+      "potential_units": 120,
+      "reason_codes": [],
+      "required_standard_minutes": "1200",
+      "required_worker_minutes": "1500",
+      "shortfall_standard_minutes": "0",
+      "shortfall_worker_minutes": "0",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-FIN-01",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "FIN-01",
+      "order_id": "O-QC",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH"
+      ],
+      "required_standard_minutes": "10",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "quality_control",
+      "standard_minutes_per_unit": "1",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-01",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-01",
+      "order_id": "O-QC",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH"
+      ],
+      "required_standard_minutes": "10",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "quality_control",
+      "standard_minutes_per_unit": "1",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-B",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-B",
+      "order_id": "O-QC",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH"
+      ],
+      "required_standard_minutes": "10",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "quality_control",
+      "standard_minutes_per_unit": "1",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-OFF",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-OFF",
+      "order_id": "O-QC",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH",
+        "LINE_UNAVAILABLE",
+        "NO_WORKING_TIME"
+      ],
+      "required_standard_minutes": "10",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "quality_control",
+      "standard_minutes_per_unit": "1",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-ZERO",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-ZERO",
+      "order_id": "O-QC",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH",
+        "NO_WORKERS"
+      ],
+      "required_standard_minutes": "10",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "quality_control",
+      "standard_minutes_per_unit": "1",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-EVE-SEW-01",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-01",
+      "order_id": "O-QC",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH"
+      ],
+      "required_standard_minutes": "10",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "quality_control",
+      "standard_minutes_per_unit": "1",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-FIN-01",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "FIN-01",
+      "order_id": "O-SMALL",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH"
+      ],
+      "required_standard_minutes": "960",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-01",
+      "capacity_sufficient": true,
+      "compatible": true,
+      "independent_slot_feasible": true,
+      "line_id": "SEW-01",
+      "order_id": "O-SMALL",
+      "potential_units": 96,
+      "reason_codes": [],
+      "required_standard_minutes": "960",
+      "required_worker_minutes": "1200",
+      "shortfall_standard_minutes": "0",
+      "shortfall_worker_minutes": "0",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-SEW-B",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-B",
+      "order_id": "O-SMALL",
+      "potential_units": null,
+      "reason_codes": [
+        "STYLE_NOT_SUPPORTED"
+      ],
+      "required_standard_minutes": "960",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-OFF",
+      "capacity_sufficient": false,
+      "compatible": true,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-OFF",
+      "order_id": "O-SMALL",
+      "potential_units": 0,
+      "reason_codes": [
+        "LINE_UNAVAILABLE",
+        "NO_WORKING_TIME",
+        "INSUFFICIENT_CAPACITY"
+      ],
+      "required_standard_minutes": "960",
+      "required_worker_minutes": "1200",
+      "shortfall_standard_minutes": "960",
+      "shortfall_worker_minutes": "1200",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-SEW-ZERO",
+      "capacity_sufficient": false,
+      "compatible": true,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-ZERO",
+      "order_id": "O-SMALL",
+      "potential_units": 0,
+      "reason_codes": [
+        "NO_WORKERS",
+        "INSUFFICIENT_CAPACITY"
+      ],
+      "required_standard_minutes": "960",
+      "required_worker_minutes": "1200",
+      "shortfall_standard_minutes": "960",
+      "shortfall_worker_minutes": "1200",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-EVE-SEW-01",
+      "capacity_sufficient": true,
+      "compatible": true,
+      "independent_slot_feasible": true,
+      "line_id": "SEW-01",
+      "order_id": "O-SMALL",
+      "potential_units": 120,
+      "reason_codes": [],
+      "required_standard_minutes": "960",
+      "required_worker_minutes": "1200",
+      "shortfall_standard_minutes": "0",
+      "shortfall_worker_minutes": "0",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-FIN-01",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "FIN-01",
+      "order_id": "O-STYLE-B",
+      "potential_units": null,
+      "reason_codes": [
+        "STAGE_MISMATCH"
+      ],
+      "required_standard_minutes": "800",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "sewing",
+      "standard_minutes_per_unit": "20",
+      "style_id": "STYLE-B",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-01",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-01",
+      "order_id": "O-STYLE-B",
+      "potential_units": null,
+      "reason_codes": [
+        "STYLE_NOT_SUPPORTED"
+      ],
+      "required_standard_minutes": "800",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "sewing",
+      "standard_minutes_per_unit": "20",
+      "style_id": "STYLE-B",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-B",
+      "capacity_sufficient": true,
+      "compatible": true,
+      "independent_slot_feasible": true,
+      "line_id": "SEW-B",
+      "order_id": "O-STYLE-B",
+      "potential_units": 50,
+      "reason_codes": [],
+      "required_standard_minutes": "800",
+      "required_worker_minutes": "1066.666666666666666666666667",
+      "shortfall_standard_minutes": "0",
+      "shortfall_worker_minutes": "0",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "20",
+      "style_id": "STYLE-B",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-SEW-OFF",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-OFF",
+      "order_id": "O-STYLE-B",
+      "potential_units": null,
+      "reason_codes": [
+        "STYLE_NOT_SUPPORTED",
+        "LINE_UNAVAILABLE",
+        "NO_WORKING_TIME"
+      ],
+      "required_standard_minutes": "800",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "sewing",
+      "standard_minutes_per_unit": "20",
+      "style_id": "STYLE-B",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-DAY-SEW-ZERO",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-ZERO",
+      "order_id": "O-STYLE-B",
+      "potential_units": null,
+      "reason_codes": [
+        "STYLE_NOT_SUPPORTED",
+        "NO_WORKERS"
+      ],
+      "required_standard_minutes": "800",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "sewing",
+      "standard_minutes_per_unit": "20",
+      "style_id": "STYLE-B",
+      "workforce_basis": null
+    },
+    {
+      "assignment_id": "A-EVE-SEW-01",
+      "capacity_sufficient": null,
+      "compatible": false,
+      "independent_slot_feasible": false,
+      "line_id": "SEW-01",
+      "order_id": "O-STYLE-B",
+      "potential_units": null,
+      "reason_codes": [
+        "STYLE_NOT_SUPPORTED"
+      ],
+      "required_standard_minutes": "800",
+      "required_worker_minutes": null,
+      "shortfall_standard_minutes": null,
+      "shortfall_worker_minutes": null,
+      "stage": "sewing",
+      "standard_minutes_per_unit": "20",
+      "style_id": "STYLE-B",
+      "workforce_basis": null
+    }
+  ],
+  "assumptions": [
+    "Entirely synthetic example; no actual factory observations or performance claims.",
+    "Dedicated qualified crews have constant headcount within each shift; capacity is additive labor only.",
+    "Stage standards and efficiency fractions are hypothetical inputs independent of all ML predictions.",
+    "Calendar dates use the supplied shift start offset; overnight shifts belong to their start date.",
+    "Each order is assessed independently against each full slot; no reservations, splitting, stage scheduling or global feasibility."
+  ],
+  "capacity_unit": "standard_worker_minute",
+  "elapsed_time_unit": "minute",
+  "labor_unit": "worker_minute",
+  "limitations": [
+    "Each order is assessed independently; capacity is never reserved or summed across orders.",
+    "Stage precedence is declared, but stage timing, WIP, materials and shared resources are not scheduled.",
+    "Dedicated qualified line crews and stage labor standards are scenario assumptions; no cross-line interchangeability is inferred.",
+    "Efficiency is a declared capacity derating fraction, not an experimental ML prediction."
+  ],
+  "orders": [
+    {
+      "all_stages_have_independent_slot": false,
+      "due_date": "2030-01-07",
+      "order_id": "O-LARGE",
+      "priority": 2,
+      "quantity": 200,
+      "release_date": "2030-01-07",
+      "required_stages": [
+        "sewing"
+      ],
+      "required_standard_minutes_total": "2400",
+      "stage_checks": [
+        {
+          "independently_sufficient_assignment_ids": [],
+          "reason_codes": [
+            "NO_SUFFICIENT_INDEPENDENT_SLOT"
+          ],
+          "stage": "sewing"
+        }
+      ],
+      "style_id": "TEE"
+    },
+    {
+      "all_stages_have_independent_slot": true,
+      "due_date": "2030-01-07",
+      "order_id": "O-MULTI",
+      "priority": 2,
+      "quantity": 50,
+      "release_date": "2030-01-07",
+      "required_stages": [
+        "sewing",
+        "finishing"
+      ],
+      "required_standard_minutes_total": "800",
+      "stage_checks": [
+        {
+          "independently_sufficient_assignment_ids": [
+            "A-DAY-SEW-01",
+            "A-EVE-SEW-01"
+          ],
+          "reason_codes": [],
+          "stage": "sewing"
+        },
+        {
+          "independently_sufficient_assignment_ids": [
+            "A-DAY-FIN-01"
+          ],
+          "reason_codes": [],
+          "stage": "finishing"
+        }
+      ],
+      "style_id": "TEE"
+    },
+    {
+      "all_stages_have_independent_slot": true,
+      "due_date": "2030-01-07",
+      "order_id": "O-NORMAL",
+      "priority": 1,
+      "quantity": 100,
+      "release_date": "2030-01-07",
+      "required_stages": [
+        "sewing"
+      ],
+      "required_standard_minutes_total": "1200",
+      "stage_checks": [
+        {
+          "independently_sufficient_assignment_ids": [
+            "A-EVE-SEW-01"
+          ],
+          "reason_codes": [],
+          "stage": "sewing"
+        }
+      ],
+      "style_id": "TEE"
+    },
+    {
+      "all_stages_have_independent_slot": false,
+      "due_date": "2030-01-07",
+      "order_id": "O-QC",
+      "priority": 2,
+      "quantity": 10,
+      "release_date": "2030-01-07",
+      "required_stages": [
+        "quality_control"
+      ],
+      "required_standard_minutes_total": "10",
+      "stage_checks": [
+        {
+          "independently_sufficient_assignment_ids": [],
+          "reason_codes": [
+            "NO_COMPATIBLE_SLOT"
+          ],
+          "stage": "quality_control"
+        }
+      ],
+      "style_id": "TEE"
+    },
+    {
+      "all_stages_have_independent_slot": true,
+      "due_date": "2030-01-07",
+      "order_id": "O-SMALL",
+      "priority": 2,
+      "quantity": 80,
+      "release_date": "2030-01-07",
+      "required_stages": [
+        "sewing"
+      ],
+      "required_standard_minutes_total": "960",
+      "stage_checks": [
+        {
+          "independently_sufficient_assignment_ids": [
+            "A-DAY-SEW-01",
+            "A-EVE-SEW-01"
+          ],
+          "reason_codes": [],
+          "stage": "sewing"
+        }
+      ],
+      "style_id": "TEE"
+    },
+    {
+      "all_stages_have_independent_slot": true,
+      "due_date": "2030-01-07",
+      "order_id": "O-STYLE-B",
+      "priority": 2,
+      "quantity": 40,
+      "release_date": "2030-01-07",
+      "required_stages": [
+        "sewing"
+      ],
+      "required_standard_minutes_total": "800",
+      "stage_checks": [
+        {
+          "independently_sufficient_assignment_ids": [
+            "A-DAY-SEW-B"
+          ],
+          "reason_codes": [],
+          "stage": "sewing"
+        }
+      ],
+      "style_id": "STYLE-B"
+    }
+  ],
+  "quantity_unit": "piece",
+  "scenario_id": "synthetic:m02-capacity-demo",
+  "schedule_feasibility": "NOT_ASSESSED",
+  "schema_version": 1,
+  "slots": [
+    {
+      "assignment_id": "A-DAY-FIN-01",
+      "assumed_efficiency": "0.9",
+      "availability": {
+        "available_elapsed_minutes": "450",
+        "blocked_union_minutes": "30",
+        "break_minutes": "30",
+        "gross_elapsed_minutes": "480",
+        "planned_downtime_additional_minutes": "0",
+        "unavailable_additional_minutes": "0"
+      },
+      "available_worker_minutes": "900",
+      "effective_capacity_standard_minutes": "810",
+      "line_id": "FIN-01",
+      "profile_evidence_reference": null,
+      "profile_evidence_status": "synthetic",
+      "profile_id": "P-FIN-01",
+      "profile_source_id": "synthetic:m02-demo",
+      "shift_end": "2030-01-07T16:00:00+03:00",
+      "shift_id": "DAY",
+      "shift_start": "2030-01-07T08:00:00+03:00",
+      "stage": "finishing",
+      "worker_count": 2
+    },
+    {
+      "assignment_id": "A-DAY-SEW-01",
+      "assumed_efficiency": "0.8",
+      "availability": {
+        "available_elapsed_minutes": "360",
+        "blocked_union_minutes": "120",
+        "break_minutes": "30",
+        "gross_elapsed_minutes": "480",
+        "planned_downtime_additional_minutes": "60",
+        "unavailable_additional_minutes": "30"
+      },
+      "available_worker_minutes": "1440",
+      "effective_capacity_standard_minutes": "1152",
+      "line_id": "SEW-01",
+      "profile_evidence_reference": null,
+      "profile_evidence_status": "synthetic",
+      "profile_id": "P-SEW-01",
+      "profile_source_id": "synthetic:m02-demo",
+      "shift_end": "2030-01-07T16:00:00+03:00",
+      "shift_id": "DAY",
+      "shift_start": "2030-01-07T08:00:00+03:00",
+      "stage": "sewing",
+      "worker_count": 4
+    },
+    {
+      "assignment_id": "A-DAY-SEW-B",
+      "assumed_efficiency": "0.75",
+      "availability": {
+        "available_elapsed_minutes": "450",
+        "blocked_union_minutes": "30",
+        "break_minutes": "30",
+        "gross_elapsed_minutes": "480",
+        "planned_downtime_additional_minutes": "0",
+        "unavailable_additional_minutes": "0"
+      },
+      "available_worker_minutes": "1350",
+      "effective_capacity_standard_minutes": "1012.5",
+      "line_id": "SEW-B",
+      "profile_evidence_reference": null,
+      "profile_evidence_status": "synthetic",
+      "profile_id": "P-SEW-B",
+      "profile_source_id": "synthetic:m02-demo",
+      "shift_end": "2030-01-07T16:00:00+03:00",
+      "shift_id": "DAY",
+      "shift_start": "2030-01-07T08:00:00+03:00",
+      "stage": "sewing",
+      "worker_count": 3
+    },
+    {
+      "assignment_id": "A-DAY-SEW-OFF",
+      "assumed_efficiency": "0.8",
+      "availability": {
+        "available_elapsed_minutes": "0",
+        "blocked_union_minutes": "480",
+        "break_minutes": "30",
+        "gross_elapsed_minutes": "480",
+        "planned_downtime_additional_minutes": "0",
+        "unavailable_additional_minutes": "450"
+      },
+      "available_worker_minutes": "0",
+      "effective_capacity_standard_minutes": "0",
+      "line_id": "SEW-OFF",
+      "profile_evidence_reference": null,
+      "profile_evidence_status": "synthetic",
+      "profile_id": "P-SEW-OFF",
+      "profile_source_id": "synthetic:m02-demo",
+      "shift_end": "2030-01-07T16:00:00+03:00",
+      "shift_id": "DAY",
+      "shift_start": "2030-01-07T08:00:00+03:00",
+      "stage": "sewing",
+      "worker_count": 4
+    },
+    {
+      "assignment_id": "A-DAY-SEW-ZERO",
+      "assumed_efficiency": "0.8",
+      "availability": {
+        "available_elapsed_minutes": "450",
+        "blocked_union_minutes": "30",
+        "break_minutes": "30",
+        "gross_elapsed_minutes": "480",
+        "planned_downtime_additional_minutes": "0",
+        "unavailable_additional_minutes": "0"
+      },
+      "available_worker_minutes": "0",
+      "effective_capacity_standard_minutes": "0",
+      "line_id": "SEW-ZERO",
+      "profile_evidence_reference": null,
+      "profile_evidence_status": "synthetic",
+      "profile_id": "P-SEW-ZERO",
+      "profile_source_id": "synthetic:m02-demo",
+      "shift_end": "2030-01-07T16:00:00+03:00",
+      "shift_id": "DAY",
+      "shift_start": "2030-01-07T08:00:00+03:00",
+      "stage": "sewing",
+      "worker_count": 0
+    },
+    {
+      "assignment_id": "A-EVE-SEW-01",
+      "assumed_efficiency": "0.8",
+      "availability": {
+        "available_elapsed_minutes": "450",
+        "blocked_union_minutes": "30",
+        "break_minutes": "30",
+        "gross_elapsed_minutes": "480",
+        "planned_downtime_additional_minutes": "0",
+        "unavailable_additional_minutes": "0"
+      },
+      "available_worker_minutes": "1800",
+      "effective_capacity_standard_minutes": "1440",
+      "line_id": "SEW-01",
+      "profile_evidence_reference": null,
+      "profile_evidence_status": "synthetic",
+      "profile_id": "P-SEW-01",
+      "profile_source_id": "synthetic:m02-demo",
+      "shift_end": "2030-01-08T00:00:00+03:00",
+      "shift_id": "EVE",
+      "shift_start": "2030-01-07T16:00:00+03:00",
+      "stage": "sewing",
+      "worker_count": 4
+    }
+  ],
+  "status": "CAPACITY_ASSESSED",
+  "synthetic": true
+}

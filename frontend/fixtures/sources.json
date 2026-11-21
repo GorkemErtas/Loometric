@@ -1,0 +1,12 @@
+{
+  "capacity": {
+    "sha256": "24c12131599eaf8c9b4ea1451ba80d6fb36265bf769d426613eed4535c967bc9",
+    "file": "examples/planning/capacity-demo.json",
+    "hash_basis": "UTF-8 JSON text with LF line endings"
+  },
+  "competition": {
+    "sha256": "e4be25ddbd4794bda3baece93e4f268e196263b7ace6e0856d9f9f9ed26eb20e",
+    "file": "examples/scheduling/competition.json",
+    "hash_basis": "UTF-8 JSON text with LF line endings"
+  }
+}

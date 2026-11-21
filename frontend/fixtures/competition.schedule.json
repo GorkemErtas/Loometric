@@ -1,0 +1,32 @@
+{
+  "allocations": [
+    {
+      "assignment_id": "A-DAY-SEW-01",
+      "consumed_standard_minutes": "720",
+      "consumed_worker_minutes": "900",
+      "interval": {
+        "end": "2030-01-07T08:45:00+00:00",
+        "start": "2030-01-07T05:00:00+00:00"
+      },
+      "line_id": "SEW-01",
+      "order_id": "A",
+      "profile_id": "P-SEW-01",
+      "quantity": 60,
+      "required_standard_minutes": "720",
+      "shift_id": "DAY",
+      "stage": "sewing"
+    }
+  ],
+  "instance_fingerprint": "f84788b106e2d42de3b99adcfc53f6c24b7f7e145ba3ff8d61be74d41df5ab26",
+  "instance_id": "synthetic:m03a-competition",
+  "policy_version": "whole-stage-minute-v1",
+  "schema_version": 1,
+  "unscheduled": [
+    {
+      "order_id": "B",
+      "quantity": 80,
+      "reason": "CAPACITY_RESERVED",
+      "stage": "sewing"
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 11px;
+}
+thead {
+  background: #f9fafc;
+}
+th {
+  color: #657488;
+  font-weight: 500;
+  font-size: 10px;
+  white-space: nowrap;
+}
+th,
+td {
+  padding: 13px 20px;
+  border-bottom: 1px solid #edf0f4;
+  vertical-align: middle;
+}
+tbody th {
+  color: #2a3c4e;
+  font-size: 11px;
+  font-weight: 600;
+}
+tbody tr:last-child td,
+tbody tr:last-child th {
+  border-bottom: none;
+}
+tbody tr:hover {
+  background: #fafcfd;
+}
+.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.cell-primary {
+  display: block;
+  font-weight: 500;
+}
+.cell-secondary {
+  display: block;
+  font-size: 10px;
+  color: #596b7e;
+  font-weight: 400;
+  margin-top: 3px;
+}
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #edf0f4;
+  font-size: 11px;
+}
+.search-field {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  border: 1px solid #d5dde5;
+  border-radius: 6px;
+  padding: 7px 10px;
+  width: min(100%, 310px);
+  color: #7a8998;
+}
+.search-field:focus-within {
+  border-color: #128c87;
+  outline: 2px solid #cae5e2;
+  outline-offset: 1px;
+}
+.search-field input {
+  border: 0;
+  width: 100%;
+  min-width: 0;
+  font-size: 11px;
+  outline: none;
+  background: transparent;
+  color: #293c4e;
+}
+.search-field input::placeholder {
+  color: #596b7e;
+}
+.sort-button {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  padding: 3px 0;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+}
+.sort-button:hover {
+  color: #087e76;
+}
+.sort-button > span {
+  color: #768698;
+}
+.table-footnote {
+  color: #596b7e;
+  font-size: 10px;
+  padding: 13px 20px;
+  border-top: 1px solid #edf0f4;
+}
+.checkbox-field,
+.inline-field {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #52677b;
+  font-size: 11px;
+}
+.inline-field select {
+  font-size: 11px;
+  min-height: 33px;
+  padding: 5px 9px;
+}
+.checkbox-field input {
+  accent-color: #087e76;
+  width: 15px;
+  height: 15px;
+  margin: 0;
+}
+.blocked-details summary {
+  cursor: pointer;
+}
+.blocked-details > span {
+  display: block;
+  font-size: 10px;
+  padding-top: 5px;
+  white-space: nowrap;
+}

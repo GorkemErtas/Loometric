@@ -1,0 +1,135 @@
+{
+  "allocation_performed": false,
+  "assessment_scope": "INDEPENDENT_ORDER_STAGE_SLOT",
+  "assessments": [
+    {
+      "assignment_id": "A-DAY-SEW-01",
+      "capacity_sufficient": true,
+      "compatible": true,
+      "independent_slot_feasible": true,
+      "line_id": "SEW-01",
+      "order_id": "A",
+      "potential_units": 128,
+      "reason_codes": [],
+      "required_standard_minutes": "720",
+      "required_worker_minutes": "900",
+      "shortfall_standard_minutes": "0",
+      "shortfall_worker_minutes": "0",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    },
+    {
+      "assignment_id": "A-DAY-SEW-01",
+      "capacity_sufficient": true,
+      "compatible": true,
+      "independent_slot_feasible": true,
+      "line_id": "SEW-01",
+      "order_id": "B",
+      "potential_units": 128,
+      "reason_codes": [],
+      "required_standard_minutes": "960",
+      "required_worker_minutes": "1200",
+      "shortfall_standard_minutes": "0",
+      "shortfall_worker_minutes": "0",
+      "stage": "sewing",
+      "standard_minutes_per_unit": "12",
+      "style_id": "TEE",
+      "workforce_basis": "Synthetic dedicated crew assumed qualified for this exact style/stage; no transfers, shared workers or role bottlenecks modeled."
+    }
+  ],
+  "assumptions": [
+    "Entirely synthetic benchmark; no actual factory performance or ML capacity adjustments.",
+    "Dedicated qualified crews, additive stage labor standards and constant line efficiency are hypothetical.",
+    "Whole-stage nonpreemptive operations occupy one uninterrupted working fragment; no splitting, WIP initialization, setups or material constraints.",
+    "Fixed +03:00 calendar, hard local-midnight releases and soft next-midnight due deadlines."
+  ],
+  "capacity_unit": "standard_worker_minute",
+  "elapsed_time_unit": "minute",
+  "labor_unit": "worker_minute",
+  "limitations": [
+    "Each order is assessed independently; capacity is never reserved or summed across orders.",
+    "Stage precedence is declared, but stage timing, WIP, materials and shared resources are not scheduled.",
+    "Dedicated qualified line crews and stage labor standards are scenario assumptions; no cross-line interchangeability is inferred.",
+    "Efficiency is a declared capacity derating fraction, not an experimental ML prediction."
+  ],
+  "orders": [
+    {
+      "all_stages_have_independent_slot": true,
+      "due_date": "2030-01-07",
+      "order_id": "A",
+      "priority": 1,
+      "quantity": 60,
+      "release_date": "2030-01-07",
+      "required_stages": [
+        "sewing"
+      ],
+      "required_standard_minutes_total": "720",
+      "stage_checks": [
+        {
+          "independently_sufficient_assignment_ids": [
+            "A-DAY-SEW-01"
+          ],
+          "reason_codes": [],
+          "stage": "sewing"
+        }
+      ],
+      "style_id": "TEE"
+    },
+    {
+      "all_stages_have_independent_slot": true,
+      "due_date": "2030-01-07",
+      "order_id": "B",
+      "priority": 2,
+      "quantity": 80,
+      "release_date": "2030-01-07",
+      "required_stages": [
+        "sewing"
+      ],
+      "required_standard_minutes_total": "960",
+      "stage_checks": [
+        {
+          "independently_sufficient_assignment_ids": [
+            "A-DAY-SEW-01"
+          ],
+          "reason_codes": [],
+          "stage": "sewing"
+        }
+      ],
+      "style_id": "TEE"
+    }
+  ],
+  "quantity_unit": "piece",
+  "scenario_id": "synthetic:m03a-competition",
+  "schedule_feasibility": "NOT_ASSESSED",
+  "schema_version": 1,
+  "slots": [
+    {
+      "assignment_id": "A-DAY-SEW-01",
+      "assumed_efficiency": "0.8",
+      "availability": {
+        "available_elapsed_minutes": "480",
+        "blocked_union_minutes": "0",
+        "break_minutes": "0",
+        "gross_elapsed_minutes": "480",
+        "planned_downtime_additional_minutes": "0",
+        "unavailable_additional_minutes": "0"
+      },
+      "available_worker_minutes": "1920",
+      "effective_capacity_standard_minutes": "1536",
+      "line_id": "SEW-01",
+      "profile_evidence_reference": null,
+      "profile_evidence_status": "synthetic",
+      "profile_id": "P-SEW-01",
+      "profile_source_id": "synthetic:m03a-competition",
+      "shift_end": "2030-01-07T16:00:00+03:00",
+      "shift_id": "DAY",
+      "shift_start": "2030-01-07T08:00:00+03:00",
+      "stage": "sewing",
+      "worker_count": 4
+    }
+  ],
+  "status": "CAPACITY_ASSESSED",
+  "synthetic": true
+}

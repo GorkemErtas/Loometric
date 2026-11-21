@@ -1,0 +1,138 @@
+{
+  "algorithm": "serial-priority-due-id-v1",
+  "allocation_granularity_minutes": 1,
+  "assumptions": [
+    "Entirely synthetic benchmark; no actual factory performance or ML capacity adjustments.",
+    "Dedicated qualified crews, additive stage labor standards and constant line efficiency are hypothetical.",
+    "Whole-stage nonpreemptive operations occupy one uninterrupted working fragment; no splitting, WIP initialization, setups or material constraints.",
+    "Fixed +03:00 calendar, hard local-midnight releases and soft next-midnight due deadlines."
+  ],
+  "calendar_utc_offset_minutes": 180,
+  "horizon": {
+    "end": "2030-01-07T16:00:00+03:00",
+    "start": "2030-01-07T08:00:00+03:00"
+  },
+  "instance_fingerprint": "f84788b106e2d42de3b99adcfc53f6c24b7f7e145ba3ff8d61be74d41df5ab26",
+  "instance_id": "synthetic:m03a-competition",
+  "metrics": {
+    "allocated_stage_units": 60,
+    "available_line_minutes": "480",
+    "available_standard_minutes": "1536",
+    "available_worker_minutes": "1920",
+    "capacity_unit": "standard_worker_minute",
+    "consumed_standard_minutes": "720",
+    "consumed_worker_minutes": "900",
+    "elapsed_time_unit": "minute",
+    "labor_unit": "worker_minute",
+    "late_completed_orders": 0,
+    "line_utilization": "0.46875",
+    "makespan_minutes": 225,
+    "occupied_line_minutes": "225",
+    "on_time_completed_orders": 1,
+    "orders": [
+      {
+        "allocated_stages": [
+          "sewing"
+        ],
+        "completed_units": 60,
+        "completion_at": "2030-01-07T08:45:00+00:00",
+        "order_id": "A",
+        "priority_weight": 2,
+        "quantity": 60,
+        "status": "COMPLETED",
+        "tardiness_minutes": 0,
+        "unscheduled_reasons": [],
+        "unscheduled_units": 0
+      },
+      {
+        "allocated_stages": [],
+        "completed_units": 0,
+        "completion_at": null,
+        "order_id": "B",
+        "priority_weight": 1,
+        "quantity": 80,
+        "status": "UNSCHEDULED",
+        "tardiness_minutes": null,
+        "unscheduled_reasons": [
+          "CAPACITY_RESERVED"
+        ],
+        "unscheduled_units": 80
+      }
+    ],
+    "partial_orders": 0,
+    "priority_weighted_tardiness_minutes": 0,
+    "quantity_unit": "piece",
+    "resources": [
+      {
+        "assignment_id": "A-DAY-SEW-01",
+        "available_elapsed_minutes": "480",
+        "available_standard_minutes": "1536",
+        "available_worker_minutes": "1920",
+        "consumed_standard_minutes": "720",
+        "consumed_worker_minutes": "900",
+        "line_id": "SEW-01",
+        "line_utilization": "0.46875",
+        "occupied_elapsed_minutes": "225",
+        "shift_id": "DAY",
+        "stage": "sewing",
+        "standard_capacity_utilization": "0.46875",
+        "unused_standard_minutes": "816",
+        "unused_worker_minutes": "1020"
+      }
+    ],
+    "rounding_slack_standard_minutes": "0",
+    "scheduled_operations": 1,
+    "scheduled_orders": 1,
+    "scheduled_units": 60,
+    "standard_capacity_utilization": "0.46875",
+    "tardiness_scope": "COMPLETED_ORDERS_ONLY",
+    "total_tardiness_minutes": 0,
+    "unscheduled_operations": 1,
+    "unscheduled_orders": 1,
+    "unscheduled_units": 80,
+    "unused_standard_minutes": "816",
+    "unused_worker_minutes": "1020"
+  },
+  "optimality_claim": false,
+  "policy_version": "whole-stage-minute-v1",
+  "schedule": {
+    "allocations": [
+      {
+        "assignment_id": "A-DAY-SEW-01",
+        "consumed_standard_minutes": "720",
+        "consumed_worker_minutes": "900",
+        "interval": {
+          "end": "2030-01-07T08:45:00+00:00",
+          "start": "2030-01-07T05:00:00+00:00"
+        },
+        "line_id": "SEW-01",
+        "order_id": "A",
+        "profile_id": "P-SEW-01",
+        "quantity": 60,
+        "required_standard_minutes": "720",
+        "shift_id": "DAY",
+        "stage": "sewing"
+      }
+    ],
+    "instance_fingerprint": "f84788b106e2d42de3b99adcfc53f6c24b7f7e145ba3ff8d61be74d41df5ab26",
+    "instance_id": "synthetic:m03a-competition",
+    "policy_version": "whole-stage-minute-v1",
+    "schema_version": 1,
+    "unscheduled": [
+      {
+        "order_id": "B",
+        "quantity": 80,
+        "reason": "CAPACITY_RESERVED",
+        "stage": "sewing"
+      }
+    ]
+  },
+  "schema_version": 1,
+  "status": "VALID_PARTIAL",
+  "synthetic": true,
+  "verification": {
+    "complete": false,
+    "feasible": true,
+    "violations": []
+  }
+}
