@@ -7,6 +7,8 @@ an expanding-window temporal audit, saved-prediction error/readiness analysis, a
 an experimental offline prediction contract with explicit artifact generation.
 A separate offline compatibility audit checks declared ML/planning contexts and
 inspects saved training-period predictions; target-to-efficiency conversion is blocked.
+An independent synthetic data foundation now generates normalized pre-shift plans,
+realized outcomes, leakage-safe feature views, reserved splits and quality audits.
 A separate planning foundation validates synthetic production scenarios and calculates
 deterministic shift capacity. Its reference scheduler now reserves finite capacity
 and independently verifies complete or partial schedules without forecasting.
@@ -139,8 +141,44 @@ model deserialization, HTTP ML endpoint or scenario application occurs.
 
 M07B regression: **1,001 Python tests**, **139 frontend tests**, **10 real-backend
 browser workflows**, with passing Ruff, frontend type/lint/build and dependency
-consistency checks. M08 requires a separately scoped evidence/contract phase before
-any conversion proposal; it is not started here.
+consistency checks. The M08A foundation below defines a separate synthetic problem;
+M01's compatibility verdict remains unchanged.
+
+## M08A: synthetic pre-shift training data foundation
+
+`synthetic-ml-v1` generates explicit factories, lines, qualified dedicated crews,
+styles/standards, orders, day/night shifts, plans and realized outcomes. All five
+production stages are supported. Every value is a declared synthetic assumption
+or simulated outcome; these are not measured factory records.
+
+The new `standard_capacity_attainment` label is completed good pieces × standard
+worker-minutes per piece / frozen planned available worker-minutes. Values above
+one are retained; zero planned capacity produces an explicit null/status. The
+13-column pre-shift feature whitelist never reads outcomes. Timestamped snapshots,
+chronological gaps and separate unseen crew/line/factory/style populations make
+future evaluation scope explicit. No model is trained or connected to scheduling.
+
+```powershell
+.venv/Scripts/python.exe -m loometric.synthetic_ml generate --profile development --seed 42 --scenario baseline --output data/processed/synthetic_ml/my-development-42
+```
+
+Choose a new output directory. Generation validates/replays before publishing and
+prints fingerprints for receipt-bound read-only `audit`. Normalized JSONL tables,
+feature/partitioned-label views, manifests, `quality.json` and `audit.md` stay ignored.
+Development produces **1,360 observations**; the measured benchmark produces
+**29,370**, derived from declared calendar/resource exposure. Three seeds and
+baseline/disruption/workload-surge scenarios are configured; generated ratios do
+not automatically become planning efficiency.
+
+See the [architecture and target](docs/architecture/synthetic-ml-data-foundation.md),
+[versioned field dictionary](docs/data/synthetic-ml-v1-dictionary.md),
+[quality evidence and reproduction commands](docs/data/synthetic-ml-v1-quality-and-reproduction.md),
+[configuration](configs/synthetic_ml_v1.json) and
+[ADR 0019](docs/decisions/0019-separated-synthetic-pre-shift-data.md).
+M08A checks: **1,081 Python tests**, **139 frontend tests**, **10 browser workflows**,
+passing lint/type/build and dependency checks. Historical data/artifacts/splits,
+M01 experiments/final test and M02–M04 contracts are preserved. Future model
+training and planning conversion require separate scope; M08A stops at data.
 
 ## Prediction problem
 
@@ -748,6 +786,9 @@ deterministic artifacts/inference, training-only label loading and explicit abst
 Compatibility checks add context-bound mapping/gate reasons, unsupported stages,
 unverified crews/grain, blocked conversion, no clamping or fabricated readiness,
 artifact metadata inspection without execution and saved-OOF holdout isolation.
+Synthetic-data checks add exact labor targets, seeded/scenario process properties,
+whole-date/global label-maturity boundaries, five generalization populations,
+outcome-free features, train-only label joins and normalized/derived bundle integrity.
 Planning checks cover dimensional capacity arithmetic, interval unions, references,
 capabilities, zero capacity, independent-order scope and operation without ML packages
 or protected data access.
@@ -802,6 +843,7 @@ src/loometric/
   experiments/               # Local experiment runners and saved-prediction audit CLI
   prediction/                # Offline contracts, policy, artifacts, inference and CLI
   compatibility/             # Offline context audit and saved OOF inspection; no conversion
+  synthetic_ml/              # Separate normalized synthetic pre-shift data and audits; no training
   planning/                  # Independent domain, availability, capacity and scenario CLI
   scheduling/                # Frozen contracts, reference dispatch, verifier, metrics and CLI
   optimization/              # CP-SAT model, proof-gated solves, adapter and comparison
@@ -822,6 +864,7 @@ docs/
   experiments/               # Measured experiment reports
   architecture/              # Prediction, planning and scheduling contracts/lifecycles
   contracts/                 # Versioned offline compatibility JSON Schemas
+  data/                      # Versioned synthetic dictionary and quality/reproduction guide
 examples/offline-prediction/  # Synthetic request and non-operational review policy
 examples/compatibility/       # Declared synthetic ML/planning context; always blocked
 examples/planning/            # Synthetic capacity and invalid-input scenarios
