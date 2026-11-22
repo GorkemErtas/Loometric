@@ -9,6 +9,7 @@ import {
   jobInfo,
   jobResult,
 } from "../domain/planning";
+import { inputValidation } from "../domain/production";
 
 export type ApiFailure =
   | "network"
@@ -43,10 +44,34 @@ export class ApiError extends Error {
     readonly requestId: string | null = null,
     readonly retryAfterMs: number | null = null,
     readonly code: string | null = null,
+    readonly domainCode: string | null = null,
   ) {
     super(messages[kind]);
   }
 }
+export const validationGuidance: Record<string, string> = {
+  BREAK_OUTSIDE_SHIFT: "A break lies outside its shift. Check Shifts & breaks.",
+  OVERLAPPING_BREAKS: "Breaks overlap. Check Shifts & breaks.",
+  OVERLAPPING_ASSIGNMENTS: "Assignments overlap on the same line. Check the production calendar.",
+  DOWNTIME_OUTSIDE_SHIFT:
+    "Downtime lies outside its assigned shift. Check the production calendar.",
+  PROFILE_NOT_EFFECTIVE: "A capacity profile is not effective at shift start. Check profile dates.",
+  PROFILE_LINE_MISMATCH: "The selected profile belongs to another line. Check assignments.",
+  NONWORKING_DATE:
+    "An assigned shift starts on an undeclared working date. Add that date explicitly.",
+  CALENDAR_OFFSET_MISMATCH: "A shift start uses a different offset from the fixed calendar offset.",
+  UNSUPPORTED_TIME_GRID:
+    "All horizon, shift, break and stop boundaries must align to whole minutes.",
+  INVALID_INTERVAL: "An interval ends before it starts. Check its explicit endpoints.",
+  INVALID_SHIFT: "A shift must end after it starts.",
+  INVALID_HORIZON: "The scheduling horizon must end after it starts.",
+  UNKNOWN_REFERENCE:
+    "A required entity reference is missing. Review orders, resources and calendar.",
+  DUPLICATE_IDENTIFIER: "An identifier is repeated. Review the affected entity lists.",
+  INVALID_ORDER_DATES: "An order release date follows its due date.",
+  CAPABILITY_STAGE_MISMATCH:
+    "A qualification must match both its line stage and a supported style stage.",
+};
 
 export function localOrigin(value: string): string {
   try {
@@ -214,8 +239,15 @@ export class ApiClient {
                         ? "validation"
                         : "server";
         let code = "";
+        let domainCode: string | null = null;
         try {
-          code = text(object(envelope.error).code);
+          const detail = object(envelope.error);
+          code = text(detail.code);
+          if (code === "DOMAIN_VALIDATION_FAILED" && Array.isArray(detail.details)) {
+            const candidate = object(detail.details[0]).domain_code;
+            if (typeof candidate === "string" && Object.hasOwn(validationGuidance, candidate))
+              domainCode = candidate;
+          }
         } catch {
           /* Optional safe error category. */
         }
@@ -225,6 +257,7 @@ export class ApiClient {
           safeId,
           retry,
           publicCodes.has(code) ? code : null,
+          domainCode,
         );
       }
       const result = unwrap(raw);
@@ -269,6 +302,16 @@ export class ApiClient {
     const r = await this.request("/scheduling/dispatch", dispatchReport, { instance }, signal);
     if (r.data.instanceId !== text(instance.instance_id)) throw new ApiError("contract");
     return r;
+  }
+  async validateInput(instance: JsonObject, signal?: AbortSignal) {
+    const result = await this.request(
+      "/scheduling/validate",
+      inputValidation,
+      { instance },
+      signal,
+    );
+    if (result.data.instanceId !== text(instance.instance_id)) throw new ApiError("contract");
+    return result;
   }
   async compare(baseline: JsonObject, specification: JsonObject, signal?: AbortSignal) {
     const r = await this.request(

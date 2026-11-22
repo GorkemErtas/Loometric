@@ -5,6 +5,11 @@ import { useWorkspace } from "../state/Workspace";
 
 export const routes = [
   {
+    key: "data",
+    label: "Production data",
+    description: "Build, validate and exchange your own synthetic production inputs.",
+  },
+  {
     key: "overview",
     label: "Overview",
     description: "A clear view of your planning inputs and available capacity.",
@@ -180,7 +185,7 @@ export function Layout({ route, children }: { route: Route; children: React.Reac
           <p>
             Synthetic planning data
             <br />
-            M06B · Planning workspace
+            M07A · Production data workspace
           </p>
           <span className="sidebar-version">No live factory connection</span>
         </div>
@@ -261,9 +266,11 @@ export function Layout({ route, children }: { route: Route; children: React.Reac
                 ? dataset?.previewCapacity
                   ? "Saved M02 report · explicit demo mode"
                   : "Input-only preview · connect API for reports"
-                : ["scheduling", "scenarios", "jobs"].includes(route)
-                  ? "M05A / M05B · interactive planning"
-                  : "M05A · read-only inspection"}
+                : route === "data"
+                  ? "M07A · synthetic data editor"
+                  : ["scheduling", "scenarios", "jobs"].includes(route)
+                    ? "M05A / M05B · interactive planning"
+                    : "M05A · read-only inspection"}
             </span>
           </div>
           {children}

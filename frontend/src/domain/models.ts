@@ -143,6 +143,7 @@ export interface Capabilities {
   jobLimits: { name: string; value: string }[];
 }
 export interface Dataset {
+  validatedFingerprint?: string;
   key: string;
   name: string;
   description: string;

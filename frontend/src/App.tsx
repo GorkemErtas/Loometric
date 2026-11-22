@@ -3,14 +3,23 @@ import { Capacity } from "./pages/Capacity";
 import { Jobs } from "./pages/Jobs";
 import { Orders } from "./pages/Orders";
 import { Overview } from "./pages/Overview";
+import { ProductionData } from "./pages/ProductionData";
 import { Resources } from "./pages/Resources";
 import { Scenarios } from "./pages/Scenarios";
 import { Scheduling } from "./pages/Scheduling";
 import { System } from "./pages/System";
 import { PlanningProvider } from "./state/PlanningWorkspace";
+import { ProductionProvider } from "./state/ProductionWorkspace";
 import { useWorkspace, WorkspaceProvider } from "./state/Workspace";
 
 export function Workspace() {
+  return (
+    <ProductionProvider>
+      <WorkspaceViews />
+    </ProductionProvider>
+  );
+}
+function WorkspaceViews() {
   const route = useRoute();
   const { dataset, sessionId } = useWorkspace();
   return (
@@ -19,6 +28,8 @@ export function Workspace() {
         <div key={`${route}:${dataset?.key ?? "empty"}`}>
           {route === "overview" ? (
             <Overview />
+          ) : route === "data" ? (
+            <ProductionData />
           ) : route === "orders" ? (
             <Orders />
           ) : route === "resources" ? (

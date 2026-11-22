@@ -31,6 +31,7 @@ interface WorkspaceValue {
   requestId: string | null;
   error: ApiError | null;
   selectDataset: (key: string) => void;
+  activateDataset: (source: Dataset) => void;
   connect: (origin: string, token: string) => Promise<void>;
   enterPreview: () => void;
   refresh: () => void;
@@ -46,6 +47,8 @@ export function WorkspaceProvider({
   children: ReactNode;
   catalog?: readonly Dataset[];
 }) {
+  const [userInput, setUserInput] = useState<Dataset | null>(null);
+  const available = userInput ? [...catalog, userInput] : catalog;
   const [dataset, setDataset] = useState<Dataset | null>(catalog[0] ?? null);
   const [api, setApi] = useState<ApiClient | null>(null);
   const [sessionId, setSessionId] = useState(0);
@@ -97,7 +100,7 @@ export function WorkspaceProvider({
   }, []);
 
   const selectDataset = (key: string) => {
-    const next = catalog.find((item) => item.key === key);
+    const next = available.find((item) => item.key === key);
     if (!next || next === dataset) return;
     const stamp = ++generation.current;
     selected.current = next;
@@ -111,6 +114,18 @@ export function WorkspaceProvider({
     }
     setCapacity(null);
     if (client.current && health) void fetchCapacity(client.current, next, stamp);
+  };
+  const activateDataset = (next: Dataset) => {
+    if (!client.current || !next.validatedFingerprint) return;
+    setUserInput(next);
+    const stamp = ++generation.current;
+    selected.current = next;
+    setDataset(next);
+    clearSchedule();
+    setError(null);
+    setRequestId(null);
+    setCapacity(null);
+    void fetchCapacity(client.current, next, stamp);
   };
   const enterPreview = () => {
     setApi(null);
@@ -213,7 +228,7 @@ export function WorkspaceProvider({
         api,
         sessionId,
         rejectSession,
-        catalog,
+        catalog: available,
         dataset,
         mode,
         status,
@@ -227,6 +242,7 @@ export function WorkspaceProvider({
         requestId,
         error,
         selectDataset,
+        activateDataset,
         connect,
         enterPreview,
         refresh,

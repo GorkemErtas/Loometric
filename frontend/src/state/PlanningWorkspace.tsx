@@ -123,6 +123,11 @@ export function PlanningProvider({ children }: { children: ReactNode }) {
       setComparison(null);
       setReview(null);
       const response = await api.dispatch(dataset.instance, signal);
+      if (
+        dataset.validatedFingerprint &&
+        response.data.fingerprint !== dataset.validatedFingerprint
+      )
+        throw new ContractError();
       if (!signal.aborted && mounted.current) setReference(response);
     });
   const runComparison = () =>

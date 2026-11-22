@@ -1,0 +1,262 @@
+.production-workspace {
+  font-size: 1rem;
+}
+.production-workspace .panel {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.production-workspace .panel-heading {
+  padding: 0 0 1rem;
+}
+.production-workspace .button {
+  font-size: 0.875rem;
+}
+.production-workspace h2 {
+  font-size: 1.125rem;
+}
+.production-workspace .panel-actions,
+.production-workspace .provenance-grid {
+  padding: 0;
+}
+.production-workspace .panel > .notice {
+  margin: 0;
+}
+.production-workspace .error-notice {
+  padding: 1rem;
+  color: #8b342a;
+  border: 1px solid #e8c2bd;
+  background: #fff1ef;
+  border-radius: 0.6rem;
+}
+.production-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.production-steps button {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  padding: 0.8rem;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.production-steps button[aria-current="step"] {
+  background: #e4f3ee;
+  color: #165b48;
+  border-color: #278467;
+  font-weight: 600;
+}
+.production-steps :where(button) span {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.production-steps button:disabled {
+  cursor: default;
+  opacity: 0.65;
+}
+.production-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.production-field,
+.production-template-controls label,
+.production-transfer-controls label,
+.production-date-form label {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.production-workspace small {
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.production-workspace .field-help {
+  color: #43556a;
+  font-size: 0.875rem;
+}
+.production-form textarea {
+  width: 100%;
+  resize: vertical;
+  font: inherit;
+  padding: 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+}
+.production-repeater {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+}
+.production-repeater legend {
+  font-weight: 600;
+  padding: 0 0.3rem;
+}
+.production-repeat-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 0.7rem;
+  align-items: end;
+  margin-bottom: 0.8rem;
+}
+.production-stage {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+.production-stage span {
+  margin-right: auto;
+}
+.production-records {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+.production-records li {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.production-records li > div:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.production-records p {
+  margin: 0.4rem 0 0;
+}
+.production-records .panel-actions {
+  flex-shrink: 0;
+}
+.production-template-controls,
+.production-transfer-controls {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.production-template-controls label,
+.production-transfer-controls label {
+  flex: 1 1 20rem;
+}
+.production-template-controls .button,
+.production-transfer-controls .button {
+  flex: 0 1 auto;
+}
+.production-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1rem;
+}
+.production-summary dt {
+  font-size: 0.875rem;
+}
+.production-summary dd {
+  margin: 0.3rem 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+.production-issues {
+  background: #fff5e7;
+  border: 1px solid #e5c79c;
+  color: #62400d;
+  padding: 1rem;
+  border-radius: 0.6rem;
+  overflow-wrap: anywhere;
+}
+.production-issues li {
+  margin: 0.5rem 0;
+}
+.production-validation {
+  margin: 1.2rem 0;
+}
+.production-step-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.production-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
+.production-dates > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.production-date-form {
+  display: flex;
+  gap: 1rem;
+  align-items: end;
+  flex-wrap: wrap;
+}
+.production-date-form label {
+  flex: 1 1 12rem;
+}
+.production-workspace .panel-heading p {
+  font-size: 0.875rem;
+}
+.production-workspace .production-form label {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.production-workspace input[type="text"],
+.production-workspace input[type="date"] {
+  min-width: 0;
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid #cdd6e0;
+  border-radius: 0.4rem;
+  background: white;
+  color: var(--ink);
+}
+@media (max-width: 1000px) {
+  .production-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .production-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .production-field-grid,
+  .production-repeat-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .production-steps button {
+    padding: 0.65rem;
+    font-size: 0.875rem;
+  }
+  .production-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .production-records li {
+    align-items: start;
+    flex-direction: column;
+  }
+  .production-step-controls .button {
+    flex: 1;
+  }
+}
