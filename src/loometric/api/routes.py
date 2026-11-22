@@ -36,7 +36,7 @@ async def capabilities(request: Request, auth: AUTH) -> SuccessResponse:
         request,
         {
             "policy_versions": ["whole-stage-minute-v1"],
-            "operations": ["capacity", "dispatch", "verify", "compare"],
+            "operations": ["capacity", "dispatch", "verify", "compare", "validate"],
             "scenario_changes": [
                 "set_workers",
                 "set_efficiency",
@@ -146,6 +146,16 @@ def _request_schema(operation: str) -> dict:
 )
 async def capacity(request: Request, auth: AUTH) -> SuccessResponse:
     return await _run(request, "capacity")
+
+
+@ROUTER.post(
+    "/scheduling/validate",
+    response_model=SuccessResponse,
+    responses=ERRORS,
+    openapi_extra=_request_schema("validate"),
+)
+async def validate(request: Request, auth: AUTH) -> SuccessResponse:
+    return await _run(request, "validate")
 
 
 @ROUTER.post(

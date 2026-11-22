@@ -18,6 +18,98 @@ from loometric.scheduling.contracts import instance_fingerprint
 from loometric.scheduling.loading import parse_instance
 
 
+def test_validate_input_returns_exact_identity_without_scheduling(http, fixture_json):
+    instance = fixture_json("scheduling/competition.json")
+    instance["planning"]["styles"][0]["standards"][0]["standard_minutes_per_unit"] = Decimal(
+        "0.1234567890123456789012345678"
+    )
+    original = copy.deepcopy(instance)
+    response = http("POST", "/api/v1/scheduling/validate", body={"instance": instance})
+    assert response.status_code == 200, response.text
+    result = response.json()["data"]
+    assert result == {
+        "schema_version": 1,
+        "policy_version": "whole-stage-minute-v1",
+        "synthetic": True,
+        "status": "VALID_INPUT",
+        "instance_id": instance["instance_id"],
+        "instance_fingerprint": instance_fingerprint(parse_instance(input_json(instance))),
+    }
+    assert instance == original
+    assert response.headers["cache-control"] == "no-store"
+    assert "/api/v1/scheduling/validate" in http("GET", "/api/v1/openapi.json").json()["paths"]
+
+
+@pytest.mark.parametrize(
+    ("kind", "code"),
+    [
+        ("quantity", "INVALID_INTEGER"),
+        ("date", "INVALID_DATE"),
+        ("duplicate", "DUPLICATE_IDENTIFIER"),
+        ("reference", "UNKNOWN_REFERENCE"),
+        ("break", "BREAK_OUTSIDE_SHIFT"),
+        ("downtime", "DOWNTIME_OUTSIDE_SHIFT"),
+        ("profile", "PROFILE_NOT_EFFECTIVE"),
+        ("offset", "CALENDAR_OFFSET_MISMATCH"),
+        ("fields", "INVALID_FIELDS"),
+    ],
+)
+def test_validate_reuses_authoritative_domain_rules(http, fixture_json, kind, code):
+    instance = fixture_json("scheduling/competition.json")
+    planning = instance["planning"]
+    if kind == "quantity":
+        planning["orders"][0]["quantity"] = 0
+    elif kind == "date":
+        planning["orders"][0]["due_date"] = "2030-02-30"
+    elif kind == "duplicate":
+        planning["orders"].append(copy.deepcopy(planning["orders"][0]))
+    elif kind == "reference":
+        planning["orders"][0]["style_id"] = "private:must-not-echo"
+    elif kind == "break":
+        planning["shifts"][0]["breaks"] = [
+            {"start": "2030-01-01T00:00:00+03:00", "end": "2030-01-01T00:01:00+03:00"}
+        ]
+    elif kind == "downtime":
+        planning["calendar"]["planned_downtime"] = [
+            {
+                "downtime_id": "stop",
+                "assignment_id": planning["calendar"]["assignments"][0]["assignment_id"],
+                "interval": {
+                    "start": "2030-01-01T00:00:00+03:00",
+                    "end": "2030-01-01T00:01:00+03:00",
+                },
+                "reason": "private:must-not-echo",
+            }
+        ]
+    elif kind == "profile":
+        planning["capacity_profiles"][0]["effective_date"] = "2099-01-01"
+    elif kind == "offset":
+        instance["calendar_utc_offset_minutes"] = 0
+    else:
+        planning["private:must-not-echo"] = True
+    response = http("POST", "/api/v1/scheduling/validate", body={"instance": instance})
+    result = assert_error(response, 422, "DOMAIN_VALIDATION_FAILED")
+    assert result.error.details == [{"domain_code": code}]
+    assert "must-not-echo" not in response.text
+
+
+def test_validate_security_and_transport_limits(http, fixture_json):
+    path = "/api/v1/scheduling/validate"
+    body = {"instance": fixture_json("scheduling/competition.json")}
+    assert_error(http("POST", path, body=body, authorized=False), 401, "AUTHENTICATION_REQUIRED")
+    assert http("POST", path, body=body, peer="192.0.2.1").status_code == 403
+    assert (
+        http("POST", path, body=body, headers={"Origin": "https://evil.example"}).status_code == 403
+    )
+    assert http("POST", path, body=body, headers={"Host": "evil.example"}).status_code == 403
+    assert_error(http("POST", path, body={**body, "token": "private"}), 422, "INVALID_ENVELOPE")
+    assert http("POST", path, content=" " * 262145).status_code == 413
+    for content in ("[" * 25 + "0" + "]" * 25, json.dumps([0] * 257)):
+        assert http("POST", path, content=content).status_code == 422
+    body["instance"]["planning"]["synthetic"] = False
+    assert_error(http("POST", path, body=body), 422, "SYNTHETIC_REQUIRED")
+
+
 @pytest.fixture
 def http(api_settings):
     app = create_app(api_settings)
@@ -236,7 +328,7 @@ def test_media_and_http_errors_are_uniform(http):
 
 def test_openapi_documents_authentication_envelopes_and_errors(http):
     spec = http("GET", "/api/v1/openapi.json", authorized=False).json()
-    assert len(spec["paths"]) == 10
+    assert len(spec["paths"]) == 11
     assert spec["components"]["securitySchemes"]["LocalBearer"]["scheme"] == "bearer"
     for path, methods in spec["paths"].items():
         for method, operation in methods.items():

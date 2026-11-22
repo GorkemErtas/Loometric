@@ -92,6 +92,15 @@ def execute(
             ),
         )
     instance = _instance(request.instance, limits)
+    if operation == "validate":
+        return {
+            "schema_version": 1,
+            "policy_version": instance.policy_version,
+            "instance_id": instance.instance_id,
+            "instance_fingerprint": instance_fingerprint(instance),
+            "synthetic": True,
+            "status": "VALID_INPUT",
+        }
     schedule = (
         dispatch(instance)
         if operation == "dispatch"

@@ -12,6 +12,22 @@ from loometric.planning.loading import parse_json
 from loometric.planning.validation import PlanningError
 
 
+def test_validate_never_dispatches_or_assesses(monkeypatch, fixture_json):
+    def forbidden(*args, **kwargs):
+        pytest.fail("Validation must not calculate a schedule or capacity")
+
+    monkeypatch.setattr("loometric.api.operations.dispatch", forbidden)
+    monkeypatch.setattr("loometric.api.operations.assess_scenario", forbidden)
+    instance = fixture_json("scheduling/competition.json")
+    assert execute("validate", input_json({"instance": instance}), default_limits())["status"] == (
+        "VALID_INPUT"
+    )
+    for name in ("max_orders", "max_operations"):
+        limits = default_limits().model_copy(update={name: 1})
+        with pytest.raises(ApiError, match="synchronous API envelope"):
+            execute("validate", input_json({"instance": instance}), limits)
+
+
 @pytest.mark.parametrize("source", ['{"x":1,"x":2}', '{"x":NaN}', '{"x":Infinity}', "{", "01"])
 def test_strict_json_rejects_ambiguous_values(source):
     with pytest.raises(ApiError) as caught:

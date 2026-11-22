@@ -46,6 +46,7 @@ class ErrorResponse(ClosedModel):
 
 REQUEST_MODELS = {
     "capacity": CapacityRequest,
+    "validate": DispatchRequest,
     "dispatch": DispatchRequest,
     "verify": VerifyRequest,
     "compare": CompareRequest,
