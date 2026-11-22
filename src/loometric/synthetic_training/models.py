@@ -1,5 +1,6 @@
 """Small declared mean/Ridge/forest/histogram models; fitted inputs are features only."""
 
+from fractions import Fraction
 from math import fsum
 
 import numpy as np
@@ -61,12 +62,14 @@ def workload_band(row) -> str:
     require(
         row["available_minutes"] * row["planned_workers"] > 0, "ZERO_CAPACITY_REQUIRES_ABSTENTION"
     )
+    # M08A standards have at most two decimal places and counts are exact integers.
+    # Reconstruct those decimal inputs instead of comparing binary products at 0.6.
     load = (
-        row["order_quantity"]
-        * row["standard_worker_minutes_per_piece"]
-        / (row["available_minutes"] * row["planned_workers"])
+        Fraction(str(row["order_quantity"]))
+        * Fraction(str(row["standard_worker_minutes_per_piece"]))
+        / (Fraction(str(row["available_minutes"])) * Fraction(str(row["planned_workers"])))
     )
-    return "low" if load <= 0.6 else "nominal" if load <= 1 else "high"
+    return "low" if load <= Fraction(3, 5) else "nominal" if load <= 1 else "high"
 
 
 class MeanModel:

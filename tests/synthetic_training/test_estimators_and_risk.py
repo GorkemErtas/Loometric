@@ -11,7 +11,12 @@ from loometric.synthetic_training.configuration import load_study
 from loometric.synthetic_training.data import Population
 from loometric.synthetic_training.folds import expanding_folds
 from loometric.synthetic_training.metrics import analyze, error_summary
-from loometric.synthetic_training.models import MeanModel, build_model, model_metadata
+from loometric.synthetic_training.models import (
+    MeanModel,
+    build_model,
+    model_metadata,
+    workload_band,
+)
 from loometric.synthetic_training.risk import (
     assess_support,
     band_diagnostics,
@@ -114,6 +119,18 @@ def test_unknown_mean_groups_fall_back_to_global_and_no_clamping(toy):
     unknown = toy.X.iloc[:2].copy()
     unknown.loc[:, "stage"] = "unseen"
     assert list(model.predict(unknown)) == [1.4, 1.4]
+
+
+def test_planned_workload_boundary_uses_exact_declared_decimal_units():
+    row = {
+        "order_quantity": 100.0,
+        "standard_worker_minutes_per_piece": 4.86,
+        "available_minutes": 405.0,
+        "planned_workers": 2.0,
+    }
+    assert row["order_quantity"] * row["standard_worker_minutes_per_piece"] / 810 > 0.6
+    assert workload_band(row) == "low"  # 100 × 4.86 / (405 × 2) = exactly 0.6.
+    assert workload_band({**row, "standard_worker_minutes_per_piece": 4.87}) == "nominal"
 
 
 def test_training_fold_dates_are_disjoint_purged_and_mature(toy):
