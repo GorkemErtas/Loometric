@@ -106,9 +106,40 @@ function harness(fetcher = transport()) {
 async function ready() {
   await waitFor(() => expect(screen.getByLabelText("API connected")).toHaveTextContent("yes"));
 }
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
 
 describe("draft validation, activation and ownership", () => {
+  it.each(["Switch dataset", "Disconnect"])(
+    "can validate again after %s interrupts asynchronous activation",
+    async (action) => {
+      harness();
+      await ready();
+      fireEvent.click(screen.getByRole("button", { name: "Validate" }));
+      await waitFor(() => expect(screen.getByLabelText("Validated")).toHaveTextContent("yes"));
+      const original = crypto.subtle.digest.bind(crypto.subtle);
+      let finish: (() => void) | undefined;
+      vi.spyOn(crypto.subtle, "digest").mockImplementationOnce(
+        (...args) =>
+          new Promise((resolve, reject) => {
+            finish = () => {
+              original(...args).then(resolve, reject);
+            };
+          }),
+      );
+      fireEvent.click(screen.getByRole("button", { name: "Activate" }));
+      await waitFor(() => expect(finish).toBeDefined());
+      fireEvent.click(screen.getByRole("button", { name: action }));
+      await act(async () => finish?.());
+      expect(screen.getByLabelText("Active dataset")).not.toHaveTextContent(/^user-/);
+      fireEvent.click(screen.getByRole("button", { name: "Connect" }));
+      await ready();
+      fireEvent.click(screen.getByRole("button", { name: "Validate" }));
+      await waitFor(() => expect(screen.getByLabelText("Validated")).toHaveTextContent("yes"));
+    },
+  );
   it("sends one exact validation request, activates an independent dataset and keeps only one user input", async () => {
     const fetcher = harness();
     await ready();

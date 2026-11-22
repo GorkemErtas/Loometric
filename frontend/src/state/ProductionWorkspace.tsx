@@ -59,6 +59,7 @@ export function ProductionProvider({ children }: { children: ReactNode }) {
   };
   useEffect(() => {
     if (ownership.current !== owner) return;
+    activating.current = false;
     serial.current++;
     pending.current?.abort();
     pending.current = null;
@@ -163,7 +164,7 @@ export function ProductionProvider({ children }: { children: ReactNode }) {
         setStep,
         editing,
         setEditing,
-        receipt,
+        receipt: accepted.current?.owner === owner ? receipt : null,
         busy,
         message,
         validate,
