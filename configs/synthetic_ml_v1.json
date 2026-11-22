@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "dataset_version": "synthetic-ml-v1",
+  "seeds": [19, 42, 73],
+  "scenarios": ["baseline", "disruption", "workload_surge"],
+  "profiles": {
+    "development": {"calendar_days": 56, "factories": 3, "lines_per_stage": 2, "styles": 6},
+    "benchmark": {"calendar_days": 364, "factories": 5, "lines_per_stage": 3, "styles": 12}
+  }
+}
