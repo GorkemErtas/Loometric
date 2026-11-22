@@ -1,0 +1,381 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:loometric:compatibility:assessment:v1",
+  "title": "assessment",
+  "description": "M07B policy deliberately cannot emit overall COMPATIBLE or READY. A structurally COMPATIBLE mapping is not a semantic conversion or application authorization.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "policy_version": {
+      "const": "m01-planning-audit-v1"
+    },
+    "status": {
+      "enum": [
+        "INCOMPATIBLE",
+        "INSUFFICIENT_EVIDENCE"
+      ]
+    },
+    "mappings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "pattern": "^[^\\s\\x00-\\x1f](?:[^\\x00-\\x1f]*[^\\s\\x00-\\x1f])?$"
+          },
+          "status": {
+            "enum": [
+              "COMPATIBLE",
+              "CONDITIONAL",
+              "INCOMPATIBLE",
+              "INSUFFICIENT_EVIDENCE"
+            ]
+          },
+          "reason_codes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9_]+$"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "status",
+          "reason_codes"
+        ]
+      }
+    },
+    "gates": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gate": {
+            "enum": [
+              "target_units",
+              "feature_timing",
+              "department_stage",
+              "team_crew",
+              "observation_grain",
+              "domain_shift",
+              "model_quality",
+              "uncertainty",
+              "artifact_integrity",
+              "supported_inputs",
+              "prediction_range",
+              "operational_safety"
+            ]
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "BLOCKED",
+              "NOT_ASSESSED"
+            ]
+          },
+          "reason_codes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9_]+$"
+            }
+          },
+          "evidence_references": {
+            "type": "array",
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^[^\\s\\x00-\\x1f](?:[^\\x00-\\x1f]*[^\\s\\x00-\\x1f])?$"
+            }
+          }
+        },
+        "required": [
+          "gate",
+          "status",
+          "reason_codes",
+          "evidence_references"
+        ]
+      },
+      "allOf": [
+        {
+          "contains": {
+            "properties": {
+              "gate": {
+                "const": "target_units"
+              }
+            },
+            "required": [
+              "gate"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "gate": {
+                "const": "feature_timing"
+              }
+            },
+            "required": [
+              "gate"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "gate": {
+                "const": "department_stage"
+              }
+            },
+            "required": [
+              "gate"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "gate": {
+                "const": "team_crew"
+              }
+            },
+            "required": [
+              "gate"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "gate": {
+                "const": "observation_grain"
+              }
+            },
+            "required": [
+              "gate"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "gate": {
+                "const": "domain_shift"
+              }
+            },
+            "required": [
+              "gate"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "gate": {
+                "const": "model_quality"
+              }
+            },
+            "required": [
+              "gate"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "gate": {
+                "const": "uncertainty"
+              }
+            },
+            "required": [
+              "gate"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "gate": {
+                "const": "artifact_integrity"
+              }
+            },
+            "required": [
+              "gate"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "gate": {
+                "const": "supported_inputs"
+              }
+            },
+            "required": [
+              "gate"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "gate": {
+                "const": "prediction_range"
+              }
+            },
+            "required": [
+              "gate"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "gate": {
+                "const": "operational_safety"
+              }
+            },
+            "required": [
+              "gate"
+            ]
+          }
+        }
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "context_fingerprint": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "assessment_request_fingerprint": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "instance_fingerprint": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "artifact_fingerprint": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "model_configuration_fingerprint": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "dataset_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "split_file_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "pipeline_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "instance_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^[^\\s\\x00-\\x1f](?:[^\\x00-\\x1f]*[^\\s\\x00-\\x1f])?$"
+        },
+        "model_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^[^\\s\\x00-\\x1f](?:[^\\x00-\\x1f]*[^\\s\\x00-\\x1f])?$"
+        },
+        "model_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^[^\\s\\x00-\\x1f](?:[^\\x00-\\x1f]*[^\\s\\x00-\\x1f])?$"
+        },
+        "source_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^[^\\s\\x00-\\x1f](?:[^\\x00-\\x1f]*[^\\s\\x00-\\x1f])?$"
+        }
+      },
+      "required": [
+        "context_fingerprint",
+        "assessment_request_fingerprint",
+        "instance_fingerprint",
+        "artifact_fingerprint",
+        "model_configuration_fingerprint",
+        "dataset_sha256",
+        "split_file_sha256",
+        "pipeline_sha256",
+        "instance_id",
+        "model_id",
+        "model_version",
+        "source_id"
+      ]
+    },
+    "declared_prediction": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Decimal text preserves declared values, including rejected internal nonfinite values. Never a converted efficiency."
+    },
+    "integration_readiness": {
+      "const": "NOT_READY"
+    },
+    "target_to_efficiency": {
+      "const": "BLOCKED"
+    },
+    "capacity_application_authorized": {
+      "const": false
+    },
+    "converted_efficiency": {
+      "type": "null"
+    },
+    "candidate_value_origin": {
+      "const": "DECLARED_OFFLINE_CONTEXT_NOT_REEXECUTED"
+    },
+    "final_test_evaluated": {
+      "const": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "policy_version",
+    "status",
+    "mappings",
+    "gates",
+    "provenance",
+    "declared_prediction",
+    "integration_readiness",
+    "target_to_efficiency",
+    "capacity_application_authorized",
+    "converted_efficiency",
+    "candidate_value_origin",
+    "final_test_evaluated"
+  ]
+}

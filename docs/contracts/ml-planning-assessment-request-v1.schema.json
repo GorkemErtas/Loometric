@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:loometric:compatibility:assessment-request:v1",
+  "title": "assessment-request",
+  "description": "M07B declared offline context. Typed runtime additionally enforces timezone/order, unique gates, bounded JSON, and unchanged M01/planning semantic contracts. No actual/final-test labels accepted.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "prediction_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "input_schema_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "scheduled_date": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "department": {
+          "enum": [
+            "sewing",
+            "finishing"
+          ]
+        },
+        "team": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,8}$"
+        },
+        "prediction_cutoff": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$"
+        },
+        "source_snapshot_timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$"
+        },
+        "source_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^[^\\s\\x00-\\x1f](?:[^\\x00-\\x1f]*[^\\s\\x00-\\x1f])?$"
+        },
+        "shift_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^[^\\s\\x00-\\x1f](?:[^\\x00-\\x1f]*[^\\s\\x00-\\x1f])?$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "input_schema_version",
+        "scheduled_date",
+        "department",
+        "team",
+        "prediction_cutoff",
+        "source_snapshot_timestamp",
+        "source_id"
+      ]
+    },
+    "predicted_productivity": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Declared candidate, not executed or authenticated. Negative and >1 numbers are assessed, never clamped. JSON must be finite; runtime additionally bounds Decimal digits/exponents."
+    },
+    "prediction_status": {
+      "enum": [
+        "VALID_EXPERIMENTAL",
+        "REVIEW_REQUIRED",
+        "ABSTAIN"
+      ]
+    },
+    "artifact_fingerprint": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "model_configuration_fingerprint": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$"
+    },
+    "observation_grain": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^[^\\s\\x00-\\x1f](?:[^\\x00-\\x1f]*[^\\s\\x00-\\x1f])?$"
+    },
+    "assignment_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^[^\\s\\x00-\\x1f](?:[^\\x00-\\x1f]*[^\\s\\x00-\\x1f])?$"
+    },
+    "order_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^[^\\s\\x00-\\x1f](?:[^\\x00-\\x1f]*[^\\s\\x00-\\x1f])?$"
+    },
+    "evidence_references": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gate": {
+            "enum": [
+              "target_units",
+              "feature_timing",
+              "department_stage",
+              "team_crew",
+              "observation_grain",
+              "domain_shift",
+              "model_quality",
+              "uncertainty",
+              "artifact_integrity",
+              "supported_inputs",
+              "prediction_range",
+              "operational_safety"
+            ]
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "pattern": "^[^\\s\\x00-\\x1f](?:[^\\x00-\\x1f]*[^\\s\\x00-\\x1f])?$"
+          },
+          "context_fingerprint": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "gate",
+          "reference",
+          "context_fingerprint"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "prediction_request",
+    "predicted_productivity",
+    "prediction_status",
+    "artifact_fingerprint",
+    "model_configuration_fingerprint",
+    "as_of",
+    "observation_grain",
+    "assignment_id",
+    "order_id",
+    "evidence_references"
+  ]
+}

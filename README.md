@@ -5,6 +5,8 @@ validation, exploratory analysis, a pre-shift leakage assessment, frozen chronol
 partitions, two naive mean baselines, Linear Regression, Random Forest Regression,
 an expanding-window temporal audit, saved-prediction error/readiness analysis, and
 an experimental offline prediction contract with explicit artifact generation.
+A separate offline compatibility audit checks declared ML/planning contexts and
+inspects saved training-period predictions; target-to-efficiency conversion is blocked.
 A separate planning foundation validates synthetic production scenarios and calculates
 deterministic shift capacity. Its reference scheduler now reserves finite capacity
 and independently verifies complete or partial schedules without forecasting.
@@ -100,7 +102,45 @@ validation endpoint to the backend; frozen domain algorithms, dependencies and
 existing API limits are unchanged. The browser-created example finishes all ten
 pieces in 16 minutes, with an 11-minute same-demand crew-change scenario; these
 are synthetic conditional results. No deployment or persistent storage was added.
-M07A stops here; M07B requires separate scope.
+The offline M07B audit below leaves these planning workflows unchanged.
+
+## M07B: offline ML/planning compatibility
+
+**Integration NOT_READY; productivity-to-efficiency conversion BLOCKED.** The model's
+target formula, worker-minute basis, shift grain, crew identity and transfer to the
+synthetic planning domain are unverified. Sewing/finishing labels and ratio values
+do not establish equivalent processes or units. Predictions never automatically
+replace planning efficiency, and values are never silently clamped.
+
+The [complete audit](docs/architecture/ml-planning-compatibility.md) contains the
+full feature/entity mapping matrix, measured baseline/OLS/forest results, artifact
+fingerprints, twelve measurable readiness gates and a future-only integration design.
+[ADR 0018](docs/decisions/0018-offline-ml-planning-compatibility.md) defines the boundary;
+versioned [request](docs/contracts/ml-planning-assessment-request-v1.schema.json) and
+[assessment](docs/contracts/ml-planning-assessment-v1.schema.json) schemas accompany
+the typed Python contracts.
+
+Using the existing local ML environment and retained artifact receipts:
+
+```powershell
+.venv/Scripts/python.exe -m loometric.compatibility assess --request examples/compatibility/request.json --instance examples/scheduling/competition.json --artifact data/processed/m01-b-rf01-a --expected-fingerprint e70256ebc3713aa4a5a7fa10b9a8f8454b4a7f468339b6e3c9b12998a5f94332
+.venv/Scripts/python.exe -m loometric.compatibility inspect-saved --expected-predictions-sha256 a65f2643c273dfabb13964a28197bf6ca35b7ed2a97ce64373d8825b05d31843
+```
+
+`assess` checks a declared context without executing a model. The example's 0.8 is
+synthetic input and still returns INSUFFICIENT_EVIDENCE / NOT_READY / BLOCKED.
+`inspect-saved` reuses 393 existing EXP-004 inner-OOF predictions from original
+training: forest MAE 0.148426346 versus department mean 0.147273373, 0.7829% worse.
+These are separate from its modest selected outer-validation gain. The final test
+remains reserved. Add `--include-observations` to inspect matched inner-OOF targets;
+use `--output` with a new ignored local path to save either report. Exit 0 means
+an audit was produced, including blocked assessments. No refitting, new inference,
+model deserialization, HTTP ML endpoint or scenario application occurs.
+
+M07B regression: **1,001 Python tests**, **139 frontend tests**, **10 real-backend
+browser workflows**, with passing Ruff, frontend type/lint/build and dependency
+consistency checks. M08 requires a separately scoped evidence/contract phase before
+any conversion proposal; it is not started here.
 
 ## Prediction problem
 
@@ -674,7 +714,8 @@ and native cancellation/shutdown evidence are documented in the
 [ADR 0014](docs/decisions/0014-bounded-local-optimization-jobs.md).
 The frozen optimizer/scenario/ML contracts remain unchanged. No dependencies added;
 Linux execution remains unverified on this Windows host. The M06A read-only
-foundation and interactive M06B workflows are described above; M07 remains separate.
+foundation and interactive M06B workflows are described above; M07A and the offline
+M07B audit have their own documented boundaries.
 
 ## Checks
 
@@ -704,6 +745,9 @@ sensitivity populations, artifact drift, no refitting, and holdout isolation.
 Offline-prediction checks cover strict request/provenance contracts, source-bound
 review policy, unknown/stale inputs, trusted artifact compatibility/integrity,
 deterministic artifacts/inference, training-only label loading and explicit abstention.
+Compatibility checks add context-bound mapping/gate reasons, unsupported stages,
+unverified crews/grain, blocked conversion, no clamping or fabricated readiness,
+artifact metadata inspection without execution and saved-OOF holdout isolation.
 Planning checks cover dimensional capacity arithmetic, interval unions, references,
 capabilities, zero capacity, independent-order scope and operation without ML packages
 or protected data access.
@@ -757,6 +801,7 @@ src/loometric/
   forest.py                  # Fixed forest profiles, pipeline, and importance summaries
   experiments/               # Local experiment runners and saved-prediction audit CLI
   prediction/                # Offline contracts, policy, artifacts, inference and CLI
+  compatibility/             # Offline context audit and saved OOF inspection; no conversion
   planning/                  # Independent domain, availability, capacity and scenario CLI
   scheduling/                # Frozen contracts, reference dispatch, verifier, metrics and CLI
   optimization/              # CP-SAT model, proof-gated solves, adapter and comparison
@@ -776,7 +821,9 @@ docs/
   decisions/                 # Architecture decisions and rationale
   experiments/               # Measured experiment reports
   architecture/              # Prediction, planning and scheduling contracts/lifecycles
+  contracts/                 # Versioned offline compatibility JSON Schemas
 examples/offline-prediction/  # Synthetic request and non-operational review policy
+examples/compatibility/       # Declared synthetic ML/planning context; always blocked
 examples/planning/            # Synthetic capacity and invalid-input scenarios
 examples/scheduling/          # Synthetic benchmarks and deliberately invalid proposals
 examples/scenarios/           # Small explicit what-if inputs, including conflicts/regressions
