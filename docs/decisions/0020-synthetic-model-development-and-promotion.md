@@ -36,6 +36,14 @@ One-hot stage/shift/weekday, numeric scaling for Ridge only; no early stopping o
 implicit internal validation split. Fixed model seed42, RF one worker, numerical
 thread pools one, fixed estimator/row/search bounds. No new dependencies.
 
+The grouped baseline uses stage × shift × planned-load band (≤0.6, (0.6,1], >1),
+minimum10 training observations, then stage/shift, stage, global fallback. The
+stage guard and both tail guards apply to every world/scenario cell, rather than
+only a pooled average. Staffing bands are1–5/6–10/11+, interruption bands0/1–30/31+
+minutes. These diagnostic boundaries are fixed before fitting, not learned from
+held-out labels. Runtime bounds are estimator/row/search/thread limits; elapsed
+time is checked between fits, not an OS guarantee against a hung native call.
+
 Select one configuration per family using training-fold MAE, weighted half to the
 mean development-seed score and half to benchmark; all worlds remain correlated
 synthetic evidence. Outer validation can admit or reject these fixed finalists,
