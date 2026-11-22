@@ -2,7 +2,8 @@
 
 React/strict TypeScript local workspace for synthetic M02–M04 inputs and the existing
 M05A/M05B APIs. Five inspection pages are joined by Production scheduling, What-if
-scenarios and Optimization jobs. Python owns all scheduling/optimization/verification.
+scenarios and Optimization jobs. **Production data** adds the M07A guided input
+workflow. Python owns all scheduling/optimization/verification and full domain validation.
 
 Use Node 22.12+, 24 or 26+ (verified with Node 26.13.0 / npm 11.20.0).
 From the repository root:
@@ -38,6 +39,40 @@ same token as the running server, without putting it in a command argument/URL.
 aborts requests. Reloading also discards the session. Health is a last checked
 response, not continuous monitoring. Failed API requests never use a cached
 capacity report as a substitute.
+
+For a user-defined input, open **Production data** (`/#/data`):
+
+1. Start empty, edit a reusable template copy, or import a local schema-1 scheduling
+   JSON file. Import replaces the draft only after preliminary checks and makes no
+   API request. CSV inspection exports and capacity-only M02 files are unsupported.
+2. Set explicit horizon/offset/assumptions. Add styles with exact worker-minutes per
+   piece, orders with ordered stages, dedicated lines and crew qualifications,
+   synthetic efficiency profiles, dated shifts/breaks and calendar assignments/stops.
+   Reference dropdowns reuse declared entities. Add/edit/remove controls retain
+   dependent records for explicit repair; nothing is silently inferred or deleted.
+3. Review preliminary errors and counts. Save/cancel open forms before changing
+   steps. Connect the local API and click **Validate with local Python**. The new
+   bounded POST `/api/v1/scheduling/validate` uses the existing strict Python parser
+   and returns its accepted fingerprint without dispatching or assessing capacity.
+   Run the API from this checkout; restart an older running server to load the new route.
+4. Click **Activate validated copy**, then open Scheduling and run the reference.
+   The same input is available to Capacity, verified Gantt, reviewed M04 what-if
+   comparisons and bounded scheduling/scenario jobs. Activation replaces the one
+   user input and discards old local planning results/job IDs; server jobs may continue.
+5. Use **Export scheduling JSON** to keep a local copy. Import/export preserve exact
+   numeric tokens, including Decimal precision/trailing zeros and large counts.
+   Files are strict UTF-8, at most 256 KiB, with bounded nesting/collections; the
+   complete API envelope must fit too. Unsupported inputs reject without truncation.
+
+**PYTHON VALIDATED** describes the complete input contract, not scheduling feasibility.
+Frontend checks are preliminary, and offline export does not certify domain validity.
+Any edit/import/replacement/dataset/session change invalidates the receipt; stale
+replies cannot activate another draft. The original template files remain unchanged.
+One draft and one active user input stay in tab memory; saved records survive page
+navigation, while unsaved open forms reset on departure. Reload loses the draft,
+active input, session and results. No database or automatic browser storage is used.
+Read the [complete M07A fields, ownership and evidence](../docs/architecture/user-defined-production-workspace.md)
+and [ADR 0017](../docs/decisions/0017-user-defined-synthetic-workspace.md).
 
 For the reproducible interactive workflow:
 
@@ -100,9 +135,13 @@ Screenshots and transient browser evidence go to ignored `.tmp/frontend/`.
 No credential-bearing traces, videos or automatic failure screenshots are enabled.
 
 `npm run build` emits ignored `dist/`; `npm run preview` serves that local build
-on the same fixed origin. Nothing is published. No dependency was added for M06B.
-Actual checks: 87 unit/component tests, 8 real-backend browser workflows, strict
-type/lint/format/build, zero npm audit findings, 940 preserved Python tests. Windows /
+on the same fixed origin. Nothing is published. No dependency was added for M07A.
+Actual M07A checks: 139 unit/component tests, 10 real-backend browser workflows, strict
+type/lint/format/build, zero npm audit findings, 952 Python tests. Windows /
 Edge is the verified browser environment; smoke checks are not WCAG certification.
-M01 remains offline; persistent data, deployment, factory integration and M07 remain
+The browser creates ten pieces with exact standard 2.5, two workers and efficiency
+0.8, plus explicit breaks/downtime/unavailability: VALID_COMPLETE, ten finished,
+16-minute makespan; a reviewed three-worker scenario gives 11 minutes, and the
+bounded CP-SAT job returns a verified result. These are synthetic demonstrations.
+M01 remains offline; persistent data, deployment, factory integration and M07B remain
 separate work. The HTTP envelope remains 32 orders/96 operations/64 changes.

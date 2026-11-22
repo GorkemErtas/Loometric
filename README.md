@@ -18,14 +18,15 @@ A bounded local FastAPI layer exposes capacity, greedy scheduling, independent
 verification and scenario comparison with authentication and native process limits.
 Its bounded asynchronous CP-SAT jobs support polling, verified results and real
 native cancellation, with volatile local retention.
-A local React dashboard provides eight views: five inspection pages plus interactive
+A local React dashboard provides nine views: a guided synthetic data workspace,
+five inspection pages plus interactive
 reference scheduling, verified Gantt schedules, reviewed what-if comparisons and
 bounded optimization jobs with explicit cancellation. Synthetic inputs, independent
 verification, producer selection and proof provenance stay visible throughout.
 Models are selected on validation only; the final test remains reserved. Persistent
 jobs, databases, deployment and further ML algorithms are deferred.
 
-## Local dashboard (M06A–M06B)
+## Local dashboard (M06A–M07A)
 
 Use Node 22.12+ in the 22.x line, 24.x or 26+ (verified: Node 26.13.0/npm 11.20.0).
 From the repository root:
@@ -41,12 +42,27 @@ synthetic M02 capacity demo or M03A competing-orders example; no backend is need
 for that mode. Overview, Orders, Production resources, Capacity and API & system
 retain their inspection flows. Production scheduling, What-if scenarios and
 Optimization jobs add explicit execution through the existing local backend.
+**Production data** adds guided forms for user-defined synthetic scheduling inputs,
+template copies, local exact JSON import/export and explicit Python validation.
 
 For actual backend reports, follow the [local API session setup](frontend/README.md)
 and use **Configure API**. Tokens stay in tab memory and are cleared on disconnect
 or reload. API failures never silently substitute preview results. **Competing
 orders → Load saved outcome** inspects a saved proposal, reverified by the backend
 in API mode; it does not run a scheduler. All sample values are labeled SYNTHETIC.
+
+To use your own synthetic data, open **Production data** and follow the eight steps:
+planning assumptions, styles, orders, qualified lines, capacity profiles, shifts,
+calendar and review. All production assumptions are explicit; internal IDs and
+version/unit fields are managed by the application. Import reads bounded local
+scheduling JSON without uploading it; the consolidated inspection CSV is unsupported.
+**Validate with local Python** checks the unchanged M02/M03 contract through the new
+bounded `/api/v1/scheduling/validate` endpoint, without generating a schedule.
+**Activate validated copy** selects the input for capacity, reference scheduling,
+verified Gantt, what-if comparisons and bounded jobs. Export before reloading:
+drafts and the one active user input remain in tab memory. Frontend checks and
+offline export do not assert authoritative calendar validity or feasibility.
+See the [M07A field, validation and import/export contract](docs/architecture/user-defined-production-workspace.md).
 
 For an interactive demo, select **Capacity what-if**, connect the API and use
 **Production scheduling → Run reference scheduling**. Inspect the verified Gantt
@@ -75,12 +91,16 @@ is VALID_PARTIAL: 60 completed / 80 unfinished pieces; line utilization is
 225 / 480 net line-minutes (46.875%). No factory telemetry or ML serving is implied.
 
 Frontend checks: `npm run typecheck`, `npm run check`, `npm test`, `npm run build`,
-`npm run test:browser`. Verified results: **87 frontend tests**, **8 real-backend
-browser workflows**, **940 preserved Python tests**, passing lint/type/build and
+`npm run test:browser`. Verified M07A results: **139 frontend tests**, **10 real-backend
+browser workflows**, **952 Python tests**, passing lint/type/build and
 zero npm audit findings. See [M06B architecture and measured evidence](docs/architecture/interactive-planning-workspace.md),
 [ADR 0016](docs/decisions/0016-interactive-planning-and-job-tracking.md) and the
-[original M06A record](docs/architecture/frontend-foundation.md). No new dependency,
-backend contract, deployment or persistent storage was added. M07 remains separate.
+[original M06A record](docs/architecture/frontend-foundation.md). M07A adds only the
+validation endpoint to the backend; frozen domain algorithms, dependencies and
+existing API limits are unchanged. The browser-created example finishes all ten
+pieces in 16 minutes, with an 11-minute same-demand crew-change scenario; these
+are synthetic conditional results. No deployment or persistent storage was added.
+M07A stops here; M07B requires separate scope.
 
 ## Prediction problem
 
