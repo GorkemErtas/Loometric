@@ -74,7 +74,13 @@ def load_configuration(path: Path, profile: str, seed: int, scenario: str) -> Ge
     if path.stat().st_size > 32768:
         raise ValueError("Synthetic configuration exceeds 32 KiB.")
     data = parse_json(path.read_text(encoding="utf-8"))
-    if set(data) != {"schema_version", "dataset_version", "seeds", "scenarios", "profiles"}:
+    if not isinstance(data, dict) or set(data) != {
+        "schema_version",
+        "dataset_version",
+        "seeds",
+        "scenarios",
+        "profiles",
+    }:
         raise ValueError("Closed synthetic generation configuration required.")
     if (
         type(data["schema_version"]) is not int
@@ -82,7 +88,20 @@ def load_configuration(path: Path, profile: str, seed: int, scenario: str) -> Ge
         or data["dataset_version"] != "synthetic-ml-v1"
     ):
         raise ValueError("Unsupported synthetic dataset configuration version.")
-    if seed not in data["seeds"] or scenario not in data["scenarios"]:
+    if (
+        not isinstance(data["seeds"], list)
+        or not data["seeds"]
+        or any(type(s) is not int or not 0 <= s < 2**32 for s in data["seeds"])
+        or len(set(data["seeds"])) != len(data["seeds"])
+        or not isinstance(data["scenarios"], list)
+        or not data["scenarios"]
+        or any(s not in ("baseline", "disruption", "workload_surge") for s in data["scenarios"])
+        or len(set(data["scenarios"])) != len(data["scenarios"])
+        or not isinstance(data["profiles"], dict)
+        or not data["profiles"]
+    ):
+        raise ValueError("Explicit unique seed/scenario lists and named profiles are required.")
+    if type(seed) is not int or seed not in data["seeds"] or scenario not in data["scenarios"]:
         raise ValueError("Seed/scenario must be declared in the generation configuration.")
     raw = data["profiles"][profile]
     if not isinstance(raw, dict) or set(raw) - {f.name for f in fields(GenerationConfig)}:

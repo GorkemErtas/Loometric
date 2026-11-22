@@ -1,3 +1,4 @@
+import json
 from dataclasses import replace
 from decimal import Decimal, localcontext
 from pathlib import Path
@@ -63,3 +64,24 @@ def test_declared_multiple_seeds_sizes_and_shift_scenarios():
             large = load_configuration(path, "benchmark", seed, scenario)
             assert large.calendar_days > small.calendar_days
             assert small.seed == seed and small.scenario == scenario
+
+
+@pytest.mark.parametrize(
+    "replacement",
+    [
+        [],
+        {"seeds": [True]},
+        {"seeds": [42, 42]},
+        {"scenarios": ["unsupported"]},
+        {"profiles": []},
+        {"unexpected": 1},
+    ],
+)
+def test_closed_configuration_rejects_malformed_manifest(tmp_path, replacement):
+    source = Path(__file__).resolve().parents[2] / "configs/synthetic_ml_v1.json"
+    data = json.loads(source.read_text())
+    data = {**data, **replacement} if isinstance(replacement, dict) else replacement
+    path = tmp_path / "config.json"
+    path.write_text(json.dumps(data))
+    with pytest.raises(ValueError):
+        load_configuration(path, "development", 42, "baseline")
