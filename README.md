@@ -9,6 +9,8 @@ A separate offline compatibility audit checks declared ML/planning contexts and
 inspects saved training-period predictions; target-to-efficiency conversion is blocked.
 An independent synthetic data foundation now generates normalized pre-shift plans,
 realized outcomes, leakage-safe feature views, reserved splits and quality audits.
+A separate offline synthetic study compares naive means, Ridge, Random Forest
+and histogram boosting with temporal, cross-seed, stress and subgroup gates.
 A separate planning foundation validates synthetic production scenarios and calculates
 deterministic shift capacity. Its reference scheduler now reserves finite capacity
 and independently verifies complete or partial schedules without forecasting.
@@ -177,8 +179,45 @@ See the [architecture and target](docs/architecture/synthetic-ml-data-foundation
 [ADR 0019](docs/decisions/0019-separated-synthetic-pre-shift-data.md).
 M08A checks: **1,081 Python tests**, **139 frontend tests**, **10 browser workflows**,
 passing lint/type/build and dependency checks. Historical data/artifacts/splits,
-M01 experiments/final test and M02–M04 contracts are preserved. Future model
-training and planning conversion require separate scope; M08A stops at data.
+M01 experiments/final test and M02–M04 contracts are preserved. M08A's data-only
+boundary remains intact; the separate M08B training study appears below.
+
+## M08B: offline synthetic training and robust evaluation
+
+**NO_ML_PROMOTION: retain the grouped-mean baseline.** The predeclared study compares
+three naive models and six Ridge/forest/histogram configurations using only authorized
+synthetic training/validation labels. Every fit uses original training rows; reserved
+outcome/test files are verified as opaque bytes without decoding their label values.
+Undefined zero-capacity labels have explicit exclusion IDs, counts and reasons.
+
+Forest benchmark validation MAE is **0.076277437**, versus grouped mean
+**0.122346291** (37.6545% lower), but packing error worsens **51.8408%** in a
+development seed and fails the frozen stage guard. Histogram boosting also fails
+stage and worst-error guards. The candidate decision considers all four baseline
+worlds, temporal windows, paired stress scenarios and tails; a strong average alone
+does not promote a model. These are synthetic error reductions, not factory gains.
+
+The selected artifact is transparent grouped-mean JSON fitted on **14,711 benchmark
+training labels**, with no validation refit. Corrected independent runs have identical
+model/report/prediction/receipt bytes. Descriptive training-OOF residual bands carry
+no calibrated coverage guarantee and degrade under hidden disruption. Unknown or
+invalid inputs abstain; extrapolation requires review. Values above one are retained.
+
+```powershell
+.venv/Scripts/python.exe -m loometric.synthetic_training run --output data/processed/synthetic_training/my-exp-006
+.venv/Scripts/python.exe -m loometric.synthetic_training inspect --artifact data/processed/synthetic_training/exp-006-c --expected-fingerprint cd19c78c8321ac1bb69dc16d61dc7de01469e35f0d35afe3a3d8c8dca4e8b7b4
+```
+
+Outputs must use a new ignored directory. Inspection verifies metadata and bytes
+without unpickling or executing a model. See the [training architecture](docs/architecture/synthetic-ml-model-training.md),
+[EXP-006 results, correction and receipts](docs/experiments/EXP-006-synthetic-productivity.md),
+[frozen study configuration](configs/synthetic_training_v1.json) and
+[ADR 0020](docs/decisions/0020-synthetic-model-development-and-promotion.md).
+Unseen factory/line/crew/style tests remain reserved. M08C needs separate scope
+and a trusted input/loading/review contract; no ML serving, prediction page,
+capacity conversion or scheduling integration was added here.
+M08B verification: **1,142 Python tests**, **139 frontend tests**, **10 browser
+workflows**, passing lint/type/build and dependency checks; no new packages.
 
 ## Prediction problem
 
@@ -789,6 +828,10 @@ artifact metadata inspection without execution and saved-OOF holdout isolation.
 Synthetic-data checks add exact labor targets, seeded/scenario process properties,
 whole-date/global label-maturity boundaries, five generalization populations,
 outcome-free features, train-only label joins and normalized/derived bundle integrity.
+Synthetic-training checks add opaque reserved-label loading, audited target exclusions,
+train-only preprocessing/fits, reproducible regressors, exact workload-band boundaries,
+hand-calculated metrics, guarded promotion/fallback, uncalibrated residual-risk bands
+and receipt-bound artifact inspection without automatic executable loading.
 Planning checks cover dimensional capacity arithmetic, interval unions, references,
 capabilities, zero capacity, independent-order scope and operation without ML packages
 or protected data access.
@@ -822,6 +865,8 @@ data/
 configs/
   chronological_split.json   # Frozen source fingerprint, date ranges, and counts
   m03c_benchmark.json         # Predeclared synthetic matrix, budgets and resource guards
+  synthetic_ml_v1.json       # Separate synthetic data dimensions, seeds and scenarios
+  synthetic_training_v1.json # Predeclared offline models, folds, gates and source receipts
 frontend/                    # Local React/TypeScript planning workspace, exact API client and tests
 requirements/
   exp-001.txt                # Exact installed EXP-001 environment snapshot
@@ -844,6 +889,7 @@ src/loometric/
   prediction/                # Offline contracts, policy, artifacts, inference and CLI
   compatibility/             # Offline context audit and saved OOF inspection; no conversion
   synthetic_ml/              # Separate normalized synthetic pre-shift data and audits; no training
+  synthetic_training/        # Offline model study, risk/selection, ignored artifacts; no serving
   planning/                  # Independent domain, availability, capacity and scenario CLI
   scheduling/                # Frozen contracts, reference dispatch, verifier, metrics and CLI
   optimization/              # CP-SAT model, proof-gated solves, adapter and comparison
