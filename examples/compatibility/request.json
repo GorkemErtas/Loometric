@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "prediction_request": {
+    "input_schema_version": 1,
+    "scheduled_date": "2030-01-07",
+    "department": "sewing",
+    "team": "1",
+    "prediction_cutoff": "2030-01-07T07:00:00+03:00",
+    "source_snapshot_timestamp": "2030-01-07T06:30:00+03:00",
+    "source_id": "synthetic:m07b-declared-context-not-a-model-run",
+    "shift_id": "DAY"
+  },
+  "predicted_productivity": 0.8,
+  "prediction_status": "REVIEW_REQUIRED",
+  "artifact_fingerprint": "e70256ebc3713aa4a5a7fa10b9a8f8454b4a7f468339b6e3c9b12998a5f94332",
+  "model_configuration_fingerprint": "9942cfe8cc7f779a42cf25f60e39310ea2f2dd35e688a089c6815ee222e2571c",
+  "as_of": "2030-01-07T06:45:00+03:00",
+  "observation_grain": "date_department_team_unverified",
+  "assignment_id": "A-DAY-SEW-01",
+  "order_id": "A",
+  "evidence_references": []
+}
