@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "experiment_id": "EXP-006",
+  "policy_version": "synthetic-training-v1",
+  "model_seed": 42,
+  "folds": {
+    "evaluation_start_fractions": [
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        5,
+        6
+      ]
+    ],
+    "evaluation_width_fraction": [
+      1,
+      6
+    ],
+    "purged_dates": 1
+  },
+  "search": [
+    {
+      "name": "ridge-1",
+      "family": "ridge",
+      "parameters": {
+        "alpha": 1
+      }
+    },
+    {
+      "name": "ridge-10",
+      "family": "ridge",
+      "parameters": {
+        "alpha": 10
+      }
+    },
+    {
+      "name": "forest-6",
+      "family": "forest",
+      "parameters": {
+        "n_estimators": 150,
+        "max_depth": 6,
+        "min_samples_leaf": 10
+      }
+    },
+    {
+      "name": "forest-12",
+      "family": "forest",
+      "parameters": {
+        "n_estimators": 150,
+        "max_depth": 12,
+        "min_samples_leaf": 5
+      }
+    },
+    {
+      "name": "hist-15",
+      "family": "hist",
+      "parameters": {
+        "max_iter": 150,
+        "max_leaf_nodes": 15,
+        "l2_regularization": 5
+      }
+    },
+    {
+      "name": "hist-31",
+      "family": "hist",
+      "parameters": {
+        "max_iter": 150,
+        "max_leaf_nodes": 31,
+        "l2_regularization": 10
+      }
+    }
+  ],
+  "selection": {
+    "minimum_macro_improvement_percent": 5,
+    "minimum_temporal_wins_per_world": 2,
+    "maximum_stage_regression_percent": 5,
+    "maximum_stress_seed_regression_percent": 10,
+    "maximum_overprediction_p95_regression_percent": 5,
+    "maximum_worst_error_regression_percent": 10,
+    "simplicity_tolerance_percent": 1,
+    "family_preference": [
+      "ridge",
+      "hist",
+      "forest"
+    ]
+  },
+  "risk": {
+    "absolute_residual_quantile": 0.9,
+    "minimum_stage_oof_rows": 30,
+    "interpretation": "DEVELOPMENT_RESIDUAL_BAND_NOT_CALIBRATED"
+  },
+  "artifact_case": "benchmark-42-baseline",
+  "datasets": [
+    {
+      "case_id": "development-19-baseline",
+      "directory": "data/processed/synthetic_ml/m08a-v1-development-19-baseline",
+      "expected_manifest_fingerprint": "64330160688ce4c089a22a320cb604e587eed4204d4a43493117f7bd2855f359",
+      "profile": "development",
+      "seed": 19,
+      "scenario": "baseline"
+    },
+    {
+      "case_id": "development-19-disruption",
+      "directory": "data/processed/synthetic_ml/m08a-v1-development-19-disruption",
+      "expected_manifest_fingerprint": "7aeddc35b2683ba8c97303ca1c2599770f2cd927bb55584100879c7e842f5b2d",
+      "profile": "development",
+      "seed": 19,
+      "scenario": "disruption"
+    },
+    {
+      "case_id": "development-19-workload_surge",
+      "directory": "data/processed/synthetic_ml/m08a-v1-development-19-workload_surge",
+      "expected_manifest_fingerprint": "14af7c679ca4dcb99b38a7547310ab282bc31c3fd0d51397108d7eeef70ca7d6",
+      "profile": "development",
+      "seed": 19,
+      "scenario": "workload_surge"
+    },
+    {
+      "case_id": "development-42-baseline",
+      "directory": "data/processed/synthetic_ml/m08a-v1-development-42-baseline",
+      "expected_manifest_fingerprint": "e6af2f894ef3d9edf1c6cee75603f52cd26bc66a55fcaa9d8178056e49b17b3e",
+      "profile": "development",
+      "seed": 42,
+      "scenario": "baseline"
+    },
+    {
+      "case_id": "development-42-disruption",
+      "directory": "data/processed/synthetic_ml/m08a-v1-development-42-disruption",
+      "expected_manifest_fingerprint": "b24618673ca47ac977a9303892bf11c0273abc7275e3a17981365879390fef07",
+      "profile": "development",
+      "seed": 42,
+      "scenario": "disruption"
+    },
+    {
+      "case_id": "development-42-workload_surge",
+      "directory": "data/processed/synthetic_ml/m08a-v1-development-42-workload_surge",
+      "expected_manifest_fingerprint": "0b5ce1af86a715df8e7269c22f5105231525b60b3fef7a2330bc6802cb5c2bf4",
+      "profile": "development",
+      "seed": 42,
+      "scenario": "workload_surge"
+    },
+    {
+      "case_id": "development-73-baseline",
+      "directory": "data/processed/synthetic_ml/m08a-v1-development-73-baseline",
+      "expected_manifest_fingerprint": "713cf810b17a7d9e37889ea1d086d5892eacc0f58bfcbb574adc4564656e959b",
+      "profile": "development",
+      "seed": 73,
+      "scenario": "baseline"
+    },
+    {
+      "case_id": "development-73-disruption",
+      "directory": "data/processed/synthetic_ml/m08a-v1-development-73-disruption",
+      "expected_manifest_fingerprint": "7f707de6a5c31692c038561e863ac04ad26f6ee30b63444df8ee86b0b5d47bfc",
+      "profile": "development",
+      "seed": 73,
+      "scenario": "disruption"
+    },
+    {
+      "case_id": "development-73-workload_surge",
+      "directory": "data/processed/synthetic_ml/m08a-v1-development-73-workload_surge",
+      "expected_manifest_fingerprint": "f9fb020bf1a32a06f0ad885092728100d6b3270ab19ab7cd1cd89c50d82ff8d6",
+      "profile": "development",
+      "seed": 73,
+      "scenario": "workload_surge"
+    },
+    {
+      "case_id": "benchmark-42-baseline",
+      "directory": "data/processed/synthetic_ml/m08a-v1-benchmark-42-baseline",
+      "expected_manifest_fingerprint": "7e7dae049270675c2eac4f8ad05d55a9ac84cc9c1160e0a6b7e9f4010a64f7eb",
+      "profile": "benchmark",
+      "seed": 42,
+      "scenario": "baseline"
+    }
+  ]
+}
