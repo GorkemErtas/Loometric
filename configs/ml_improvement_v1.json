@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "experiment_id": "EXP-008",
+  "policy_version": "ml-improvement-research-v1",
+  "source_study_configuration_sha256": "40b75e3a5854679f990cb1c6647302752ede45ed33773787172179d85c181c52",
+  "source_study_manifest_sha256": "cd19c78c8321ac1bb69dc16d61dc7de01469e35f0d35afe3a3d8c8dca4e8b7b4",
+  "model_seed": 42,
+  "resampling_seed": 20261123,
+  "fold_boundaries_fifths": [2, 3, 4, 5],
+  "purged_dates": 1,
+  "references": ["grouped_mean", "forest-12", "hist-31"],
+  "candidates": [
+    {"name": "rf_physics", "family": "forest", "architecture": "global", "parameters": {"n_estimators": 150, "max_depth": 12, "min_samples_leaf": 5}},
+    {"name": "rf_physics_regularized", "family": "forest", "architecture": "global", "parameters": {"n_estimators": 150, "max_depth": 8, "min_samples_leaf": 15, "max_features": 0.8}},
+    {"name": "hist_physics", "family": "hist", "architecture": "global", "parameters": {"max_iter": 150, "max_leaf_nodes": 31, "l2_regularization": 10}},
+    {"name": "hist_physics_regularized", "family": "hist", "architecture": "global", "parameters": {"max_iter": 150, "max_leaf_nodes": 15, "l2_regularization": 20}},
+    {"name": "hist_residual", "family": "hist", "architecture": "baseline_residual", "parameters": {"max_iter": 150, "max_leaf_nodes": 15, "l2_regularization": 20}},
+    {"name": "hist_stage_shrunk", "family": "hist", "architecture": "stage_shrunk", "parameters": {"max_iter": 150, "max_leaf_nodes": 15, "l2_regularization": 20}}
+  ],
+  "stage_model": {"minimum_training_rows": 200, "minimum_training_dates": 5, "shrinkage_rows": 200},
+  "ablations": {
+    "clock": ["shift_kind", "weekday"],
+    "planned_downtime": ["planned_downtime_minutes"],
+    "stock_split": ["opening_wip_pieces", "planned_release_pieces"]
+  },
+  "permutation": {"repeats": 3, "max_evaluation_rows": 1000, "shuffle_within_start_date": true},
+  "bootstrap": {"repeats": 500, "quantiles": [0.025, 0.975], "block": "start_date"},
+  "risk": {"minimum_joint_support": 20, "minimum_residual_support": 30, "residual_quantile": 0.9, "high_load_threshold": 1.5},
+  "selection": {
+    "minimum_macro_gain_vs_group_percent": 5,
+    "minimum_macro_gain_vs_best_raw_percent": 2,
+    "minimum_temporal_wins_per_world": 2,
+    "maximum_stage_regression_percent": 5,
+    "maximum_positive_p95_regression_percent": 5,
+    "maximum_worst_error_regression_percent": 10,
+    "simplicity_tolerance_percent": 1,
+    "preference": ["hist_physics_regularized", "rf_physics_regularized", "hist_physics", "rf_physics", "hist_residual", "hist_stage_shrunk"]
+  },
+  "budget": {"maximum_estimator_fits": 300, "maximum_rows_per_fit": 20000, "between_fit_wall_seconds": 1200, "numeric_threads": 1}
+}
