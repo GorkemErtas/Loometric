@@ -11,6 +11,9 @@ An independent synthetic data foundation now generates normalized pre-shift plan
 realized outcomes, leakage-safe feature views, reserved splits and quality audits.
 A separate offline synthetic study compares naive means, Ridge, Random Forest
 and histogram boosting with temporal, cross-seed, stress and subgroup gates.
+An explicitly experimental inference service now executes the fixed synthetic
+forest/boosting pipelines and a comparison baseline in the AI Predictions page,
+without changing the NO_ML_PROMOTION decision or applying results to planning.
 A separate planning foundation validates synthetic production scenarios and calculates
 deterministic shift capacity. Its reference scheduler now reserves finite capacity
 and independently verifies complete or partial schedules without forecasting.
@@ -24,7 +27,7 @@ A bounded local FastAPI layer exposes capacity, greedy scheduling, independent
 verification and scenario comparison with authentication and native process limits.
 Its bounded asynchronous CP-SAT jobs support polling, verified results and real
 native cancellation, with volatile local retention.
-A local React dashboard provides nine views: a guided synthetic data workspace,
+A local React dashboard provides ten views: AI Predictions, a guided synthetic data workspace,
 five inspection pages plus interactive
 reference scheduling, verified Gantt schedules, reviewed what-if comparisons and
 bounded optimization jobs with explicit cancellation. Synthetic inputs, independent
@@ -32,7 +35,7 @@ verification, producer selection and proof provenance stay visible throughout.
 Models are selected on validation only; the final test remains reserved. Persistent
 jobs, databases, deployment and further ML algorithms are deferred.
 
-## Local dashboard (M06A–M07A)
+## Local dashboard (M06A–M08C)
 
 Use Node 22.12+ in the 22.x line, 24.x or 26+ (verified: Node 26.13.0/npm 11.20.0).
 From the repository root:
@@ -213,10 +216,49 @@ without unpickling or executing a model. See the [training architecture](docs/ar
 [EXP-006 results, correction and receipts](docs/experiments/EXP-006-synthetic-productivity.md),
 [frozen study configuration](configs/synthetic_training_v1.json) and
 [ADR 0020](docs/decisions/0020-synthetic-model-development-and-promotion.md).
-Unseen factory/line/crew/style tests remain reserved. M08C needs separate scope
-and a trusted input/loading/review contract; no ML serving, prediction page,
-capacity conversion or scheduling integration was added here.
+Unseen factory/line/crew/style tests remain reserved. No serving, prediction page,
+capacity conversion or scheduling integration was added in M08B; separately
+authorized M08C experimental inference is described below.
 M08B verification: **1,142 Python tests**, **139 frontend tests**, **10 browser
+workflows**, passing lint/type/build and dependency checks; no new packages.
+
+## M08C: actual experimental ML predictions
+
+**AI Predictions** (`/#/predictions`) runs actual **Forest12** and **Hist31**
+estimators, both **EXPERIMENTAL_NOT_PROMOTED**. Grouped Mean remains a transparent
+comparison baseline. NO_ML_PROMOTION, failed subgroup gates, reserved tests and
+all planning contracts are preserved. This is synthetic research only.
+
+Using the existing locked ML/API environment and retained M08A/M08B artifacts:
+
+```powershell
+.venv/Scripts/python.exe -m loometric.experimental_ml publish --version v1
+.venv/Scripts/python.exe -m loometric.experimental_ml publish --version v1-reproduction
+```
+
+Create-only outputs are ignored. Both actual publications produced identical bytes;
+all **4,833 validation predictions per model** match retained EXP-006 values exactly.
+The independent trusted registry pins manifest
+`bc5e255d8d58fc49e8b37bb44d58647c47402d4cf5f46a525ff9a1b513d28a34`.
+Inference verifies all model bytes before loading them and never trains or reads labels.
+
+Start the local API as usual, connect with **Configure API**, review the guided
+thirteen-feature form and confirm hypothetical synthetic pre-shift use. Random
+Forest is the default; choose **Compare all three models** for real same-input
+results, validation errors, subgroup weaknesses and descriptive uncertainty bands.
+Pin a response with **Use as scenario baseline**, edit inputs and predict again
+to compare actual before/after outputs. Differences are not proven causal effects.
+
+The versioned endpoint is `POST /api/v1/predictions/synthetic`. The included sewing
+example returns **0.90363 forest**, **0.89456 boosting**, **0.76283 baseline**.
+Zero capacity abstains, extrapolation requires review, and valid values above one
+are retained. The target is standard capacity attainment, not guaranteed output
+or intrinsic employee efficiency. No prediction becomes scheduling efficiency.
+
+See the [complete setup, API contract, workflow and limitations](docs/architecture/experimental-ml-inference.md),
+[EXP-007 receipts/parity](docs/experiments/EXP-007-experimental-inference.md) and
+[example request](examples/api/synthetic-prediction.json).
+M08C verification: **1,202 Python tests**, **162 frontend tests**, **12 browser
 workflows**, passing lint/type/build and dependency checks; no new packages.
 
 ## Prediction problem
@@ -739,8 +781,9 @@ concurrent expensive calls. A guarded 256 MiB child performs parsing/engine work
 a 5-second watchdog; body reading has a separate 3-second deadline. Native timeout
 actually kills/reaps the worker; disconnects retain their slot until cleanup.
 Exact Decimal numbers, fingerprints, independent verification, synthetic provenance
-and valid-partial status survive transport. No API training, artifact/data loading
-or synchronous CP-SAT is exposed; M01 stays offline. M05B job endpoints appear below.
+and valid-partial status survive transport. M05A planning workers perform no model
+training/loading or synchronous CP-SAT; M01 stays offline. M08C's separately bounded
+experimental model loading is described above. M05B job endpoints appear below.
 
 Run [the client](examples/api/workflow.py) in a terminal with the same token/port,
 or execute the self-contained live-server test:
@@ -874,7 +917,7 @@ requirements/
   m03b.txt                   # Prior pins plus exact optional OR-Tools dependency closure
   m05a.txt                   # Existing exact FastAPI/Pydantic/Uvicorn dependency closure
 src/loometric/
-  api/                       # Local sync operations and bounded volatile jobs; no model serving
+  api/                       # Local planning/jobs and separately bounded experimental inference
   execution.py               # Shared hard process limits and bounded native workers
   cli.py                     # Local orchestration and exit codes
   leakage.py                 # Source-column availability policy
@@ -890,6 +933,7 @@ src/loometric/
   compatibility/             # Offline context audit and saved OOF inspection; no conversion
   synthetic_ml/              # Separate normalized synthetic pre-shift data and audits; no training
   synthetic_training/        # Offline model study, risk/selection, ignored artifacts; no serving
+  experimental_ml/           # Trusted experimental estimator artifacts and prediction only
   planning/                  # Independent domain, availability, capacity and scenario CLI
   scheduling/                # Frozen contracts, reference dispatch, verifier, metrics and CLI
   optimization/              # CP-SAT model, proof-gated solves, adapter and comparison

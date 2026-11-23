@@ -4,6 +4,8 @@ React/strict TypeScript local workspace for synthetic M02–M04 inputs and the e
 M05A/M05B APIs. Five inspection pages are joined by Production scheduling, What-if
 scenarios and Optimization jobs. **Production data** adds the M07A guided input
 workflow. Python owns all scheduling/optimization/verification and full domain validation.
+**AI Predictions** adds actual experimental Forest12/Hist31 inference and a Grouped
+Mean comparison baseline, independently of the selected planning dataset.
 
 Use Node 22.12+, 24 or 26+ (verified with Node 26.13.0 / npm 11.20.0).
 From the repository root:
@@ -39,6 +41,42 @@ same token as the running server, without putting it in a command argument/URL.
 aborts requests. Reloading also discards the session. Health is a last checked
 response, not continuous monitoring. Failed API requests never use a cached
 capacity report as a substitute.
+
+For **AI Predictions** (`/#/predictions`), first publish the trusted local models
+from the root, using the existing locked ML/API environment and retained M08A/M08B
+source artifacts:
+
+```powershell
+.venv/Scripts/python.exe -m loometric.experimental_ml publish --version v1
+```
+
+Existing output is never overwritten; inference never trains automatically. The
+versioned independent registry pins its manifest receipt. Missing/incompatible
+artifacts fail visibly instead of substituting a baseline or preview prediction.
+Connect the API, review the guided thirteen-feature hypothetical pre-shift inputs
+and confirm synthetic use. **Random Forest** is the default experimental estimator;
+choose **Compare all three models** to execute it alongside HistGradientBoosting
+and the transparent Grouped Mean baseline. The M08B **NO_ML_PROMOTION** decision
+and failed subgroup gates remain visible beside actual results and validation errors.
+
+Use **Use as scenario baseline**, change inputs and **Predict** again for actual
+before/after results and input differences. No after value is assumed while the
+request is pending. Edits abort/disown old requests and clear the current output;
+session/context replacement, navigation or reload clears this page's research
+state. Predictions never mutate the production workspace or invoke scheduling.
+Zero capacity abstains, out-of-support conditions require review and valid values
+above one remain unclipped. Descriptive residual bands are uncalibrated. The
+target is synthetic standard capacity attainment, not guaranteed pieces or intrinsic
+employee efficiency. Global forest importance describes training behavior, not
+causation or an individual prediction. Read the [API and research contract](../docs/architecture/experimental-ml-inference.md).
+
+The complete browser suite now also needs the trusted `v1` artifacts; it does not
+generate them or consume reserved-test labels. The test-only saved prediction
+response fixture was captured from the actual API and is never imported by the app.
+M08C verification:162 frontend tests,12 real-backend browser workflows, strict
+type/lint/build checks and zero npm audit findings. Complete Python regression:
+1,202 passed. The desktop/mobile prediction/scenario/error screenshots remain
+under ignored `.tmp/frontend/`; no production artifacts or credentials are bundled.
 
 For a user-defined input, open **Production data** (`/#/data`):
 

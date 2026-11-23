@@ -9,6 +9,8 @@ promotion gates. The user explicitly authorizes research inference of Forest12
 and Hist31 while preserving that finding. Options are baseline-only serving,
 silently promoting the best aggregate model, or an explicit experimental registry.
 Choose the registry. Neither model becomes an operational recommendation.
+This replaces the synthetic serving deferral for M08C only; M01 remains offline
+and existing planning-worker isolation remains in force.
 
 ## Decision
 

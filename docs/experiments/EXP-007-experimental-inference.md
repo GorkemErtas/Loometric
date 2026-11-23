@@ -81,5 +81,76 @@ Artifact-stage tests:14 passed, including private-data reproduction, actual load
 estimator parity, altered retained predictions, create-only output, wrong receipt,
 all-file tampering before deserialization, environment drift and replacement of
 model files after verification. The loader executes the already checked buffers.
-Ruff lint and formatting pass. Runtime, dashboard and complete regression evidence
-will be recorded after their independently verified stages.
+Ruff lint and formatting pass.
+
+M08C completion verification (2026-11-23):
+
+| Executed check | Actual result |
+| --- | --- |
+| Full Python `pytest -q -p no:cacheprovider`, normal native/temp permissions | **1,202 passed**,255.75s |
+| New experimental Python tests |60 collected, all pass in the full suite |
+| Full frontend Vitest | **162 passed**,8files,22.09s |
+| Final focused frontend prediction verification after label correction |23 passed,7.57s |
+| Complete real-backend Edge browser suite | **12 passed**,1.4m |
+| Root Ruff lint and format check | Pass,264 Python files formatted |
+| Frontend Biome, TypeScript and refreshed Vite production build | Pass,63 checked files/68 built modules |
+| `pip check`, Python snapshot pins, `npm ls --depth=0`, `npm audit --audit-level=low` | Pass,39 historical Python pin entries match,17 exact direct npm dependencies,zero vulnerabilities |
+| Two actual publications and independently pinned registry check | All five deterministic files byte-identical; all14,499 retained predictions match exactly |
+| Source preservation audit |704/716 starting files unchanged;12 expected application/package/test/docs edits only |
+| Documentation links / ignored outputs |68 relative links resolve; instructions/local plan/models/evidence remain ignored and untracked |
+
+The native HTTP tests run private fitted artifacts under the actual guard while
+an audit hook prohibits repository training/test-data and fixture-source access.
+They exercise auth, tampering, no planning mutation, safe errors, hard deadline,
+single-slot admission and cancellation ownership. Other focused tests cover
+exact thirteen-feature ordering, actual estimator calls, no inference-time fits,
+unknown categories, physical validation, out-of-support review, zero capacity,
+above-one preservation, failed model outputs and pairwise arithmetic.
+
+The real browser executes all three actual estimators, compares returned values
+with rendered cards, pins a response, changes workers6→8, checks numerical/input
+differences, reviews30workers and abstains at zero. It verifies loading, edit-time
+cancellation of a delayed real response, explicit503 handling without fake values,
+desktop/mobile axe smoke checks, no page overflow or planning requests, and no
+credential persistence. Four screenshots are under ignored `.tmp/frontend/`:
+`m08c-predictions-desktop.png`, `m08c-scenario-comparison.png`,
+`m08c-predictions-mobile.png`, `m08c-predictions-error.png`. Owned API/Vite listeners
+were closed and ephemeral credentials discarded. These are tested Windows/Edge
+views, not a WCAG conformance or other-platform claim.
+
+Actual guarded example, sewing/day/Monday, standard4, available420minutes,
+downtime30, skill/complexity3, WIP100+release500=quantity600:
+
+| Planned workers | Forest12 | Hist31 | Grouped Mean |
+| --- | ---: | ---: | ---: |
+|6|0.9036296370677777|0.8945601867754494|0.7628348220475517|
+|8|0.7758056870789638|0.6891308994297132|0.7628348220475517|
+
+Zero workers returns null/ABSTAIN for all three;30workers returns REVIEW_REQUIRED.
+Four initial whole-child wall measurements span3.029–4.001seconds and Windows
+aggregate committed memory200,183,808–200,581,120bytes under the768MiB/10second
+guard. These include import/check/load/predict and exclude HTTP transit/rendering;
+they are host-specific samples, not a latency SLA. Forest23,718,378bytes,
+histogram558,505bytes, baseline3,449bytes. API/page artifacts stay local.
+
+An additional actual endpoint request reconstructed only the thirteen pre-shift
+features for authorized validation observation
+`OBS-SH-F01-2030-08-13-day-L-F01-sewing-00`. The forest returned
+**1.0846155586330681**, exactly its retained EXP-006 prediction, without clipping.
+No target label was needed for this check. Its first attempt reached the ten-second
+watchdog and returned sanitized504; the unchanged request/artifacts succeeded on
+the development rerun. The timing variation's cause was not established. Keep the
+hard deadline and explicit timeout state; do not infer a cold-start latency SLA
+or add automatic retries from this result.
+
+Superseded verification failures are explicit. Initial expanded tests exposed
+missing residual-band metadata in a private fixture and the old OpenAPI route
+count; both were corrected. Strict TypeScript/control-label issues and the sandbox
+native-worker EPERM were resolved with normal process permissions. First browser
+run passed11/failed1 on the model selector's exact label; its association was fixed
+and all12 reran successfully. Full Python initially stopped during collection on
+a new `test_artifacts` basename collision; the new module was uniquely renamed,
+then the unchanged full-suite invocation passed all1,202. A local preservation
+helper's unsupported multi-path `git check-ignore --quiet` invocation was corrected
+and the complete audit reran successfully. No automatic approval rejection,
+dependency change, test-set consumption or scientific gate relaxation occurred.
