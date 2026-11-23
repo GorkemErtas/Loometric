@@ -14,6 +14,8 @@ and histogram boosting with temporal, cross-seed, stress and subgroup gates.
 An explicitly experimental inference service now executes the fixed synthetic
 forest/boosting pipelines and a comparison baseline in the AI Predictions page,
 without changing the NO_ML_PROMOTION decision or applying results to planning.
+An offline improvement study now diagnoses matched model errors and develops
+predeclared research candidates without changing those served models.
 A separate planning foundation validates synthetic production scenarios and calculates
 deterministic shift capacity. Its reference scheduler now reserves finite capacity
 and independently verifies complete or partial schedules without forecasting.
@@ -32,7 +34,7 @@ five inspection pages plus interactive
 reference scheduling, verified Gantt schedules, reviewed what-if comparisons and
 bounded optimization jobs with explicit cancellation. Synthetic inputs, independent
 verification, producer selection and proof provenance stay visible throughout.
-Models are selected on validation only; the final test remains reserved. Persistent
+Models use authorized development evidence; final tests remain reserved. Persistent
 jobs, databases, deployment and further ML algorithms are deferred.
 
 ## Local dashboard (M06A–M08C)
@@ -259,6 +261,43 @@ See the [complete setup, API contract, workflow and limitations](docs/architectu
 [EXP-007 receipts/parity](docs/experiments/EXP-007-experimental-inference.md) and
 [example request](examples/api/synthetic-prediction.json).
 M08C verification: **1,202 Python tests**, **162 frontend tests**, **12 browser
+workflows**, passing lint/type/build and dependency checks; no new packages.
+
+## M09A: controlled ML improvement research
+
+**Research candidate: `rf_physics`; no serving replacement or promotion.** The
+frozen study adds planned load/capacity features to Forest12 and compares six
+bounded improvements with Grouped Mean and the two current raw tree references.
+Selection uses newly declared purged folds inside original training only. The
+already-inspected validation/stress sets remain diagnostic, not fresh confirmation.
+
+The candidate's training-fold macro MAE is **0.06223**, versus **0.09856** for the
+strongest raw reference (36.87% lower). Spent benchmark MAE is **0.05793**, versus
+current forest **0.07628**. Packing improves substantially, but disruption-stage
+and worst-error guards still fail. **NO_ML_PROMOTION remains unchanged.**
+
+Diagnosis identifies missing planned-ratio representation, redundant stock/time
+predictors, small repeated entity cells and unobservable disruption. Removing the
+WIP/release split improves raw-tree fold MAE; replacing or inflating datasets is
+not needed to establish that feature finding. Identical-input disruption pairs
+expose an information limit; narrower conditional residual bands still fail under
+hidden shift and are not calibrated confidence intervals.
+
+```powershell
+.venv/Scripts/python.exe -m loometric.ml_research run --output data/processed/ml_research/exp-008-a
+.venv/Scripts/python.exe -m loometric.ml_research run --output data/processed/ml_research/exp-008-b
+```
+
+Use new ignored directories and the retained M08A/M08B/M08C artifacts. The workflow
+never regenerates actual source data or reads reserved-test label values. All
+M08C artifacts/registry, historical experiments and planning algorithms remain
+unchanged. See [EXP-008 findings and receipts](docs/experiments/EXP-008-ml-improvement-research.md),
+[research method and reproduction](docs/architecture/ml-improvement-research.md),
+[pre-fit declaration](configs/ml_improvement_v1.json) and the concrete
+[synthetic-ml-v2 design proposal](docs/architecture/synthetic-ml-v2-proposal.md).
+V2 is proposed for observability/diversity experiments; it is not generated here.
+Both actual research runs reproduce all eight deterministic files byte-for-byte.
+M09A verification: **1,230 Python tests**, **162 frontend tests**, **12 browser
 workflows**, passing lint/type/build and dependency checks; no new packages.
 
 ## Prediction problem
@@ -910,6 +949,7 @@ configs/
   m03c_benchmark.json         # Predeclared synthetic matrix, budgets and resource guards
   synthetic_ml_v1.json       # Separate synthetic data dimensions, seeds and scenarios
   synthetic_training_v1.json # Predeclared offline models, folds, gates and source receipts
+  ml_improvement_v1.json     # Frozen M09A candidates, training-only selection and diagnostics
 frontend/                    # Local React/TypeScript planning workspace, exact API client and tests
 requirements/
   exp-001.txt                # Exact installed EXP-001 environment snapshot
@@ -934,6 +974,7 @@ src/loometric/
   synthetic_ml/              # Separate normalized synthetic pre-shift data and audits; no training
   synthetic_training/        # Offline model study, risk/selection, ignored artifacts; no serving
   experimental_ml/           # Trusted experimental estimator artifacts and prediction only
+  ml_research/               # Offline matched diagnosis, feature/candidate/risk experiments
   planning/                  # Independent domain, availability, capacity and scenario CLI
   scheduling/                # Frozen contracts, reference dispatch, verifier, metrics and CLI
   optimization/              # CP-SAT model, proof-gated solves, adapter and comparison
