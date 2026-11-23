@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "model_version": "synthetic-experimental-v1",
+  "directory": "data/processed/experimental_ml/v1",
+  "manifest_sha256": "bc5e255d8d58fc49e8b37bb44d58647c47402d4cf5f46a525ff9a1b513d28a34"
+}
