@@ -1,0 +1,312 @@
+.predictions-page {
+  display: grid;
+  gap: 1.25rem;
+  font-size: 1rem;
+}
+.predictions-page h2 {
+  font-size: 1.25rem;
+}
+.predictions-page h3 {
+  font-size: 1.05rem;
+}
+.prediction-intro {
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+  padding: 1.75rem;
+  border: 1px solid #bed9d8;
+  border-radius: 12px;
+  background: linear-gradient(115deg, #edf8f5, #fff);
+}
+.prediction-intro h2 {
+  margin: 0.7rem 0 0.4rem;
+  font-size: 1.7rem;
+}
+.prediction-intro p {
+  max-width: 52rem;
+  color: #40566a;
+}
+.prediction-policy {
+  display: grid;
+  align-content: center;
+  flex-shrink: 0;
+  gap: 0.4rem;
+  padding-left: 1.5rem;
+  border-left: 1px solid #c8d9d8;
+  color: #39565a;
+  font-size: 0.875rem;
+}
+.prediction-caution {
+  padding: 1rem 1.25rem;
+  border-left: 4px solid #a96b11;
+  border-radius: 4px;
+  background: #fff7e8;
+  color: #624813;
+}
+.prediction-form {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+.prediction-form-toolbar {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) 1fr;
+  gap: 1.5rem;
+  align-items: end;
+}
+.prediction-form-toolbar p {
+  font-size: 0.875rem;
+  color: #465b6f;
+}
+.prediction-form label {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.prediction-form input:not([type="checkbox"]),
+.prediction-form select {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+  border: 1px solid #aab9c6;
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  color: #203749;
+  background-color: #fff;
+  font-size: 1rem;
+}
+.prediction-form select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2340566a'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  padding-right: 2rem;
+}
+.prediction-form fieldset {
+  min-width: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.prediction-form legend {
+  font-size: 1.05rem;
+  font-weight: 650;
+  margin-bottom: 0.8rem;
+}
+.prediction-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+.prediction-field {
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+}
+.prediction-fields span,
+.prediction-checkbox span {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #4c6074;
+}
+.prediction-form .prediction-checkbox {
+  display: grid;
+  grid-template-columns: 1.25rem 1fr;
+  column-gap: 0.7rem;
+  align-items: center;
+}
+.prediction-checkbox input {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: #087e76;
+}
+.prediction-checkbox span {
+  grid-column: 2;
+}
+.prediction-issues {
+  padding: 1rem;
+  background: #fff1e8;
+  color: #783714;
+  border-radius: 6px;
+}
+.prediction-issues ul,
+.prediction-provenance ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+.prediction-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+}
+.prediction-actions span {
+  font-size: 0.875rem;
+  color: #4b6070;
+  overflow-wrap: anywhere;
+}
+.prediction-results {
+  display: grid;
+  gap: 1.25rem;
+}
+.prediction-result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 1rem;
+}
+.prediction-card {
+  padding: 1.5rem;
+  border: 1px solid #c9d9e1;
+  border-radius: 10px;
+  background: white;
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+}
+.prediction-card-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.prediction-value {
+  font-size: 3rem;
+  line-height: 1.1;
+  font-weight: 650;
+  color: #086d66;
+  letter-spacing: -0.06rem;
+  font-variant-numeric: tabular-nums;
+}
+.prediction-card p {
+  font-size: 0.875rem;
+  color: #465c70;
+}
+.prediction-supported {
+  color: #156553;
+  font-size: 0.875rem;
+}
+.prediction-review {
+  color: #8b4b0e;
+  font-size: 0.875rem;
+}
+.prediction-reasons {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+.prediction-band {
+  padding: 1rem;
+  background: #f0f6f8;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+.prediction-band p + p {
+  margin-top: 0.4rem;
+}
+.prediction-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line);
+}
+.prediction-metrics dt {
+  font-size: 0.875rem;
+  color: #4f6276;
+}
+.prediction-metrics dd {
+  margin: 0.3rem 0 0;
+  font-size: 1.1rem;
+  font-weight: 650;
+}
+.prediction-weakness {
+  background: #fff5e4;
+  border-radius: 6px;
+  padding: 0.8rem;
+  font-size: 0.875rem;
+}
+.prediction-card .prediction-identity {
+  font-size: 0.875rem;
+  color: #465c70;
+  overflow-wrap: anywhere;
+}
+.prediction-explanation,
+.prediction-provenance,
+.prediction-scenario-summary {
+  padding: 1.25rem 1.5rem;
+}
+.prediction-provenance {
+  display: grid;
+  gap: 0.65rem;
+}
+.prediction-provenance code {
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+.importance-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  display: grid;
+  gap: 0.8rem;
+}
+.importance-list li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.3rem 1rem;
+  font-size: 0.9375rem;
+}
+.importance-track {
+  grid-column: 1 / -1;
+  background: #edf2f4;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.importance-track i {
+  display: block;
+  background: #087e76;
+  height: 100%;
+}
+.predictions-page table {
+  font-size: 0.9375rem;
+}
+.predictions-page .empty h3 {
+  font-size: 1.1rem;
+}
+@media (max-width: 1000px) {
+  .prediction-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .prediction-intro {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .prediction-policy {
+    border-left: 0;
+    border-top: 1px solid #c8d9d8;
+    padding: 1rem 0 0;
+  }
+}
+@media (max-width: 600px) {
+  .prediction-fields,
+  .prediction-form-toolbar {
+    grid-template-columns: 1fr;
+  }
+  .prediction-form,
+  .prediction-card,
+  .prediction-intro {
+    padding: 1rem;
+  }
+  .prediction-actions .button {
+    width: 100%;
+  }
+  .prediction-value {
+    font-size: 2.5rem;
+  }
+}

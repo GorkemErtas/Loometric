@@ -5,6 +5,12 @@ import { useWorkspace } from "../state/Workspace";
 
 export const routes = [
   {
+    key: "predictions",
+    label: "AI Predictions",
+    description:
+      "Run experimental synthetic ML models, compare a baseline and explore planned conditions.",
+  },
+  {
     key: "data",
     label: "Production data",
     description: "Build, validate and exchange your own synthetic production inputs.",
@@ -259,18 +265,30 @@ export function Layout({ route, children }: { route: Route; children: React.Reac
           </div>
           <div className="source-strip">
             <Badge tone="amber">SYNTHETIC</Badge>
-            <strong>{mode === "preview" ? "Fixture preview" : "Local API mode"}</strong>
-            <span>{dataset?.planning.id ?? "No dataset selected"}</span>
+            <strong>
+              {route === "predictions"
+                ? "Experimental ML research"
+                : mode === "preview"
+                  ? "Fixture preview"
+                  : "Local API mode"}
+            </strong>
+            <span>
+              {route === "predictions"
+                ? "synthetic-ml-v1 · independent of planning dataset"
+                : (dataset?.planning.id ?? "No dataset selected")}
+            </span>
             <span className="source-strip-end">
-              {mode === "preview"
-                ? dataset?.previewCapacity
-                  ? "Saved M02 report · explicit demo mode"
-                  : "Input-only preview · connect API for reports"
-                : route === "data"
-                  ? "M07A · synthetic data editor"
-                  : ["scheduling", "scenarios", "jobs"].includes(route)
-                    ? "M05A / M05B · interactive planning"
-                    : "M05A · read-only inspection"}
+              {route === "predictions"
+                ? "M08C · NO_ML_PROMOTION"
+                : mode === "preview"
+                  ? dataset?.previewCapacity
+                    ? "Saved M02 report · explicit demo mode"
+                    : "Input-only preview · connect API for reports"
+                  : route === "data"
+                    ? "M07A · synthetic data editor"
+                    : ["scheduling", "scenarios", "jobs"].includes(route)
+                      ? "M05A / M05B · interactive planning"
+                      : "M05A · read-only inspection"}
             </span>
           </div>
           {children}

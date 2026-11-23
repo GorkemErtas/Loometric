@@ -9,6 +9,12 @@ import {
   jobInfo,
   jobResult,
 } from "../domain/planning";
+import {
+  type ModelName,
+  type PredictionInputs,
+  predictionReport,
+  sameInputs,
+} from "../domain/predictions";
 import { inputValidation } from "../domain/production";
 
 export type ApiFailure =
@@ -153,6 +159,7 @@ const publicCodes = new Set([
   "BODY_TOO_LARGE",
   "EXECUTION_TIMEOUT",
   "JOB_SERVICE_UNAVAILABLE",
+  "EXPERIMENTAL_ARTIFACT_UNAVAILABLE",
 ]);
 const jobPath = (id: string) => {
   if (!/^[a-f0-9]{32}$/.test(id)) throw new ApiError("validation");
@@ -282,6 +289,26 @@ export class ApiClient {
   }
   capabilities() {
     return this.request("/capabilities", capabilities);
+  }
+  async predictSynthetic(inputs: PredictionInputs, models: ModelName[], signal?: AbortSignal) {
+    const result = await this.request(
+      "/predictions/synthetic",
+      predictionReport,
+      {
+        schema_version: 1,
+        synthetic: true,
+        prediction_context: "HYPOTHETICAL_PRE_SHIFT",
+        inputs,
+        models,
+      },
+      signal,
+    );
+    if (
+      !sameInputs(inputs, result.data.inputs) ||
+      result.data.results.map((r) => r.model).join() !== models.join()
+    )
+      throw new ApiError("contract");
+    return result;
   }
   async capacity(planning: Planning) {
     const response = await this.request("/planning/capacity", capacityReport, {

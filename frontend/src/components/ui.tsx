@@ -3,6 +3,13 @@ import type { ApiError } from "../api/client";
 
 export function Icon({ name, size = 20 }: { name: string; size?: number }) {
   const paths: Record<string, ReactNode> = {
+    predictions: (
+      <>
+        <path d="M4 19V5m0 14h16M7 15l4-5 4 2 5-7" />
+        <circle cx="11" cy="10" r="1.5" />
+        <circle cx="15" cy="12" r="1.5" />
+      </>
+    ),
     data: (
       <>
         <rect x="4" y="3" width="16" height="18" rx="2" />

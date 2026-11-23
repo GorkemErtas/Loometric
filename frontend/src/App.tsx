@@ -3,6 +3,7 @@ import { Capacity } from "./pages/Capacity";
 import { Jobs } from "./pages/Jobs";
 import { Orders } from "./pages/Orders";
 import { Overview } from "./pages/Overview";
+import { Predictions } from "./pages/Predictions";
 import { ProductionData } from "./pages/ProductionData";
 import { Resources } from "./pages/Resources";
 import { Scenarios } from "./pages/Scenarios";
@@ -28,6 +29,8 @@ function WorkspaceViews() {
         <div key={`${route}:${dataset?.key ?? "empty"}`}>
           {route === "overview" ? (
             <Overview />
+          ) : route === "predictions" ? (
+            <Predictions />
           ) : route === "data" ? (
             <ProductionData />
           ) : route === "orders" ? (
