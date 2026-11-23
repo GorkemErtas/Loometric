@@ -11,7 +11,7 @@ from loometric.synthetic_training.configuration import load_study
 from loometric.synthetic_training.data import load_development
 from loometric.synthetic_training.metrics import analyze
 from loometric.synthetic_training.models import build_model
-from loometric.synthetic_training.risk import residual_reference
+from loometric.synthetic_training.risk import band_diagnostics, residual_reference
 
 
 @pytest.fixture(scope="module")
@@ -51,6 +51,12 @@ def publication_fixture(tmp_path_factory):
             # production metadata uses retained benchmark training-OOF residuals.
             report["residual_references"][STUDY_CASE][name] = residual_reference(
                 [{"stage": "cutting", "actual": 0.4, "prediction": 0.5}]
+            )
+            report["validation"][STUDY_CASE][name]["risk_band"] = band_diagnostics(
+                data.validation.y,
+                predicted,
+                data.validation.metadata,
+                report["residual_references"][STUDY_CASE][name],
             )
             rows.extend(
                 {

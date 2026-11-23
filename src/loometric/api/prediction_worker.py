@@ -1,0 +1,60 @@
+"""Stdlib-only startup; hard memory guard established before importing ML."""
+
+import json
+import os
+import sys
+
+from loometric.execution import apply_child_memory_limit
+
+
+def main() -> int:
+    request = json.loads(sys.stdin.read())
+    try:
+        backend = apply_child_memory_limit(768 * 1024**2, request.get("windows_job_name"))
+    except OSError:
+        print(json.dumps({"error": {"code": "RESOURCE_GUARD_UNAVAILABLE"}}))
+        return 0
+    # Fixed numerical worker controls, established before native libraries import.
+    for variable in (
+        "OMP_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "NUMEXPR_NUM_THREADS",
+    ):
+        os.environ[variable] = "1"
+    from pydantic import ValidationError
+
+    from loometric.api.codec import decode_body
+    from loometric.api.errors import ApiError
+    from loometric.api.prediction_schemas import SyntheticPredictionRequest
+    from loometric.api.settings import default_limits
+    from loometric.experimental_ml.artifacts import ArtifactError, load_trusted
+    from loometric.experimental_ml.inference import predict
+
+    try:
+        parsed = decode_body(request["body"], default_limits())
+        contract = SyntheticPredictionRequest.model_validate(parsed)
+        metadata, models = load_trusted(request["receipt"])
+        result = {
+            "data": predict(contract, metadata, models, request["receipt"]),
+            "memory_backend": backend,
+        }
+    except ArtifactError:
+        result = {"error": {"code": "EXPERIMENTAL_ARTIFACT_UNAVAILABLE"}}
+    except ApiError as exc:
+        result = {"error": {"code": exc.code}}
+    except (ValidationError, ValueError, TypeError, KeyError):
+        result = {"error": {"code": "INVALID_ENVELOPE"}}
+    except MemoryError:
+        result = {"error": {"code": "MEMORY_LIMIT_EXCEEDED"}}
+    except Exception:
+        result = {"error": {"code": "EXECUTION_FAILED"}}
+    encoded = json.dumps(result, allow_nan=False)
+    if len(encoded.encode("utf-8")) > 131072:
+        encoded = json.dumps({"error": {"code": "RESPONSE_LIMIT_EXCEEDED"}})
+    print(encoded)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

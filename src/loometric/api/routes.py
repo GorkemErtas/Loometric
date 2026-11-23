@@ -56,14 +56,26 @@ async def capabilities(request: Request, auth: AUTH) -> SuccessResponse:
                 "durable": False,
             },
             "limits": request.app.state.settings.limits.model_dump(),
+            "experimental_predictions": {
+                "endpoint": "/api/v1/predictions/synthetic",
+                "models": ["random_forest", "histogram_gradient_boosting", "grouped_mean"],
+                "status": "EXPERIMENTAL_NOT_PROMOTED",
+                "promotion_decision": "NO_ML_PROMOTION",
+                "artifact_availability": "VERIFIED_ON_EACH_REQUEST_FAIL_CLOSED",
+                "memory_limit_mib": 768,
+                "deadline_seconds": 10,
+                "max_concurrent_inference": 1,
+                "max_body_bytes": 8192,
+                "capacity_application_authorized": False,
+            },
             "deferred": {
                 "cp_sat": "CP-SAT is available only through bounded optimization jobs.",
-                "prediction": "M01 offline; artifact registry and HTTP policy deferred.",
+                "prediction": "M01 remains offline; M08C synthetic models are experimental only.",
             },
             "limitations": [
                 "Loopback development API with one shared secret; no public hosting.",
                 "Synthetic conditional results require human review.",
-                "No database, durable jobs, ML data/artifacts or automatic production decisions.",
+                "No database, durable jobs or automatic production decisions.",
             ],
         },
     )

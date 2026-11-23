@@ -10,6 +10,8 @@ from starlette.responses import HTMLResponse, JSONResponse
 from loometric.api.errors import ApiError
 from loometric.api.job_routes import JOB_ROUTER
 from loometric.api.jobs import JobRegistry
+from loometric.api.prediction_routes import PREDICTION_ROUTER
+from loometric.api.prediction_service import PredictionService
 from loometric.api.routes import ROUTER
 from loometric.api.security import LocalBoundaryMiddleware, error_response
 from loometric.api.services import OperationService, wait_for_cleanup
@@ -42,9 +44,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.operations = OperationService(settings.limits, settings.job_limits)
     app.state.jobs = jobs
+    app.state.predictions = PredictionService()
     app.add_middleware(LocalBoundaryMiddleware, settings=settings)
     app.include_router(ROUTER)
     app.include_router(JOB_ROUTER)
+    app.include_router(PREDICTION_ROUTER)
 
     @app.get("/api/v1/docs", include_in_schema=False, response_class=HTMLResponse)
     async def docs() -> str:
@@ -62,9 +66,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 <li>POST /api/v1/jobs/scenarios — {"baseline": M03 object, "specification": M04 object}</li>
 <li>GET /api/v1/jobs/{job_id} — lifecycle status</li>
 <li>GET /api/v1/jobs/{job_id}/result — verified result</li>
-<li>DELETE /api/v1/jobs/{job_id} — request native cancellation</li></ul>
+<li>DELETE /api/v1/jobs/{job_id} — request native cancellation</li>
+<li>POST /api/v1/predictions/synthetic — experimental synthetic estimators</li></ul>
 <p>Planning decimals are JSON numbers; reported decimals are strings. Only synthetic,
-bounded planning is supported. CP-SAT uses jobs. No prediction or file paths.</p>
+bounded planning is supported. CP-SAT uses jobs. Experimental synthetic prediction
+is separate from planning and requires trusted local M08C artifacts. No client file paths.</p>
 <p>See docs/architecture/api-foundation.md and examples/api/workflow.py in the repository.</p>
 <p>Jobs: docs/architecture/optimization-jobs-api.md and examples/api/jobs_workflow.py.</p>
 </html>"""
