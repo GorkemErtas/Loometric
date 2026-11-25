@@ -386,3 +386,121 @@ All historical datasets/artifacts/splits/experiments, M08C registry/serving beha
 and frozen planning contracts are preserved. No actual study run failed or changed
 the predeclared hypotheses after results. No v2 generation, operational promotion,
 deployment, capacity conversion or follow-on milestone was started. M09A stops here.
+
+## M09B integration addendum (2026-11-25)
+
+This dated addendum records experimental application integration, not another
+model-selection experiment. All preceding M09A methods, metrics and conclusions
+remain historical evidence. M09B leaves EXP-006/007, the research declaration and
+code, original data/splits, source model bytes and frozen planning contracts
+unchanged. **RESEARCH_CANDIDATE** is a research designation;
+**NO_ML_PROMOTION** remains the decision.
+
+The local dashboard defaults to the frozen RF Physics candidate. Its additive
+schema-2 endpoint supports candidate-only inference or a four-model comparison
+with six unique signed differences. Legacy selections retain the v1 endpoint and
+its original outputs. Both routes use the same guarded single inference slot,
+768 MiB ceiling, ten-second whole-child deadline, one numerical thread, 8 KiB
+request / 128 KiB response limits, loopback/Bearer authorization and cancellation
+cleanup. The HTTP process imports no ML and inference performs no fitting or
+training-data access.
+
+An independently pinned v2 artifact copies the original 18,361,466-byte EXP-008
+model. Its three files are create-only, ignored and never bundled into Git or the
+dashboard build. Offline `serving_authorized: false` is preserved. A separate
+receipt authorizes synthetic hypothetical experimental API requests only;
+revocation, tampering or provenance drift fails closed. No production permission,
+efficiency conversion, capacity application or scheduling mutation is introduced.
+See [ADR 0023](../decisions/0023-rf-physics-v2-regression-contract.md) and the
+[complete artifact/startup workflow](../architecture/experimental-ml-inference.md#reproducible-v2-artifact-preparation).
+
+### Reproduced historical metrics and remaining limits
+
+On exactly the same 4,833 eligible benchmark validation rows, candidate predictions
+match the receipt-bound retained EXP-008 predictions with maximum absolute
+difference **0.0** (tolerance 1e-12):
+
+| Metric | RF Physics | Raw Forest12 reference |
+| --- | ---: | ---: |
+| MAE | 0.057931364704274735 | 0.07627743732687367 |
+| RMSE | 0.09936276695864536 | 0.11161282998389319 |
+| R² | 0.8206691735917163 | 0.7737253842072748 |
+
+Relative MAE reduction is **24.051768472477693%**, reported as **24.05%**;
+R² rounds to **0.82067**. This compares prediction errors in dimensionless
+synthetic attainment units, not a measured gain in factory productivity.
+The frozen candidate was selected on original-training folds before these outer
+diagnostics. Those validation rows were already inspected repeatedly:
+**spent validation is not independent validation**, and replaying it does not
+restore independence. No fresh holdout was scored, no candidate was reranked and
+no reserved/final-test labels were decoded. Prospective independent validation
+and a separate calibration period remain future work.
+
+The earlier failures still apply: hidden-disruption overprediction
+(bias +0.1857–0.1950); seed-73 disruption cutting MAE 11.71% worse than Grouped
+Mean; worst absolute-error regressions against Grouped Mean of 18.25% in seed-42
+surge and 16.66% on benchmark; and 205 remaining offered-work ceiling violations
+on benchmark. Research conditional-band disruption coverage is only 39.89–41.67%.
+The API supplies no candidate band, invented stage metrics, gate approval or
+feature importance. Valid above-one values remain unclipped; unsupported outputs
+abstain. Marginal training support cannot certify joint support, unseen-entity
+generalization or observability of hidden shocks. These limitations preclude an
+operational-readiness or real-factory-accuracy claim.
+
+### Artifact and support consistency evidence
+
+Actual offline verification recomputed v1's support profile from all **14,711**
+benchmark original-training observations. It matches v1 metadata exactly, and the
+full training provenance equals EXP-008's retained source provenance. Configuration
+pins training fingerprint
+`8ae08345a01c025b5e34a736b848100bc530c4987ac0d750543a7e07847171e8`
+and canonical support digest
+`f2e50ecd9b0a589d88a3706f3a31a17f621a5de13b1bf3b9a33380dbaca1e4a3`.
+No serving request reads those training rows.
+
+Independent preparation in fresh ignored `.tmp/m09b-v2-reproduction-final` produced
+**all three v2 files byte-identical** to the existing bundle, without training or
+deserializing a model during publication. Manifest SHA-256:
+`55b09223c57e6c52261a71bc777edddc6116b88b8ffae3f7b0f9cc9075cc51f0`.
+Model SHA-256 remains the original
+`4f64df4485927c1fdc6eb4bd4a1d65f70a0d6dd9634e002c0f17a427a8d2a30c`.
+A before/after audit preserved all **19** files in the audited raw-data,
+v1/v2 serving and EXP-008-a artifact sets. This is a scoped byte audit, not a claim
+to have independently regenerated every historical dataset.
+
+The offline parity and four-scenario comparison tools ran successfully. Default
+hypothetical input predictions are Forest12 0.9036296370677777, Hist31
+0.8945601867754494, Grouped Mean 0.7628348220475517 and RF Physics
+0.8919168184750277. These are executed estimator examples, not causal intervention
+effects. Local audit evidence remains under ignored `.tmp/`.
+
+### Final verification
+
+| Executed command/check | Actual result |
+| --- | --- |
+| `pytest -q -x -p no:cacheprovider tests/experimental_ml tests/api/test_http.py` | 181 passed, 193.86s |
+| Full Python `pytest -q -p no:cacheprovider` | **1,307 passed**, 528.28s; no failures or skipped tests |
+| Frontend `npm test`, final rerun | 183 passed in 8 files, 19.18s |
+| Full real-backend `npm run test:browser` | **12 passed**, 1.9m; owned API/Vite listeners closed and session token discarded |
+| `npm run typecheck`, `npm run check`, `npm run build` | Passed; 63 checked files, 68 built modules |
+| Root Ruff lint/format with `--no-cache`; `pip check` | Passed |
+| Actual v2 reproduction, training support and spent-prediction parity | Passed; three identical files, 14,711 training rows, 4,833 retained predictions, maximum difference 0.0 |
+| Credential-pattern scan and file policy across all 419 tracked files | Passed; no tracked raw/generated datasets, model binaries, credentials, builds or local instruction/plan files |
+| 50 relative links/anchors and fenced blocks in six affected documents; prediction fixture IDs absent from production JS | Passed |
+
+Initial sandbox runs were not counted as successful verification: Python encountered
+WinError 5 on pytest temporary-directory access/cleanup, and a frontend rerun could
+not spawn Vitest workers (`EPERM`). Native suites were rerun with normal local
+process permissions; no assertion, model/source receipt or resource limit was
+relaxed to accommodate the sandbox. Python has no configured static type checker;
+the frontend uses the existing strict TypeScript configuration.
+
+The untracked `test_prediction_v2_local.py` smoke script was removed **after**
+its four-model values, six differences, NO_ML_PROMOTION/capacity flags,
+zero-capacity abstention, v1 compatibility, HTTP authentication/invalid models and
+candidate-only behavior passed in permanent native and browser coverage.
+Desktop/mobile axe smoke checks and existing scheduling/optimization/workspace
+browser regressions passed. Only the known NO_COLOR/FORCE_COLOR warning remained;
+Windows/Edge is the verified environment, not a cross-platform or accessibility-
+certification claim. No dependencies were added. Raw/generated datasets, model
+binaries, secrets and build outputs remain untracked.

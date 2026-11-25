@@ -215,3 +215,27 @@ failure limits, timings, receipts and test evidence are in EXP-008.
 M09A delivers research evidence and a [v2 design proposal](synthetic-ml-v2-proposal.md).
 No dataset replacement, automatic training/promotion, deployment,
 real-factory accuracy claim, capacity conversion or scheduling integration.
+
+## M09B follow-on integration (2026-11-25)
+
+The preceding methods/results are the immutable M09A research record. M09B adds
+an explicitly authorized experimental inference projection of its frozen
+`rf_physics` candidate; it does not change the research protocol, code identities,
+selection, reports, source datasets or model bytes. The separate create-only v2
+bundle preserves offline `serving_authorized: false`; a distinct pinned receipt
+permits hypothetical synthetic requests only. It adds neither production serving
+permission nor an operational model promotion.
+
+The dashboard defaults to RF Physics and compares it with the three v1 models.
+Its historical benchmark MAE is 0.057931364704274735, **24.05% lower than raw
+Forest12** (0.07627743732687367), RMSE 0.09936276695864536 and **R² 0.82067** on
+4,833 spent validation rows. Reproduced historical prediction parity is distinct
+from independent validation. Stage/worst-error regressions, hidden-shift risk and
+uncalibrated uncertainty remain; the API serves no candidate residual band or
+invented feature explanation. **NO_ML_PROMOTION** and reserved-final-test boundaries
+remain unchanged.
+
+See the [inference architecture and reproducible local setup](experimental-ml-inference.md#reproducible-v2-artifact-preparation),
+[ADR 0023](../decisions/0023-rf-physics-v2-regression-contract.md) and
+[dated EXP-008 addendum](../experiments/EXP-008-ml-improvement-research.md#m09b-integration-addendum-2026-11-25)
+for the actual integration, support-profile consistency and final verification.

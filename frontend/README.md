@@ -4,8 +4,8 @@ React/strict TypeScript local workspace for synthetic M02–M04 inputs and the e
 M05A/M05B APIs. Five inspection pages are joined by Production scheduling, What-if
 scenarios and Optimization jobs. **Production data** adds the M07A guided input
 workflow. Python owns all scheduling/optimization/verification and full domain validation.
-**AI Predictions** adds actual experimental Forest12/Hist31 inference and a Grouped
-Mean comparison baseline, independently of the selected planning dataset.
+**AI Predictions** adds actual experimental RF Physics, Forest12/Hist31 inference
+and a Grouped Mean comparison baseline, independently of the selected planning dataset.
 
 Use Node 22.12+, 24 or 26+ (verified with Node 26.13.0 / npm 11.20.0).
 From the repository root:
@@ -48,15 +48,22 @@ source artifacts:
 
 ```powershell
 .venv/Scripts/python.exe -m loometric.experimental_ml publish --version v1
+.venv/Scripts/python.exe -m loometric.experimental_ml_v2.publish
 ```
 
+The v2 command also needs the retained, receipt-verified EXP-008 research artifact.
+Follow the [complete preparation order and checks](../docs/architecture/experimental-ml-inference.md#reproducible-v2-artifact-preparation)
+before either publication; skip a create-only command if its verified output already exists.
 Existing output is never overwritten; inference never trains automatically. The
 versioned independent registry pins its manifest receipt. Missing/incompatible
 artifacts fail visibly instead of substituting a baseline or preview prediction.
 Connect the API, review the guided thirteen-feature hypothetical pre-shift inputs
-and confirm synthetic use. **Random Forest** is the default experimental estimator;
-choose **Compare all three models** to execute it alongside HistGradientBoosting
-and the transparent Grouped Mean baseline. The M08B **NO_ML_PROMOTION** decision
+and confirm synthetic use. **RF Physics** is the default experimental research candidate;
+choose **Compare all four models** to execute it alongside Random Forest,
+HistGradientBoosting and the transparent Grouped Mean baseline. The candidate's
+separate trusted v2 bundle must already exist; inference never creates it. See the
+[v2 artifact and API contract](../docs/architecture/experimental-ml-inference.md#rf-physics-v2-integration-and-regression-repair).
+The M08B **NO_ML_PROMOTION** decision
 and failed subgroup gates remain visible beside actual results and validation errors.
 
 Use **Use as scenario baseline**, change inputs and **Predict** again for actual
@@ -70,13 +77,22 @@ target is synthetic standard capacity attainment, not guaranteed pieces or intri
 employee efficiency. Global forest importance describes training behavior, not
 causation or an individual prediction. Read the [API and research contract](../docs/architecture/experimental-ml-inference.md).
 
-The complete browser suite now also needs the trusted `v1` artifacts; it does not
+The complete browser suite needs both trusted `v1` and `v2` artifacts; it does not
 generate them or consume reserved-test labels. The test-only saved prediction
-response fixture was captured from the actual API and is never imported by the app.
+response fixtures were captured from the actual v1/v2 APIs and are never imported by the app.
 M08C verification:162 frontend tests,12 real-backend browser workflows, strict
 type/lint/build checks and zero npm audit findings. Complete Python regression:
 1,202 passed. The desktop/mobile prediction/scenario/error screenshots remain
 under ignored `.tmp/frontend/`; no production artifacts or credentials are bundled.
+
+M09B finalization passed **183 frontend tests**, **12 real-backend browser workflows**
+and **1,307 Python tests**, plus lint/type/build checks, on Windows/Edge. Details are in the
+[inference guide](../docs/architecture/experimental-ml-inference.md#m09b-final-verification)
+and the [EXP-008 integration addendum](../docs/experiments/EXP-008-ml-improvement-research.md#m09b-integration-addendum-2026-11-25).
+V1 compatibility, candidate provenance, revoked experimental authorization, tampering,
+training support consistency and create-only artifact preparation have permanent
+regressions. RF Physics's 24.05% MAE reduction versus Forest12 and R² 0.82067 use
+spent synthetic benchmark validation; independent validation remains pending.
 
 For a user-defined input, open **Production data** (`/#/data`):
 

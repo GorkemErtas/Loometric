@@ -1,4 +1,172 @@
-# M08C: Experimental synthetic estimator inference
+# Experimental synthetic estimator inference
+
+## RF Physics v2 integration and regression repair
+
+M09B finalizes the additive integration on 2026-11-25. The earlier M08C record
+below describes the original v1 behavior and its historical verification.
+
+The dashboard now defaults to **RF Physics** (`rf_physics`), a separately
+receipt-bound EXP-008 **RESEARCH_CANDIDATE**. **Compare all four models** executes
+it alongside Forest12, Hist31 and Grouped Mean and returns six signed differences.
+The existing v1 route and three-model response remain compatible. Selecting only
+legacy models still uses v1; a selection including RF Physics uses
+`POST /api/v1/predictions/synthetic/v2`, with `schema_version: 2` and the same
+closed thirteen inputs. The outer API envelope remains `api_version: "v1"`.
+API v2 uses `synthetic-ml-v1` data; it does not generate the proposed v2 dataset.
+
+The frozen ignored candidate bundle under `data/processed/experimental_ml/v2`
+must already exist. Its manifest receipt is
+`55b09223c57e6c52261a71bc777edddc6116b88b8ffae3f7b0f9cc9075cc51f0`.
+Inference never publishes, fits or repairs artifacts automatically. Its metadata
+keeps `serving_authorized: false`; the separate experimental serving receipt
+permits only hypothetical synthetic research requests, never production serving
+or capacity application. Missing, revoked or inconsistent policy fails closed.
+
+Both v2 response-level and per-model provenance identify EXP-008, the candidate
+receipt and `fresh_validation: false`. RF Physics's retained benchmark metrics
+use 4,833 **spent validation** rows. Its example prediction is
+**0.8919168184750277**. No independently calibrated band, stage metrics, promotion
+approval or feature explanation is invented. **NO_ML_PROMOTION** persists.
+
+| Spent benchmark metric | RF Physics | Raw Forest12 |
+| --- | ---: | ---: |
+| MAE | 0.057931364704274735 | 0.07627743732687367 |
+| RMSE | 0.09936276695864536 | 0.11161282998389319 |
+| R² | 0.8206691735917163 | 0.7737253842072748 |
+| Eligible rows | 4,833 | 4,833, matched IDs |
+
+The relative MAE reduction is `(Forest12 MAE - RF Physics MAE) / Forest12 MAE`,
+**24.05%**, not a gain in factory productivity. Selection was sealed on original-
+training folds before these outer diagnostics. The outer validation had already
+been repeatedly inspected; reproducing predictions on it does not restore its
+independence. Reserved entity/final-test labels remain untouched. Independent
+validation requires a separately declared evaluation on new seeds/entity profiles,
+with a separate calibration period, as proposed in EXP-008.
+
+The candidate still has hidden-disruption bias (+0.1857–0.1950), an 11.71% cutting
+MAE regression in seed-73 disruption against Grouped Mean, and worst-error
+regressions against Grouped Mean (18.25% in seed-42 surge; 16.66% on benchmark).
+Benchmark offered-work ceiling violations fall from 1,086 to 205 but are not eliminated. The research
+conditional residual bands cover only about 40% under disruption and are not
+served. The reused v1 marginal support profile cannot certify joint support,
+new-factory transfer or detection of an unobservable shock. No predictions,
+labels or interval endpoints are clipped to conceal these failures. Full slices
+and counts remain in [EXP-008](../experiments/EXP-008-ml-improvement-research.md).
+
+Support uses v1's original benchmark training population, independently checked
+against EXP-008's retained training provenance. V2 pins the training fingerprint
+`8ae08345a01c025b5e34a736b848100bc530c4987ac0d750543a7e07847171e8`
+and canonical profile digest
+`f2e50ecd9b0a589d88a3706f3a31a17f621a5de13b1bf3b9a33380dbaca1e4a3`.
+The profile was recomputed offline from all 14,711 original training rows and
+matched exactly. That support check uses training rows only; the separate parity
+replay uses spent validation. No new fit or reserved-label decoding was performed.
+Profile or training-source drift fails before prediction. The fixed 768 MiB,
+10-second, one-thread, single-slot worker and cancellation cleanup apply to both
+routes, as do the 8 KiB request and 128 KiB response ceilings.
+
+[ADR0023](../decisions/0023-rf-physics-v2-regression-contract.md) records these
+regression boundaries. Coverage includes native authenticated execution, artifact
+tampering before unpickling, policy revocation, checked-buffer loading, v1 parity,
+candidate abstention, training-only support and cross-version cancellation.
+
+## Reproducible v2 artifact preparation
+
+Run offline commands from the repository root with the existing Python 3.13.14
+environment locked by `requirements/m05a.txt`. Use the installation and two-terminal
+startup commands in [README](../../README.md#local-setup); keep the API token in
+the backend process environment and the dashboard session's password field.
+The UI runs on `http://127.0.0.1:5173`; the supported single-worker API startup is
+`.venv/Scripts/python.exe -m loometric.api`, on loopback port 8000 by default.
+Use no cloud service, remote factory system or client-bundled token.
+
+Prerequisites, in order:
+
+1. Retain or reproduce the ten original M08A `synthetic-ml-v1` bundles following
+   [data reproduction commands](../data/synthetic-ml-v1-quality-and-reproduction.md#reproduction-commands).
+   Their exact directories and independent receipts
+   are in `configs/synthetic_training_v1.json`; do not create a new dataset version.
+2. Retain or reproduce corrected EXP-006 `data/processed/synthetic_training/exp-006-c`
+   using the [training workflow](synthetic-ml-model-training.md). Its receipt is
+   `cd19c78c8321ac1bb69dc16d61dc7de01469e35f0d35afe3a3d8c8dca4e8b7b4`.
+3. Prepare v1 using the fixed refits below, if it does not already exist. V1's
+   independent package receipt is `src/loometric/experimental_ml/trusted_v1.json`.
+4. Retain or reproduce EXP-008 at `data/processed/ml_research/exp-008-a` using the
+   [research workflow](ml-improvement-research.md#reproduction-and-artifacts).
+   Inspect its receipt before v2 preparation. This is historical reproduction,
+   not a new search or independent validation milestone.
+5. Prepare v2 once, then check the bundle and retained-prediction parity:
+
+```powershell
+# Only if EXP-006-c is absent, after all ten dataset receipts match:
+.venv/Scripts/python.exe -m loometric.synthetic_training run --output data/processed/synthetic_training/exp-006-c
+
+# Run only if v1 is absent; this refits the fixed original-training models.
+.venv/Scripts/python.exe -m loometric.experimental_ml publish --version v1
+
+# Only if EXP-008-a is absent; its research diagnosis requires the verified v1 metadata.
+.venv/Scripts/python.exe -m loometric.ml_research run --output data/processed/ml_research/exp-008-a
+
+# Metadata/hash inspection only; no executable model is loaded.
+.venv/Scripts/python.exe -m loometric.ml_research inspect --artifact data/processed/ml_research/exp-008-a --expected-fingerprint d2fe121d592a5934753c555815a255620d0010838dc90957af5e3e73319a9cdb
+
+# Run only if v2 is absent; this copies the frozen model, without fitting/loading it.
+.venv/Scripts/python.exe -m loometric.experimental_ml_v2.publish
+.venv/Scripts/python.exe -c "from loometric.experimental_ml_v2.artifacts import verified_bundle; metadata, _ = verified_bundle(); print(metadata['model'], metadata['promotion_decision'])"
+
+# Offline only: re-predict the same authorized, spent benchmark validation rows.
+.venv/Scripts/python.exe -m loometric.experimental_ml_v2.parity
+.venv/Scripts/python.exe -m loometric.experimental_ml_v2.compare
+```
+
+V2 contains only `manifest.json`, `metadata.json` and `rf_physics.joblib`. Preparation
+must reproduce manifest SHA-256
+`55b09223c57e6c52261a71bc777edddc6116b88b8ffae3f7b0f9cc9075cc51f0`
+and source-model SHA-256
+`4f64df4485927c1fdc6eb4bd4a1d65f70a0d6dd9634e002c0f17a427a8d2a30c`
+(18,361,466 model bytes). It rejects a serving-receipt mismatch before creating
+output. The publisher never overwrites an existing directory; use verified existing
+bundles or explicitly investigate a failed/partial publication. Do not delete
+historical outputs, edit the trusted receipts to accept drift, or expect a fresh
+dependency environment to reproduce them automatically. Environment/research-code
+drift fails closed. Both directories and all source datasets/models stay ignored.
+
+The parity tool checks all 4,833 original validation IDs and predictions against
+receipt-bound EXP-008 diagnostics, with tolerance 1e-12. Its metrics are expressly
+`fresh_validation: false`. The comparison tool shows frozen same-input scenario
+predictions; it does not apply support policy or provide causal recommendations.
+Serving uses the guarded API, not these offline tools. A checkout without local
+artifacts can still run the Python fixture and frontend unit suites; browser
+estimator tests require the verified actual v1/v2 bundles.
+
+## M09B final verification
+
+Final execution on 2026-11-25 passed **1,307 Python tests** (528.28s),
+**183 frontend tests** (19.18s), and **12 real-backend browser workflows** (1.9m),
+without failures or skipped tests. Ruff lint/format, `pip check`, strict TypeScript,
+Biome and the production build passed. Actual training-source/support verification,
+zero-difference spent-prediction parity and byte-identical v2 preparation passed.
+The temporary smoke script was removed after its permanent native/browser coverage
+passed. Initial sandbox permission failures were resolved by running native suites
+with normal local permissions. The browser harness closed its owned listeners and
+discarded the token; only the known NO_COLOR/FORCE_COLOR warning remained.
+Windows/Edge is verified; no other-platform or accessibility-certification claim
+is made. Full command outcomes and scoped reproduction evidence are recorded in
+the [EXP-008 integration addendum](../experiments/EXP-008-ml-improvement-research.md#m09b-integration-addendum-2026-11-25).
+
+The cancellation regression tests both versions and retains the inference slot until
+cleanup across competing versions. OpenAPI covers all thirteen routes and each
+prediction schema's version/model limits. Permanent tests cover artifact and support
+drift, authorization revocation, native error mapping, create-only preparation and
+retained-prediction parity. Frontend fixtures are test-only and absent from the app
+bundle. The browser suite runs default RF Physics, four-model comparison, scenario,
+review, abstention, cancellation, errors and legacy v1, plus existing planning jobs.
+Windows exposes aggregate committed-memory telemetry; Linux uses RLIMIT_AS and
+does not claim equivalent telemetry. No resource limit or assertion is relaxed.
+
+The earlier M08C implementation and its historical verification follow.
+
+## M08C implementation record
 
 M08C connects actual fitted Forest12 and Hist31 pipelines, plus a transparent
 Grouped Mean comparison baseline, to the local API and **AI Predictions** page.
