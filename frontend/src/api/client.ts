@@ -291,11 +291,14 @@ export class ApiClient {
     return this.request("/capabilities", capabilities);
   }
   async predictSynthetic(inputs: PredictionInputs, models: ModelName[], signal?: AbortSignal) {
+    const useV2 = models.includes("rf_physics");
+    const schemaVersion = useV2 ? 2 : 1;
+
     const result = await this.request(
-      "/predictions/synthetic",
+      useV2 ? "/predictions/synthetic/v2" : "/predictions/synthetic",
       predictionReport,
       {
-        schema_version: 1,
+        schema_version: schemaVersion,
         synthetic: true,
         prediction_context: "HYPOTHETICAL_PRE_SHIFT",
         inputs,
@@ -303,11 +306,14 @@ export class ApiClient {
       },
       signal,
     );
+
     if (
+      result.data.schemaVersion !== schemaVersion ||
       !sameInputs(inputs, result.data.inputs) ||
       result.data.results.map((r) => r.model).join() !== models.join()
     )
       throw new ApiError("contract");
+
     return result;
   }
   async capacity(planning: Planning) {

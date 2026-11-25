@@ -4,7 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import capacity from "../fixtures/capacity-demo.report.json?raw";
 import { App } from "../src/App";
 import { initialInputs, type ModelName, type PredictionInputs } from "../src/domain/predictions";
-import { capturedResponse } from "./prediction-fixtures";
+import { capturedResponse, capturedV2Response } from "./prediction-fixtures";
 
 const id = "00000000-0000-4000-8000-000000000001";
 const reply = (data: unknown) =>
@@ -31,11 +31,16 @@ function transport(
       });
     if (path === "/planning/capacity")
       return new Response(`{"api_version":"v1","request_id":"${id}","data":${capacity}}`);
-    if (path === "/predictions/synthetic") {
+    if (path === "/predictions/synthetic" || path === "/predictions/synthetic/v2") {
       const body = JSON.parse(String(options?.body));
+      const v2 = path.endsWith("/v2");
+      expect(body.schema_version).toBe(v2 ? 2 : 1);
+      expect(body.models.includes("rf_physics")).toBe(v2);
       return predict
         ? predict(body.inputs, body.models, options)
-        : new Response(JSON.stringify(capturedResponse(body.inputs, body.models)));
+        : new Response(
+            JSON.stringify((v2 ? capturedV2Response : capturedResponse)(body.inputs, body.models)),
+          );
     }
     throw new Error("Unexpected endpoint in prediction test");
   });
@@ -63,9 +68,10 @@ it("requires connection and explicit declaration and has no fabricated preview p
   vi.stubGlobal("fetch", calls);
   render(<App />);
   expect(screen.getByRole("heading", { name: "AI Predictions", level: 1 })).toBeVisible();
-  expect(screen.getByLabelText("Model")).toHaveValue("random_forest");
+  expect(screen.getByLabelText("Model")).toHaveValue("rf_physics");
   expect(screen.getByRole("button", { name: "Predict" })).toBeDisabled();
   expect(screen.queryByText("0.90363")).not.toBeInTheDocument();
+  expect(screen.queryByText("0.89192")).not.toBeInTheDocument();
   expect(calls).not.toHaveBeenCalled();
 });
 it("renders actual response, all-model differences, failed gates and global explanation", async () => {
@@ -78,6 +84,16 @@ it("renders actual response, all-model differences, failed gates and global expl
   expect(await screen.findByText("0.90363")).toBeVisible();
   expect(screen.getByText("0.89456")).toBeVisible();
   expect(screen.getByText("0.76283")).toBeVisible();
+  expect(screen.getByText("0.89192")).toBeVisible();
+  expect(screen.getAllByRole("article")).toHaveLength(4);
+  expect(
+    within(screen.getByRole("region", { name: "Model prediction differences" })).getAllByRole(
+      "row",
+    ),
+  ).toHaveLength(7);
+  expect(screen.getByRole("article", { name: "RF Physics result" })).toHaveTextContent(
+    "RESEARCH CANDIDATE",
+  );
   expect(screen.getByRole("heading", { name: "Global Random Forest behavior" })).toBeVisible();
   expect(screen.getByRole("region", { name: "Model prediction differences" })).toBeVisible();
   expect(screen.getAllByText(/Maximum stage regression/)[0]).toHaveTextContent("51.84%");
@@ -92,16 +108,16 @@ it("pins a scenario, shows changed inputs and compares only actual subsequent re
   render(<App />);
   const user = await connect();
   await user.click(screen.getByRole("button", { name: "Predict" }));
-  await screen.findByText("0.90363");
+  await screen.findByText("0.89192");
   await user.click(screen.getByRole("button", { name: "Use as scenario baseline" }));
   fireEvent.change(screen.getByLabelText("Planned workers", { exact: true }), {
     target: { value: "8" },
   });
-  expect(screen.queryByText("0.90363")).not.toBeInTheDocument();
+  expect(screen.queryByText("0.89192")).not.toBeInTheDocument();
   expect(screen.getByText(/Waiting for the next real prediction/)).toBeVisible();
   await user.click(screen.getByRole("button", { name: "Predict" }));
   const table = await screen.findByRole("region", { name: "Before and after model predictions" });
-  expect(within(table).getByText("Random Forest")).toBeVisible();
+  expect(within(table).getByText("RF Physics")).toBeVisible();
   const inputs = screen.getByRole("region", { name: "Scenario input differences" });
   expect(within(inputs).getByText("planned workers")).toBeVisible();
   expect(within(inputs).getByText("8")).toBeVisible();
@@ -128,9 +144,9 @@ it("shows loading, aborts edited requests and ignores late responses", async () 
   });
   expect(signal?.aborted).toBe(true);
   await act(async () => {
-    resolve?.(new Response(JSON.stringify(capturedResponse(initialInputs, ["random_forest"]))));
+    resolve?.(new Response(JSON.stringify(capturedV2Response(initialInputs, ["rf_physics"]))));
   });
-  expect(screen.queryByText("0.90363")).not.toBeInTheDocument();
+  expect(screen.queryByText("0.89192")).not.toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Predict" })).toBeEnabled();
 });
 it("blocks inconsistent values and displays safe API errors without fallback", async () => {
@@ -171,7 +187,7 @@ it("renders review and zero-capacity abstention without an invented estimate", a
   vi.stubGlobal(
     "fetch",
     transport(async (input, models) => {
-      const r = capturedResponse(input, models),
+      const r = capturedV2Response(input, models),
         result = r.data.results[0];
       if (input.planned_workers === 0) {
         result.prediction = null;
@@ -204,7 +220,7 @@ it("session replacement clears a pinned prediction and cancels pending research 
   render(<App />);
   const user = await connect();
   await user.click(screen.getByRole("button", { name: "Predict" }));
-  await screen.findByText("0.90363");
+  await screen.findByText("0.89192");
   await user.click(screen.getByRole("button", { name: "Use as scenario baseline" }));
   await user.click(screen.getByRole("button", { name: "Configure API" }));
   await user.type(screen.getByLabelText("Bearer token"), crypto.randomUUID().replaceAll("-", ""));
@@ -214,5 +230,5 @@ it("session replacement clears a pinned prediction and cancels pending research 
       screen.queryByRole("heading", { name: "Hypothetical scenario comparison" }),
     ).not.toBeInTheDocument(),
   );
-  expect(screen.queryByText("0.90363")).not.toBeInTheDocument();
+  expect(screen.queryByText("0.89192")).not.toBeInTheDocument();
 });

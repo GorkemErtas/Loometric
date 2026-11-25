@@ -17,7 +17,9 @@ async function connect(page: Page) {
 }
 async function predict(page: Page) {
   const response = page.waitForResponse(
-    (r) => r.url() === `${origin}/api/v1/predictions/synthetic` && r.request().method() === "POST",
+    (r) =>
+      /^\/api\/v1\/predictions\/synthetic(?:\/v2)?$/.test(new URL(r.url()).pathname) &&
+      r.request().method() === "POST",
   );
   await page.getByRole("button", { name: "Predict", exact: true }).click();
   const actual = await response;
@@ -43,12 +45,20 @@ test("actual experimental estimators, comparison, scenario change, review and ab
   });
   page.on("pageerror", (error) => errors.push(error.message));
   await connect(page);
-  await expect(page.getByLabel("Model", { exact: true })).toHaveValue("random_forest");
+  await expect(page.getByLabel("Model", { exact: true })).toHaveValue("rf_physics");
+  const candidate = await predict(page);
+  expect(candidate.schema_version).toBe(2);
+  expect(candidate.results).toHaveLength(1);
+  expect(candidate.results[0].prediction).toBe(0.8919168184750277);
+  await expect(page.getByRole("article", { name: "RF Physics result" })).toContainText(
+    "RESEARCH CANDIDATE",
+  );
   await page.getByLabel("Model", { exact: true }).selectOption("all");
   const initial = await predict(page);
   expect(initial.results.map((r: { prediction: number }) => r.prediction)).toEqual([
-    0.9036296370677777, 0.8945601867754494, 0.7628348220475517,
+    0.9036296370677777, 0.8945601867754494, 0.7628348220475517, 0.8919168184750277,
   ]);
+  expect(initial.differences).toHaveLength(6);
   await expect(page.getByRole("article", { name: "Random Forest result" })).toContainText(
     "0.90363",
   );
@@ -99,7 +109,13 @@ test("actual experimental estimators, comparison, scenario change, review and ab
     path: resolve("..", ".tmp/frontend/m08c-predictions-mobile.png"),
     fullPage: true,
   });
-  expect(requests.filter((path) => path === "/api/v1/predictions/synthetic")).toHaveLength(4);
+  await page.getByLabel("Planned workers", { exact: true }).fill("6");
+  await page.getByLabel("Model", { exact: true }).selectOption("random_forest");
+  const legacy = await predict(page);
+  expect(legacy.schema_version).toBe(1);
+  expect(legacy.results[0].prediction).toBe(initial.results[0].prediction);
+  expect(requests.filter((path) => path === "/api/v1/predictions/synthetic/v2")).toHaveLength(5);
+  expect(requests.filter((path) => path === "/api/v1/predictions/synthetic")).toHaveLength(1);
   expect(requests.some((path) => /\/scheduling|\/jobs|\/scenarios\/compare/.test(path))).toBe(
     false,
   );
@@ -125,7 +141,7 @@ test("input validation, delayed real response cancellation and explicit server f
   const completed = new Promise<void>((done) => {
     fetched = done;
   });
-  await page.route("**/api/v1/predictions/synthetic", async (route) => {
+  await page.route("**/api/v1/predictions/synthetic/v2", async (route) => {
     const actual = await route.fetch();
     expect(actual.status()).toBe(200);
     fetched?.();
@@ -142,10 +158,10 @@ test("input validation, delayed real response cancellation and explicit server f
   await page.getByLabel("Planned workers", { exact: true }).fill("8");
   release?.();
   await expect(page.getByRole("button", { name: "Predict", exact: true })).toBeEnabled();
-  await expect(page.getByText("0.90363", { exact: true })).toHaveCount(0);
-  await page.unroute("**/api/v1/predictions/synthetic");
+  await expect(page.getByText("0.89192", { exact: true })).toHaveCount(0);
+  await page.unroute("**/api/v1/predictions/synthetic/v2");
   // Explicit transport failure is test-only; no simulated successful predictions.
-  await page.route("**/api/v1/predictions/synthetic", (route) =>
+  await page.route("**/api/v1/predictions/synthetic/v2", (route) =>
     route.fulfill({
       status: 503,
       contentType: "application/json",
@@ -159,7 +175,7 @@ test("input validation, delayed real response cancellation and explicit server f
   await page.getByRole("button", { name: "Predict", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText("EXPERIMENTAL_ARTIFACT_UNAVAILABLE");
   await expect(page.getByText("private diagnostics")).toHaveCount(0);
-  await expect(page.getByRole("article", { name: "Random Forest result" })).toHaveCount(0);
+  await expect(page.getByRole("article", { name: "RF Physics result" })).toHaveCount(0);
   await axe(page);
   await page.screenshot({
     path: resolve("..", ".tmp/frontend/m08c-predictions-error.png"),

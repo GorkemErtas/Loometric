@@ -17,7 +17,7 @@ import { useWorkspace } from "../state/Workspace";
 export function Predictions() {
   const { api, sessionId, rejectSession } = useWorkspace();
   const [inputs, setInputs] = useState<PredictionInputs>({ ...initialInputs });
-  const [selection, setSelection] = useState<ModelName | "all">("random_forest");
+  const [selection, setSelection] = useState<ModelName | "all">("rf_physics");
   const [declared, setDeclared] = useState(false);
   const [report, setReport] = useState<PredictionReport | null>(null);
   const [before, setBefore] = useState<PredictionReport | null>(null);
@@ -106,6 +106,11 @@ export function Predictions() {
         51.84% in development seed 19 (36 rows). Hist31 failed stage and worst-error gates. Lower
         aggregate MAE does not establish superiority in every stage.
       </div>
+      <div className="prediction-caution">
+        <strong>RF Physics · EXP-008.</strong> Retained benchmark MAE improved by 24.05% compared
+        with Forest12. Stage-specific and worst-error regressions remain unresolved. Independent
+        validation is pending.
+      </div>
       {!api && (
         <div className="notice" role="status">
           <p>
@@ -133,15 +138,19 @@ export function Predictions() {
                 {modelNames.map((name) => (
                   <option key={name} value={name}>
                     {modelLabels[name]} ·{" "}
-                    {name === "grouped_mean" ? "comparison baseline" : "EXPERIMENTAL"}
+                    {name === "rf_physics"
+                      ? "RESEARCH CANDIDATE"
+                      : name === "grouped_mean"
+                        ? "comparison baseline"
+                        : "EXPERIMENTAL"}
                   </option>
                 ))}
-                <option value="all">Compare all three models</option>
+                <option value="all">Compare all four models</option>
               </select>
             </label>
             <p>
-              Default: Random Forest, experimental and not promoted. Grouped Mean is a transparent
-              comparison baseline.
+              Default: RF Physics, an experimental research candidate with lower retained benchmark
+              MAE. No operational promotion or independent validation is implied.
             </p>
           </div>
           <fieldset>

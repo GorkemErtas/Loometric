@@ -1,10 +1,11 @@
 import captured from "../fixtures/experimental-prediction.response.json?raw";
+import capturedV2 from "../fixtures/experimental-prediction-v2.response.json?raw";
 import { type ModelName, modelNames, type PredictionInputs } from "../src/domain/predictions";
 
 // Captured from the real Windows-guarded API, not bundled into application code.
 export function capturedResponse(
   inputs?: PredictionInputs,
-  selected: readonly ModelName[] = modelNames,
+  selected: readonly ModelName[] = modelNames.filter((name) => name !== "rf_physics"),
 ) {
   const raw = JSON.parse(captured);
   if (inputs) raw.data.inputs = inputs;
@@ -15,5 +16,23 @@ export function capturedResponse(
     (d: { left: ModelName; right: ModelName }) =>
       selected.includes(d.left) && selected.includes(d.right),
   );
+  return raw;
+}
+
+// Captured from the guarded v2 endpoint with all four actual estimators.
+export function capturedV2Response(
+  inputs?: PredictionInputs,
+  selected: readonly ModelName[] = modelNames,
+) {
+  const raw = JSON.parse(capturedV2);
+  if (inputs) raw.data.inputs = inputs;
+  raw.data.results = selected.map((name) =>
+    raw.data.results.find((r: { model: ModelName }) => r.model === name),
+  );
+  raw.data.differences = raw.data.differences.filter(
+    (d: { left: ModelName; right: ModelName }) =>
+      selected.includes(d.left) && selected.includes(d.right),
+  );
+  if (!selected.includes("rf_physics")) raw.data.provenance.research_candidate = null;
   return raw;
 }

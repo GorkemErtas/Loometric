@@ -1,13 +1,22 @@
 import { isLosslessNumber } from "lossless-json";
 import { ContractError, list, object, text, texts } from "./json";
 
-export const modelNames = ["random_forest", "histogram_gradient_boosting", "grouped_mean"] as const;
+export const modelNames = [
+  "random_forest",
+  "histogram_gradient_boosting",
+  "grouped_mean",
+  "rf_physics",
+] as const;
+
 export type ModelName = (typeof modelNames)[number];
+
 export const modelLabels: Record<ModelName, string> = {
   random_forest: "Random Forest",
   histogram_gradient_boosting: "HistGradientBoosting",
   grouped_mean: "Grouped Mean baseline",
+  rf_physics: "RF Physics",
 };
+
 export interface PredictionInputs {
   stage: string;
   shift_kind: string;
@@ -137,6 +146,7 @@ function fingerprint(value: unknown): string {
   if (!/^[a-f0-9]{64}$/.test(result)) throw new ContractError();
   return result;
 }
+const rfPhysicsManifest = "55b09223c57e6c52261a71bc777edddc6116b88b8ffae3f7b0f9cc9075cc51f0";
 function metrics(value: unknown) {
   const raw = object(value);
   const result = {
@@ -188,12 +198,36 @@ function readResult(value: unknown) {
     random_forest: "forest-12",
     histogram_gradient_boosting: "hist-31",
     grouped_mean: "grouped_mean",
+    rf_physics: "rf_physics",
   }[model];
+
+  const isResearch = model === "rf_physics";
+  if (isResearch) {
+    const provenance = object(raw.provenance);
+    if (
+      provenance.experiment_id !== "EXP-008" ||
+      provenance.manifest_sha256 !== rfPhysicsManifest ||
+      provenance.fresh_validation !== false ||
+      provenance.support_profile_source !== "V1_BENCHMARK_TRAINING" ||
+      finite(provenance.validation_rows) !== 4833 ||
+      finite(provenance.validation_rows) !== metrics(raw.validation_metrics).samples ||
+      raw.validation_stage_metrics !== null ||
+      raw.global_feature_importance !== null ||
+      raw.explanation_method !== "NOT_COMPUTED"
+    )
+      throw new ContractError();
+  }
+
   if (
     raw.identity !== expectedIdentity ||
-    raw.model_version !== "synthetic-experimental-v1" ||
+    raw.model_version !==
+      (isResearch ? "synthetic-experimental-v2" : "synthetic-experimental-v1") ||
     raw.model_status !==
-      (model === "grouped_mean" ? "BASELINE_COMPARISON_ONLY" : "EXPERIMENTAL_NOT_PROMOTED") ||
+      (isResearch
+        ? "RESEARCH_CANDIDATE"
+        : model === "grouped_mean"
+          ? "BASELINE_COMPARISON_ONLY"
+          : "EXPERIMENTAL_NOT_PROMOTED") ||
     !["ABSTAIN", "REVIEW_REQUIRED", "SUPPORTED_EXPERIMENTAL"].includes(text(support.status))
   )
     throw new ContractError();
@@ -232,11 +266,16 @@ function readResult(value: unknown) {
     )
       throw new ContractError();
   }
-  if ((band === null) !== (prediction === null)) throw new ContractError();
+  if (isResearch) {
+    if (band !== null) throw new ContractError();
+  } else if ((band === null) !== (prediction === null)) {
+    throw new ContractError();
+  }
+
   let failures: string[] = [],
     maximumStageRegression: number | null = null,
     worstErrorRegression: number | null = null;
-  if (model !== "grouped_mean") {
+  if (model !== "grouped_mean" && !isResearch) {
     const checks = object(raw.promotion_checks),
       gates = object(checks.gates);
     if (checks.eligible !== false || Object.values(gates).some((v) => typeof v !== "boolean"))
@@ -283,8 +322,9 @@ function readResult(value: unknown) {
 }
 export function predictionReport(value: unknown) {
   const raw = object(value);
+  const schemaVersion = finite(raw.schema_version);
   if (
-    finite(raw.schema_version) !== 1 ||
+    ![1, 2].includes(schemaVersion) ||
     raw.synthetic !== true ||
     raw.prediction_context !== "HYPOTHETICAL_PRE_SHIFT" ||
     raw.target !== "standard_capacity_attainment" ||
@@ -297,7 +337,8 @@ export function predictionReport(value: unknown) {
   const results = list(raw.results).map(readResult);
   if (
     results.length < 1 ||
-    results.length > 3 ||
+    results.length > (schemaVersion === 2 ? 4 : 3) ||
+    (schemaVersion === 1 && results.some((r) => r.model === "rf_physics")) ||
     new Set(results.map((r) => r.model)).size !== results.length
   )
     throw new ContractError();
@@ -325,8 +366,37 @@ export function predictionReport(value: unknown) {
     return { left, right, difference };
   });
   if (differences.length !== (results.length * (results.length - 1)) / 2) throw new ContractError();
+  if (
+    new Set(differences.map(({ left, right }) => [left, right].sort().join(":"))).size !==
+    differences.length
+  )
+    throw new ContractError();
+  const hasResearch = results.some((r) => r.model === "rf_physics");
+
+  let researchManifest: string | null = null;
+
+  if (hasResearch) {
+    const research = object(provenance.research_candidate);
+
+    if (
+      schemaVersion !== 2 ||
+      research.model !== "rf_physics" ||
+      research.experiment_id !== "EXP-008" ||
+      research.fresh_validation !== false
+    )
+      throw new ContractError();
+
+    researchManifest = fingerprint(research.manifest_sha256);
+
+    if (researchManifest !== rfPhysicsManifest) throw new ContractError();
+  } else if (schemaVersion === 2 && provenance.research_candidate !== null) {
+    throw new ContractError();
+  }
+
   const execution = object(raw.execution);
   return {
+    schemaVersion,
+    researchManifest,
     inputs: readInputs(raw.inputs),
     inputFingerprint: fingerprint(raw.input_fingerprint),
     results,

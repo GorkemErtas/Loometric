@@ -154,8 +154,11 @@
 }
 .prediction-result-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
+}
+.prediction-result-grid:has(> :only-child) {
+  grid-template-columns: minmax(0, 1fr);
 }
 .prediction-card {
   padding: 1.5rem;
@@ -308,5 +311,16 @@
   }
   .prediction-value {
     font-size: 2.5rem;
+  }
+}
+@media (min-width: 1600px) {
+  .prediction-result-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 850px) {
+  .prediction-result-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

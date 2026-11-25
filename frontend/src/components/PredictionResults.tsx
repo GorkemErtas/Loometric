@@ -7,7 +7,13 @@ function ModelCard({ result }: { result: PredictionResult }) {
     <article className="prediction-card" aria-label={`${modelLabels[result.model]} result`}>
       <div className="prediction-card-heading">
         <h3>{modelLabels[result.model]}</h3>
-        <Badge tone="amber">{result.model === "grouped_mean" ? "BASELINE" : "EXPERIMENTAL"}</Badge>
+        <Badge tone="amber">
+          {result.model === "rf_physics"
+            ? "RESEARCH CANDIDATE"
+            : result.model === "grouped_mean"
+              ? "BASELINE"
+              : "EXPERIMENTAL"}
+        </Badge>
       </div>
       <div className="prediction-value">{ratio(result.prediction)}</div>
       <p>Standard capacity attainment · dimensionless ratio</p>
@@ -35,6 +41,17 @@ function ModelCard({ result }: { result: PredictionResult }) {
           </p>
         </div>
       )}
+      {result.model === "rf_physics" && (
+        <div className="prediction-weakness">
+          <strong>Research evidence · EXP-008</strong>
+          <p>24.05% lower retained benchmark MAE compared with Forest12.</p>
+          <p>
+            Spent validation only. Stage and worst-error gates remain unresolved. No independently
+            calibrated prediction band is available.
+          </p>
+        </div>
+      )}
+
       <dl className="prediction-metrics">
         <div>
           <dt>Validation MAE</dt>
@@ -137,7 +154,7 @@ export function PredictionResults({ report }: { report: PredictionReport }) {
       )}
       <Panel
         title="Model provenance and research limits"
-        description="EXP-006 evidence is preserved; NO_ML_PROMOTION remains in force."
+        description="EXP-006 and EXP-008 research evidence; NO_ML_PROMOTION remains in force."
       >
         <div className="prediction-provenance">
           <p>
@@ -147,6 +164,11 @@ export function PredictionResults({ report }: { report: PredictionReport }) {
           <p>
             Manifest SHA-256 <code>{report.manifest}</code>
           </p>
+          {report.researchManifest && (
+            <p>
+              EXP-008 research candidate manifest SHA-256 <code>{report.researchManifest}</code>
+            </p>
+          )}
           <p>
             Training payload <code>{report.trainingFingerprint}</code>
           </p>

@@ -1,0 +1,484 @@
+{
+  "api_version": "v1",
+  "request_id": "d4bc485c-8213-4601-aac8-90a83f9b8695",
+  "data": {
+    "schema_version": 2,
+    "synthetic": true,
+    "prediction_context": "HYPOTHETICAL_PRE_SHIFT",
+    "target": "standard_capacity_attainment",
+    "units": "dimensionless_standard_worker_minutes_per_planned_worker_minute",
+    "inputs": {
+      "stage": "sewing",
+      "shift_kind": "day",
+      "weekday": 0,
+      "planned_workers": 6,
+      "skill_level": 3,
+      "style_complexity": 3,
+      "standard_worker_minutes_per_piece": 4.0,
+      "planned_machine_available": true,
+      "available_minutes": 420,
+      "planned_downtime_minutes": 30,
+      "opening_wip_pieces": 100,
+      "planned_release_pieces": 500,
+      "order_quantity": 600
+    },
+    "input_fingerprint": "e6f808fa978a731b1d5409b8347efa0b638573c5975e378fccf3e34521c1ce39",
+    "results": [
+      {
+        "model": "random_forest",
+        "identity": "forest-12",
+        "model_version": "synthetic-experimental-v1",
+        "model_status": "EXPERIMENTAL_NOT_PROMOTED",
+        "prediction": 0.9036296370677777,
+        "support": {
+          "status": "SUPPORTED_EXPERIMENTAL",
+          "reason_codes": [
+            "WITHIN_DECLARED_FEATURE_SUPPORT_ONLY"
+          ]
+        },
+        "descriptive_band": {
+          "interpretation": "DEVELOPMENT_RESIDUAL_BAND_NOT_CALIBRATED",
+          "lower": 0.7425683095814024,
+          "upper": 1.064690964554153,
+          "radius": 0.16106132748637525,
+          "coverage_guarantee": false,
+          "source": "BENCHMARK_TRAINING_OOF_P90_ABSOLUTE_RESIDUALS",
+          "selection_reused_folds": true,
+          "empirical_benchmark_validation": {
+            "coverage_guarantee": false,
+            "covered": 4410,
+            "empirical_coverage": 0.9124767225325885,
+            "interval_endpoints_clipped": false,
+            "mean_width": 0.3765337190043441,
+            "reference": "DEVELOPMENT_RESIDUAL_BAND_NOT_CALIBRATED",
+            "samples": 4833
+          }
+        },
+        "validation_metrics": {
+          "bias": 5.4756398095332444e-05,
+          "mae": 0.07627743732687367,
+          "median_absolute_error": 0.049948560462774516,
+          "p90_absolute_error": 0.17610101624450672,
+          "p95_absolute_error": 0.23837767312695868,
+          "p95_positive_error": 0.1764797031169881,
+          "predictions_above_one": 664,
+          "predictions_above_physical_envelope": 0,
+          "predictions_below_zero": 0,
+          "r2": 0.7737253842072748,
+          "rmse": 0.11161282998389319,
+          "samples": 4833,
+          "signed_error_p05": -0.17512418421420814,
+          "signed_error_p95": 0.1764797031169881,
+          "worst_absolute_error": 0.9010348548661725
+        },
+        "validation_stage_metrics": {
+          "bias": 0.000931004083674435,
+          "low_support": false,
+          "mae": 0.06693792471691136,
+          "median_absolute_error": 0.04590143829619478,
+          "p90_absolute_error": 0.14580588784468773,
+          "p95_absolute_error": 0.19085323738899745,
+          "p95_positive_error": 0.15006980199275627,
+          "predictions_above_one": 84,
+          "predictions_above_physical_envelope": 0,
+          "predictions_below_zero": 0,
+          "r2": 0.784859884067787,
+          "rmse": 0.09650013061258293,
+          "samples": 970,
+          "signed_error_p05": -0.14052415705986024,
+          "signed_error_p95": 0.15006980199275627,
+          "worst_absolute_error": 0.5039866731497703
+        },
+        "promotion_checks": {
+          "baseline_world_improvement_percent": {
+            "benchmark-42-baseline": 37.654474877057446,
+            "development-19-baseline": 16.596852414535082,
+            "development-42-baseline": 29.147563464143026,
+            "development-73-baseline": 28.30507565715165
+          },
+          "eligible": false,
+          "family": "forest",
+          "gates": {
+            "every_baseline_world_improves": true,
+            "macro_improvement": true,
+            "overprediction_guard": true,
+            "stage_guard": false,
+            "stress_macro_guard": true,
+            "stress_seed_guard": true,
+            "strongest_outer_naive_improvement": true,
+            "temporal_wins": true,
+            "worst_error_guard": true
+          },
+          "macro_improvement_percent": 31.057847435155992,
+          "macro_mae": 0.08975861695955487,
+          "maximum_stage_regression_percent": 51.84078386449176,
+          "maximum_stress_seed_regression_percent": -9.555721668686342,
+          "stress_macro_regression_percent": {
+            "disruption": -14.164416546060739,
+            "workload_surge": -23.663010040224687
+          },
+          "strongest_outer_naive_improvement_percent": 31.057847435155992,
+          "tail_regression_percent": {
+            "p95_positive_error": -12.561960906416692,
+            "worst_absolute_error": 9.250334071670958
+          },
+          "temporal_wins": {
+            "benchmark-42-baseline": 3,
+            "development-19-baseline": 3,
+            "development-42-baseline": 3,
+            "development-73-baseline": 3
+          }
+        },
+        "global_feature_importance": [
+          {
+            "feature": "order_quantity",
+            "importance": 0.373395379529392
+          },
+          {
+            "feature": "planned_workers",
+            "importance": 0.20088574970220563
+          },
+          {
+            "feature": "standard_worker_minutes_per_piece",
+            "importance": 0.18138864403193855
+          },
+          {
+            "feature": "skill_level",
+            "importance": 0.10169192628482135
+          },
+          {
+            "feature": "stage",
+            "importance": 0.056844297575599965
+          },
+          {
+            "feature": "shift_kind",
+            "importance": 0.025530482337106343
+          },
+          {
+            "feature": "planned_release_pieces",
+            "importance": 0.014441057309814615
+          },
+          {
+            "feature": "opening_wip_pieces",
+            "importance": 0.014404474782209029
+          },
+          {
+            "feature": "available_minutes",
+            "importance": 0.009886840662040318
+          },
+          {
+            "feature": "planned_downtime_minutes",
+            "importance": 0.00969657141756115
+          },
+          {
+            "feature": "weekday",
+            "importance": 0.00707776211200516
+          },
+          {
+            "feature": "style_complexity",
+            "importance": 0.004756814255305672
+          },
+          {
+            "feature": "planned_machine_available",
+            "importance": 0.0
+          }
+        ],
+        "explanation_method": "GLOBAL_TRAINING_IMPURITY_IMPORTANCE_NOT_CAUSAL_OR_LOCAL"
+      },
+      {
+        "model": "histogram_gradient_boosting",
+        "identity": "hist-31",
+        "model_version": "synthetic-experimental-v1",
+        "model_status": "EXPERIMENTAL_NOT_PROMOTED",
+        "prediction": 0.8945601867754494,
+        "support": {
+          "status": "SUPPORTED_EXPERIMENTAL",
+          "reason_codes": [
+            "WITHIN_DECLARED_FEATURE_SUPPORT_ONLY"
+          ]
+        },
+        "descriptive_band": {
+          "interpretation": "DEVELOPMENT_RESIDUAL_BAND_NOT_CALIBRATED",
+          "lower": 0.7338862845530709,
+          "upper": 1.0552340889978278,
+          "radius": 0.16067390222237848,
+          "coverage_guarantee": false,
+          "source": "BENCHMARK_TRAINING_OOF_P90_ABSOLUTE_RESIDUALS",
+          "selection_reused_folds": true,
+          "empirical_benchmark_validation": {
+            "coverage_guarantee": false,
+            "covered": 4338,
+            "empirical_coverage": 0.8975791433891993,
+            "interval_endpoints_clipped": false,
+            "mean_width": 0.383958251134282,
+            "reference": "DEVELOPMENT_RESIDUAL_BAND_NOT_CALIBRATED",
+            "samples": 4833
+          }
+        },
+        "validation_metrics": {
+          "bias": -0.0005301790293672722,
+          "mae": 0.08448497977348281,
+          "median_absolute_error": 0.05900970683045581,
+          "p90_absolute_error": 0.19189334921422702,
+          "p95_absolute_error": 0.24947517583090806,
+          "p95_positive_error": 0.19325261675317207,
+          "predictions_above_one": 543,
+          "predictions_above_physical_envelope": 0,
+          "predictions_below_zero": 0,
+          "r2": 0.7415097912433971,
+          "rmse": 0.11929390373683442,
+          "samples": 4833,
+          "signed_error_p05": -0.19026890587996312,
+          "signed_error_p95": 0.19325261675317207,
+          "worst_absolute_error": 0.9172171829091739
+        },
+        "validation_stage_metrics": {
+          "bias": -0.0004830607597419263,
+          "low_support": false,
+          "mae": 0.07250206125671757,
+          "median_absolute_error": 0.054034527230798435,
+          "p90_absolute_error": 0.16160135431998646,
+          "p95_absolute_error": 0.19981339219398844,
+          "p95_positive_error": 0.1522565598214544,
+          "predictions_above_one": 61,
+          "predictions_above_physical_envelope": 0,
+          "predictions_below_zero": 0,
+          "r2": 0.7647665087940948,
+          "rmse": 0.10090595083184409,
+          "samples": 970,
+          "signed_error_p05": -0.16874849224415767,
+          "signed_error_p95": 0.1522565598214544,
+          "worst_absolute_error": 0.48877023402788006
+        },
+        "promotion_checks": {
+          "baseline_world_improvement_percent": {
+            "benchmark-42-baseline": 30.94602265664696,
+            "development-19-baseline": 17.95253007215252,
+            "development-42-baseline": 32.53397457838899,
+            "development-73-baseline": 32.4889323723639
+          },
+          "eligible": false,
+          "family": "hist",
+          "gates": {
+            "every_baseline_world_improves": true,
+            "macro_improvement": true,
+            "overprediction_guard": true,
+            "stage_guard": false,
+            "stress_macro_guard": true,
+            "stress_seed_guard": true,
+            "strongest_outer_naive_improvement": true,
+            "temporal_wins": true,
+            "worst_error_guard": false
+          },
+          "macro_improvement_percent": 29.543662843659835,
+          "macro_mae": 0.09172999600267848,
+          "maximum_stage_regression_percent": 32.79932046941912,
+          "maximum_stress_seed_regression_percent": -9.701040525401302,
+          "stress_macro_regression_percent": {
+            "disruption": -14.32467414733497,
+            "workload_surge": -25.114529868231525
+          },
+          "strongest_outer_naive_improvement_percent": 29.543662843659835,
+          "tail_regression_percent": {
+            "p95_positive_error": 3.6385653887920215,
+            "worst_absolute_error": 23.144988478923214
+          },
+          "temporal_wins": {
+            "benchmark-42-baseline": 3,
+            "development-19-baseline": 3,
+            "development-42-baseline": 3,
+            "development-73-baseline": 3
+          }
+        },
+        "global_feature_importance": null,
+        "explanation_method": "NOT_COMPUTED"
+      },
+      {
+        "model": "grouped_mean",
+        "identity": "grouped_mean",
+        "model_version": "synthetic-experimental-v1",
+        "model_status": "BASELINE_COMPARISON_ONLY",
+        "prediction": 0.7628348220475517,
+        "support": {
+          "status": "SUPPORTED_EXPERIMENTAL",
+          "reason_codes": [
+            "WITHIN_DECLARED_FEATURE_SUPPORT_ONLY"
+          ]
+        },
+        "descriptive_band": {
+          "interpretation": "DEVELOPMENT_RESIDUAL_BAND_NOT_CALIBRATED",
+          "lower": 0.533243346655445,
+          "upper": 0.9924262974396584,
+          "radius": 0.2295914753921067,
+          "coverage_guarantee": false,
+          "source": "BENCHMARK_TRAINING_OOF_P90_ABSOLUTE_RESIDUALS",
+          "selection_reused_folds": true,
+          "empirical_benchmark_validation": {
+            "coverage_guarantee": false,
+            "covered": 4299,
+            "empirical_coverage": 0.8895096213531968,
+            "interval_endpoints_clipped": false,
+            "mean_width": 0.49287753169238496,
+            "reference": "DEVELOPMENT_RESIDUAL_BAND_NOT_CALIBRATED",
+            "samples": 4833
+          }
+        },
+        "validation_metrics": {
+          "bias": 0.0013445584756576112,
+          "mae": 0.1223462905741158,
+          "median_absolute_error": 0.0961792669924284,
+          "p90_absolute_error": 0.2561624578247817,
+          "p95_absolute_error": 0.3245007211227359,
+          "p95_positive_error": 0.2564366378058019,
+          "predictions_above_one": 254,
+          "predictions_above_physical_envelope": 0,
+          "predictions_below_zero": 0,
+          "r2": 0.5286060861190475,
+          "rmse": 0.16109727246159397,
+          "samples": 4833,
+          "signed_error_p05": -0.25565332398895685,
+          "signed_error_p95": 0.2564366378058019,
+          "worst_absolute_error": 0.9188645452749338
+        },
+        "validation_stage_metrics": {
+          "bias": 0.0015172396969637021,
+          "low_support": false,
+          "mae": 0.1117082582204397,
+          "median_absolute_error": 0.09141075265058768,
+          "p90_absolute_error": 0.23819546599190924,
+          "p95_absolute_error": 0.28827389197063635,
+          "p95_positive_error": 0.23018044916239003,
+          "predictions_above_one": 0,
+          "predictions_above_physical_envelope": 0,
+          "predictions_below_zero": 0,
+          "r2": 0.5247344623490774,
+          "rmse": 0.14342846944303558,
+          "samples": 970,
+          "signed_error_p05": -0.24830917678120415,
+          "signed_error_p95": 0.23018044916239003,
+          "worst_absolute_error": 0.4723054185011504
+        },
+        "promotion_checks": null,
+        "global_feature_importance": null,
+        "explanation_method": "NOT_COMPUTED"
+      },
+      {
+        "model": "rf_physics",
+        "identity": "rf_physics",
+        "model_version": "synthetic-experimental-v2",
+        "model_status": "RESEARCH_CANDIDATE",
+        "prediction": 0.8919168184750277,
+        "support": {
+          "status": "SUPPORTED_EXPERIMENTAL",
+          "reason_codes": [
+            "WITHIN_DECLARED_FEATURE_SUPPORT_ONLY"
+          ]
+        },
+        "descriptive_band": null,
+        "validation_metrics": {
+          "mae": 0.057931364704274735,
+          "rmse": 0.09936276695864536,
+          "r2": 0.8206691735917163,
+          "samples": 4833
+        },
+        "validation_stage_metrics": null,
+        "promotion_checks": null,
+        "global_feature_importance": null,
+        "explanation_method": "NOT_COMPUTED",
+        "provenance": {
+          "experiment_id": "EXP-008",
+          "manifest_sha256": "55b09223c57e6c52261a71bc777edddc6116b88b8ffae3f7b0f9cc9075cc51f0",
+          "validation_rows": 4833,
+          "fresh_validation": false,
+          "support_profile_source": "V1_BENCHMARK_TRAINING"
+        }
+      }
+    ],
+    "differences": [
+      {
+        "left": "random_forest",
+        "right": "histogram_gradient_boosting",
+        "left_minus_right": 0.009069450292328307
+      },
+      {
+        "left": "random_forest",
+        "right": "grouped_mean",
+        "left_minus_right": 0.14079481502022595
+      },
+      {
+        "left": "random_forest",
+        "right": "rf_physics",
+        "left_minus_right": 0.011712818592749974
+      },
+      {
+        "left": "histogram_gradient_boosting",
+        "right": "grouped_mean",
+        "left_minus_right": 0.13172536472789764
+      },
+      {
+        "left": "histogram_gradient_boosting",
+        "right": "rf_physics",
+        "left_minus_right": 0.002643368300421667
+      },
+      {
+        "left": "grouped_mean",
+        "right": "rf_physics",
+        "left_minus_right": -0.12908199642747598
+      }
+    ],
+    "provenance": {
+      "manifest_sha256": "bc5e255d8d58fc49e8b37bb44d58647c47402d4cf5f46a525ff9a1b513d28a34",
+      "dataset_version": "synthetic-ml-v1",
+      "experiment_id": "EXP-006-M08C-FIXED-REFIT",
+      "training": {
+        "case": "benchmark-42-baseline",
+        "first_date": "2030-01-07",
+        "last_date": "2030-08-10",
+        "partition": "train",
+        "rows": 14711,
+        "source": {
+          "configuration_fingerprint": "18d33a333811705226f0c43f8d2c77610648d9c1c1ddc9751ea8be573691228a",
+          "content_fingerprint": "f8d202a4771e23936a5f3076e57155f08c5bd8298624bf0ff154a7995596d784",
+          "manifest_fingerprint": "7e7dae049270675c2eac4f8ad05d55a9ac84cc9c1160e0a6b7e9f4010a64f7eb",
+          "profile": "benchmark",
+          "scenario": "baseline",
+          "seed": 42,
+          "split_fingerprint": "dffe228435e1b0d0cc2dc658f0cf18cb1571fe5a61715ce8e7d2ec78381e6718",
+          "train_fingerprint": "8ae08345a01c025b5e34a736b848100bc530c4987ac0d750543a7e07847171e8",
+          "validation_fingerprint": "7c24a0d1c3b602a2f7a54de8c666d04af99e034a885df87d0e82b99ce2be2adb"
+        },
+        "undefined_rows_excluded": 169
+      },
+      "research_candidate": {
+        "model": "rf_physics",
+        "experiment_id": "EXP-008",
+        "manifest_sha256": "55b09223c57e6c52261a71bc777edddc6116b88b8ffae3f7b0f9cc9075cc51f0",
+        "fresh_validation": false
+      }
+    },
+    "promotion_decision": "NO_ML_PROMOTION",
+    "limitations": [
+      "Synthetic research only; not authorized for operational factory decisions.",
+      "Demand-censored standard capacity attainment; not intrinsic employee efficiency or guaranteed output.",
+      "NO_ML_PROMOTION remains unchanged; lower aggregate error does not establish stage superiority.",
+      "Unseen-entity evaluation remains reserved; hidden distribution shift may be undetectable.",
+      "Residual bands are descriptive, uncalibrated and have no coverage guarantee.",
+      "Hypothetical input differences are not proven causal effects.",
+      "No conversion to assumed_efficiency or mutation of schedules/capacity profiles.",
+      "RF Physics metrics use spent benchmark validation.",
+      "RF Physics has no independently calibrated prediction band.",
+      "Hidden disruption risk remains unresolved."
+    ],
+    "capacity_application_authorized": false,
+    "target_to_efficiency": "NOT_IMPLEMENTED",
+    "execution": {
+      "whole_child_wall_seconds": 3.1526779999999235,
+      "peak_committed_bytes": 221982720,
+      "memory_limit_mib": 768,
+      "deadline_seconds": 10,
+      "thread_limit": 1,
+      "max_concurrent_inference": 1,
+      "memory_backend": "windows-job-aggregate-commit"
+    }
+  }
+}
