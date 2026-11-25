@@ -33,7 +33,7 @@ class PredictionService:
     def __init__(self):
         self._admission = anyio.CapacityLimiter(1)
 
-    async def execute(self, body: str) -> dict:
+    async def execute(self, body: str, api_version: int = 1) -> dict:
         try:
             self._admission.acquire_nowait()
         except anyio.WouldBlock:
@@ -41,15 +41,21 @@ class PredictionService:
                 429, "SERVER_BUSY", "The experimental inference slot is occupied."
             ) from None
         try:
-            return await wait_for_cleanup(self._execute, body)
+            return await wait_for_cleanup(self._execute, body, api_version)
         finally:
             self._admission.release()
 
-    def _execute(self, body: str) -> dict:
+    def _execute(self, body: str, api_version: int = 1) -> dict:
         if len(body.encode("utf-8")) > MAX_BODY_BYTES:
             raise ApiError(413, "BODY_TOO_LARGE", "Prediction request exceeds its byte limit.")
         try:
-            request = json.dumps({"body": body, "receipt": trusted_receipt()})
+            request = json.dumps(
+                {
+                    "body": body,
+                    "receipt": trusted_receipt(),
+                    **({"api_version": 2} if api_version == 2 else {}),
+                }
+            )
             payload, measurements = guarded_child(
                 request,
                 MEMORY_MIB,

@@ -328,7 +328,14 @@ def test_media_and_http_errors_are_uniform(http):
 
 def test_openapi_documents_authentication_envelopes_and_errors(http):
     spec = http("GET", "/api/v1/openapi.json", authorized=False).json()
-    assert len(spec["paths"]) == 12
+    assert len(spec["paths"]) == 13
+    for suffix, version, count in (("", 1, 3), ("/v2", 2, 4)):
+        operation = spec["paths"][f"/api/v1/predictions/synthetic{suffix}"]["post"]
+        schema = operation["requestBody"]["content"]["application/json"]["schema"]
+        assert schema["properties"]["schema_version"]["const"] == version
+        models = schema["properties"]["models"]
+        assert models["maxItems"] == count
+        assert ("rf_physics" in models["items"]["enum"]) is (version == 2)
     assert spec["components"]["securitySchemes"]["LocalBearer"]["scheme"] == "bearer"
     for path, methods in spec["paths"].items():
         for method, operation in methods.items():

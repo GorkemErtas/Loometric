@@ -33,10 +33,53 @@ def main() -> int:
 
     try:
         parsed = decode_body(request["body"], default_limits())
-        contract = SyntheticPredictionRequest.model_validate(parsed)
-        metadata, models = load_trusted(request["receipt"])
+        version = request.get("api_version", 1)
+
+        if version == 1:
+            contract = SyntheticPredictionRequest.model_validate(parsed)
+
+            metadata, models = load_trusted(request["receipt"])
+
+            prediction = predict(
+                contract,
+                metadata,
+                models,
+                request["receipt"],
+            )
+
+        elif version == 2:
+            from loometric.api.prediction_schemas_v2 import (
+                SyntheticPredictionRequestV2,
+            )
+            from loometric.experimental_ml_v2.inference import (
+                predict_v2,
+            )
+            from loometric.experimental_ml_v2.serving import (
+                load_experimental_model,
+            )
+
+            contract = SyntheticPredictionRequestV2.model_validate(parsed)
+
+            metadata, models = load_trusted(request["receipt"])
+
+            research_model = None
+
+            if "rf_physics" in contract.models:
+                _, research_model = load_experimental_model(contract)
+
+            prediction = predict_v2(
+                contract,
+                metadata,
+                models,
+                request["receipt"],
+                research_model,
+            )
+
+        else:
+            raise ValueError("Unsupported API version.")
+
         result = {
-            "data": predict(contract, metadata, models, request["receipt"]),
+            "data": prediction,
             "memory_backend": backend,
         }
     except ArtifactError:
