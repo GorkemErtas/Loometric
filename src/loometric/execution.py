@@ -262,6 +262,7 @@ def guarded_child(
         "loometric.api.job_worker",
         "loometric.api.prediction_worker",
         "loometric.prospective_evaluation.worker",
+        "loometric.prospective_evaluation.evaluation_worker",
     ):
         raise ValueError("Unsupported bounded worker module.")
     started = perf_counter()
