@@ -84,3 +84,25 @@ promotion or a claim of uniform stage/factory superiority. Failure remains visib
 and prevents presenting the candidate as a superior fifth model. No tuning follows
 held-out evidence. Four simulated worlds, online context and unobservable first
 shocks limit generalization; no independent prediction coverage is claimed.
+
+## Frozen development result before held-out generation (2026-11-26)
+
+Declaration/code commit `e2c68accb0e1b7a820c01701595ef4bd4d4af776` was pushed before
+actual generation or fitting. Preparation/protocol checks: 59 passed in 26.76s.
+Exactly one actual residual estimator fit used 5,700 defined development targets
+dated 2033-01-03 through 2033-03-18. Original models were loaded, never refitted.
+The eight development sources each passed two full deterministic generation passes.
+
+The fixed development check gave History Boost macro MAE 0.052965324 baseline and
+0.057152379 disruption, versus frozen RF Physics 0.108530350 / 0.208913496.
+These are development results only; no hyperparameter or feature change followed.
+The candidate was frozen while the heldout source directory was still absent:
+
+`320d7ea2cbc9d23f9c92953e3eb0d848bfd3b6b0e5710801016753bf54dcf2a4`
+
+The independent [candidate receipt](EXP-010-candidate-receipt.json) binds executable
+bytes, exact training fingerprint/seeds/dates, source receipts, code, configuration
+and environment. This receipt is committed and pushed before fresh held-out
+generation/evaluation. Training operation: 46.469847s, peak aggregate committed
+memory 289,505,280 bytes, native Windows Job guard, one numeric thread; 2,048 MiB /
+1,200s caps unchanged. No other actual estimator fit occurred.

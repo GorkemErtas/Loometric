@@ -1,0 +1,48 @@
+{
+  "declaration_commit": "e2c68accb0e1b7a820c01701595ef4bd4d4af776",
+  "experiment_id": "EXP-010",
+  "receipt": {
+    "code": {
+      "data.py": "4c3741bc93aa976c87106d84b7f67f2ebd604d21c11b8828d9a6cd2f7bd90e68",
+      "history.py": "ffde2f9d1eb7332d2411d7a89f97eb2552d1bb02e7ebb2f7d070f3e397fb81a2",
+      "model.py": "4c931487ec6c332c0dd5e8e19f53669f7fea40df0fa34bb34b3c87b33f12cfd6",
+      "study.py": "cdad2febf49d28bb6cdb823130360a568df4b1aed7a0cfd9fe8fed17fade3be6"
+    },
+    "configuration_sha256": "37e072925a529db3481398eb60b4caaadbf849a1290fe3942278f217c39eb537",
+    "environment": {
+      "implementation": "CPython",
+      "packages": {
+        "joblib": "1.6.0",
+        "loometric": "0.1.0",
+        "numpy": "2.5.5",
+        "pandas": "3.1.1",
+        "scikit-learn": "1.9.1"
+      },
+      "python": "3.13.14"
+    },
+    "estimator_fits": 1,
+    "first_date": "2033-01-03",
+    "fit_fingerprint": "ec1a074ed61a0118447538585acb2d4520454ae33cd589cc1e9ee817559c2cfb",
+    "fit_rows": 5700,
+    "fit_seeds": [
+      1103,
+      1201,
+      1301,
+      1409
+    ],
+    "last_date": "2033-03-18",
+    "model_sha256": "320d7ea2cbc9d23f9c92953e3eb0d848bfd3b6b0e5710801016753bf54dcf2a4",
+    "promotion_decision": "NO_ML_PROMOTION",
+    "sources": {
+      "1103-baseline": "be07631076438abcc56c2303163df42d4c8dcb78f8610508dae2c55901ff50e9",
+      "1103-disruption": "82b45dd699177ab9bfd8b6b195f8cd09cda72ec876474c8589a5186b67b0b99b",
+      "1201-baseline": "e7772ad1eca25f895270b3a9f261cd1789b7d379c34abbee757b70ac5f7e27e2",
+      "1201-disruption": "83a084d7777d5c66b4d63de639aca54193440978d8b08b1df4adf51a1e137f14",
+      "1301-baseline": "e0580ec8fb92d4f4b6ac9af9d5893e90d73d1e301e54439cbb305c1c3242c508",
+      "1301-disruption": "d25b72a88d638400aaec414b464ce78ff078815682aa15da3e52c0acfc1bf713",
+      "1409-baseline": "7f3f4493f63ecffcad179556df83c8d3939240174cc23b6e3bf2cc5153070368",
+      "1409-disruption": "d114bc1a544f4fccc9b49ee29ec7ea712230c35015ec7b09bcb12a33925593d2"
+    }
+  },
+  "state": "FROZEN_BEFORE_HELDOUT_GENERATION"
+}
