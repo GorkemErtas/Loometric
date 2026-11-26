@@ -13,7 +13,11 @@ and must be prepared independently with trusted receipts.
 
 ```powershell
 # Terminal 1, repository root; token is generated per session and never saved in Git.
+$env:LOOMETRIC_PUBLIC_ORIGIN = ""
+$env:LOOMETRIC_API_PORT = "8000"
+.\.venv\Scripts\python.exe -m loometric.final_candidate verify
 $env:LOOMETRIC_API_TOKEN = & .\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_urlsafe(32))"
+$env:LOOMETRIC_API_TOKEN # Copy this session value into Configure API.
 .\.venv\Scripts\python.exe -m loometric.api
 
 # Terminal 2
@@ -26,6 +30,38 @@ npm run preview
 Open http://127.0.0.1:5173, configure http://127.0.0.1:8000 and enter the session
 token. Export a synthetic scenario to retain it across restarts. Do not export
 credentials; the browser keeps them in memory and clears them with its session.
+
+The existing verified Windows workspace already has its dependencies and all
+three model bundles. A fresh checkout needs the README dependency setup and
+trusted bundle restoration first; model binaries are intentionally absent from Git.
+`verify` is read-only. Do not run `develop`, `evaluate`, `reproduce` or `publish`
+to start the local demo.
+
+For the complete five-model example, open **AI Predictions**, select **Compare
+all five models**, leave the thirteen planned inputs at their defaults and enter
+the following explicitly hypothetical historical summaries:
+
+| History input | Example value |
+| --- | ---: |
+| Mature history count | 7 |
+| Uncensored history count | 4 |
+| Recent uncensored attainment mean | 0.85 |
+| Recent uncensored attainment standard deviation | 0.10 |
+| Latest mature report age (hours) | 16 |
+
+Check **I am testing hypothetical synthetic pre-shift conditions**, then select
+**Predict**. The verified example returns five actual estimator outputs and ten
+pairwise differences. History Boost returns `0.834534223925279` with
+`REVIEW_REQUIRED` because the manually entered history is not source-verified.
+These are hypothetical predictions, not observed factory outcomes. Leaving
+history missing or setting its age above 72 hours makes that model abstain.
+**NO_ML_PROMOTION** remains visible throughout.
+
+The final review also exercised this flow through `npm run preview` serving the
+compiled production assets and an owned loopback API. All five outputs matched
+the retained API fixture; the inference worker used 5.197823s and 226,971,648 peak
+committed bytes under its unchanged 10s /768 MiB limits. Both owned listeners
+were closed and the test session discarded afterward.
 
 ## Optional HTTPS gateway configuration
 

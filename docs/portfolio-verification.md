@@ -6,12 +6,20 @@ Verified on Windows / Python 3.13.14 / Node 26.13.0 / npm 11.20.0 / Edge,
 M10A.4 passed its pre-merge review (263 selected regressions, frozen-source,
 artifact, dataset and A/B receipt checks) and was fast-forward merged/pushed to
 main at `bb8a4e230b12ba79d34370b5d6218b7c42150b83`. Its history was preserved.
-Final development uses the separate `feature/final-history-candidate-portfolio`
+Final development used the separate `feature/final-history-candidate-portfolio`
 branch. The EXP-010 declaration/code and independent candidate receipt were
 committed and pushed before their respective data-exposure boundaries.
 The verified integration is commit `23a300ea1790c97a9ad9921c3a3f90c52a0f62d9`
 (`feat(ml): integrate verified History Boost as fifth experimental model`);
 its feature-branch remote SHA was independently confirmed after push.
+
+Final pre-merge review checked implementation `29145d540e7ce3347f83bbbdbb3586aa2e784e21`
+with a complete **1,561-test** backend run. No blocking correctness, security or
+compatibility findings remain for the documented local-demo scope. Only this
+verification record and exact startup instructions changed after that code
+checkpoint; all four existing feature commits and verified model receipts remain
+preserved. No additional feature, model, real training run or research experiment
+was added by the pre-merge review.
 
 ## Scientific result
 
@@ -41,19 +49,22 @@ operational promotion. **NO_ML_PROMOTION** is unchanged.
 
 | Check | Actual outcome |
 | --- | --- |
-| Full Python checkpoint: `.venv/Scripts/python.exe -m pytest -q -p no:cacheprovider` | **1,544 passed**, 850.22s |
-| Final candidate/artifact/CLI/deployment/API focused regression | **65 passed**, 47.88s |
-| V1/v2/v3 auth, watchdog and cancellation admission | **9 passed**, 1.41s |
-| Current Python collection | **1,561 tests**; the 17 cases added after full-suite collection and subsequent changes are covered by the final focused commands |
-| `npm test` | **199 passed** in 9 files, 20.85s |
-| `npm run test:browser` | **13 passed**, 2.4min; real backend, Windows/Edge, no retries |
-| Final fifth-model browser/screenshot refresh | **1 passed**, 30.0s |
-| Ruff lint / `ruff format --check .` | Passed; **346 files** formatted |
+| Complete final Python suite: `.venv/Scripts/python.exe -m pytest -q -p no:cacheprovider` | **1,561 passed**, 860.12s |
+| Earlier implementation candidate/artifact/CLI/deployment/API focused regression | **65 passed**, 47.88s |
+| Earlier V1/v2/v3 auth, watchdog and cancellation admission | **9 passed**, 1.41s; also included in the final full run |
+| Current Python collection | **1,561 tests**, all executed together in the final full run |
+| `npm test` | **199 passed** in 9 files, 20.72s |
+| `npm run test:browser` | **13 passed**, 2.5min; real backend, Windows/Edge, no retries |
+| Earlier fifth-model browser/screenshot refresh | **1 passed**, 30.0s |
+| Production preview plus real five-model API smoke | Passed; five exact frozen-fixture outputs, ten pairwise differences, candidate REVIEW_REQUIRED |
+| Ruff lint / `ruff format --check .` | Passed; **347 files** formatted |
 | `pip check` / Biome / TypeScript / production build | Passed; Biome checked 64 files |
 | Read-only `python -m loometric.final_candidate verify` | VERIFIED, NO_ML_PROMOTION |
 
 Counts overlap; do not sum focused tests into a fictitious single full-suite run.
-The final focused backend command was:
+The earlier implementation checkpoint had 1,544 tests plus focused coverage for
+later additions. The final pre-merge run supersedes that checkpoint with all
+1,561 tests executed together. The earlier focused backend command was:
 
 ```powershell
 .venv/Scripts/python.exe -m pytest -q -p no:cacheprovider `
@@ -83,6 +94,13 @@ zero-capacity abstention, errors, keyboard/accessibility and mobile layout.
 Accessibility scans report no tested WCAG-rule violations; this is not a full
 accessibility certification. Owned listeners closed, session tokens were redacted
 and discarded. The existing NO_COLOR/FORCE_COLOR warning remained harmless.
+
+The additional production smoke served the compiled `/assets/` build through
+`npm run preview` and connected a real loopback API. All five hypothetical point
+estimates matched the retained API fixture exactly. Inference used 5.197823s and
+226,971,648 peak committed bytes within 10s /768 MiB. Its owned listeners closed
+and session token was discarded. The [startup guide](deployment.md#local-production-build-demo)
+records the exact commands, connection settings and historical-context example.
 
 ## Integrity and deliverables
 
