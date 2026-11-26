@@ -6,6 +6,11 @@ scenarios and Optimization jobs. **Production data** adds the M07A guided input
 workflow. Python owns all scheduling/optimization/verification and full domain validation.
 **AI Predictions** adds actual experimental RF Physics, Forest12/Hist31 inference
 and a Grouped Mean comparison baseline, independently of the selected planning dataset.
+The final milestone adds optional **History Boost** with mature pre-shift context,
+matched EXP-010 evidence and all-five comparison. See the
+[current v3 setup](../docs/architecture/mature-history-experimental-inference.md),
+[final verification](../docs/portfolio-verification.md) and
+[production-build demo instructions](../docs/deployment.md).
 
 Use Node 22.12+, 24 or 26+ (verified with Node 26.13.0 / npm 11.20.0).
 From the repository root:
@@ -59,7 +64,7 @@ versioned independent registry pins its manifest receipt. Missing/incompatible
 artifacts fail visibly instead of substituting a baseline or preview prediction.
 Connect the API, review the guided thirteen-feature hypothetical pre-shift inputs
 and confirm synthetic use. **RF Physics** is the default experimental research candidate;
-choose **Compare all four models** to execute it alongside Random Forest,
+choose **Compare all four original models** to execute it alongside Random Forest,
 HistGradientBoosting and the transparent Grouped Mean baseline. The candidate's
 separate trusted v2 bundle must already exist; inference never creates it. See the
 [v2 artifact and API contract](../docs/architecture/experimental-ml-inference.md#rf-physics-v2-integration-and-regression-repair).
@@ -77,9 +82,9 @@ target is synthetic standard capacity attainment, not guaranteed pieces or intri
 employee efficiency. Global forest importance describes training behavior, not
 causation or an individual prediction. Read the [API and research contract](../docs/architecture/experimental-ml-inference.md).
 
-The complete browser suite needs both trusted `v1` and `v2` artifacts; it does not
+The complete browser suite now needs trusted `v1`, `v2` and `v3` artifacts; it does not
 generate them or consume reserved-test labels. The test-only saved prediction
-response fixtures were captured from the actual v1/v2 APIs and are never imported by the app.
+response fixtures were captured from the actual v1/v2/v3 APIs and are never imported by the app.
 M08C verification:162 frontend tests,12 real-backend browser workflows, strict
 type/lint/build checks and zero npm audit findings. Complete Python regression:
 1,202 passed. The desktop/mobile prediction/scenario/error screenshots remain
@@ -92,7 +97,18 @@ and the [EXP-008 integration addendum](../docs/experiments/EXP-008-ml-improvemen
 V1 compatibility, candidate provenance, revoked experimental authorization, tampering,
 training support consistency and create-only artifact preparation have permanent
 regressions. RF Physics's 24.05% MAE reduction versus Forest12 and R² 0.82067 use
-spent synthetic benchmark validation; independent validation remains pending.
+spent synthetic benchmark validation. Subsequent EXP-009 prospective execution
+reproduced but failed replication criteria; EXP-010's separately declared candidate
+passed demo guards on fresh worlds. Published outcomes from both are now spent.
+
+**History Boost** needs at least two uncensored mature reports among the last
+seven same-crew/line shifts, available by cutoff and no older than 72 hours.
+Choose **Compare all five models** and enter only hypothetical context you can
+justify. Missing/stale context abstains; candidate point estimates require review
+because browser reports are not source-verified. Extra history and new development
+data contribute to gains. Worst baseline error rose 9.11%; no factory, calibrated
+interval or promotion claim is established. Editing history clears pinned context.
+The legacy models continue to work without the optional fifth bundle.
 
 For a user-defined input, open **Production data** (`/#/data`):
 

@@ -1,7 +1,9 @@
 # EXP-009 frozen evaluation engine
 
-M10A.3 implements the previously declared offline engine. **Actual EXP-009 datasets
-have not been generated; its models have not been evaluated. NO_ML_PROMOTION.**
+M10A.3 implemented the previously declared offline engine. M10A.4 subsequently
+completed the authorized actual EXP-009 generation and A/B evaluation; see the
+[actual results](../experiments/EXP-009-prospective-frozen-results.md).
+Execution reproduced, but replication criteria failed. **NO_ML_PROMOTION.**
 Implementation alone does not authorize generation or execution. The
 [protocol](../experiments/EXP-009-prospective-frozen-evaluation.md),
 [configuration](../../configs/prospective_evaluation_v1.json) and

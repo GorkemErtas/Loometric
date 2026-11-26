@@ -1,9 +1,12 @@
 # EXP-009 prospective dataset infrastructure
 
-M10A.2, 2026-11-26. Infrastructure implemented; **actual datasets not generated**.
+M10A.2, 2026-11-26, implemented the infrastructure before generation. The later
+authorized M10A.4 generated all eight sources, independently registered receipts
+and completed A/B evaluation; see [actual results](../experiments/EXP-009-prospective-frozen-results.md).
 The frozen [EXP-009 protocol](../experiments/EXP-009-prospective-frozen-evaluation.md)
 and [configuration](../../configs/prospective_evaluation_v1.json) remain unchanged.
-No model is loaded, fitted, tuned or executed. **NO_ML_PROMOTION** is unconditional.
+The dataset infrastructure loads no model and performs no fitting/tuning/scoring.
+The separate frozen evaluator performed actual scoring. **NO_ML_PROMOTION** is unconditional.
 
 ## Boundaries and public entry points
 

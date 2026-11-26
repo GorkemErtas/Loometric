@@ -1,5 +1,10 @@
 # Experimental synthetic estimator inference
 
+Current final milestone: [History Boost v3](mature-history-experimental-inference.md)
+adds an optional fifth experimental model and matched EXP-010 comparison. V1/v2
+contracts and the historical records below remain preserved. The UI offers both
+original-four and all-five comparison; all models retain NO_ML_PROMOTION.
+
 ## RF Physics v2 integration and regression repair
 
 M09B finalizes the additive integration on 2026-11-25. The earlier M08C record
