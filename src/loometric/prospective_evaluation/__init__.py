@@ -1,1 +1,1 @@
-"""EXP-009 protocol preparation only; no generator, evaluator or serving entry point."""
+"""EXP-009 offline infrastructure; imports never generate data or execute models."""
