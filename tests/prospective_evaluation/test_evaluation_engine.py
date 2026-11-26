@@ -103,7 +103,9 @@ def completed(registered, designs, history, tmp_path_factory):
     return root, registered[1], a, b
 
 
-def test_private_complete_run_is_sealed_reproduced_and_never_promoted(completed):
+def test_private_complete_run_is_sealed_reproduced_and_never_promoted(
+    completed, preserve_actual_sources
+):
     root, ledger, a, b = completed
     assert a["decision"] == "PENDING_REPRODUCTION"
     verified = evaluator.verify_reproduction(
@@ -130,7 +132,7 @@ def test_private_complete_run_is_sealed_reproduced_and_never_promoted(completed)
     errors = [json.loads(line) for line in (root / "runs/a/errors.jsonl").read_text().splitlines()]
     assert len(errors) == 400 and all(set(e["signed_errors"]) == set(NAMES) for e in errors)
     verify_frozen_sources(load_protocol())
-    assert not storage.output_root().exists()
+    preserve_actual_sources()
 
 
 def test_all_cases_predict_and_disk_seal_precede_first_label(

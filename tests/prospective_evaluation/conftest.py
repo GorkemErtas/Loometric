@@ -13,6 +13,32 @@ from loometric.synthetic_ml.configuration import GenerationConfig
 from loometric.synthetic_ml.splitting import date_partitions
 
 
+@pytest.fixture(scope="module", autouse=True)
+def preserve_actual_sources():
+    """Tests may coexist with authorized outputs; inspect metadata without opening labels."""
+    root = storage.output_root()
+
+    def snapshot():
+        if not root.exists():
+            return None
+        return {
+            str(path.relative_to(root)): (
+                path.stat().st_mode,
+                path.stat().st_size,
+                path.stat().st_mtime_ns,
+            )
+            for path in (root, *root.rglob("*"))
+        }
+
+    before = snapshot()
+
+    def unchanged():
+        assert snapshot() == before, "Regression tests modified actual EXP-009 outputs"
+
+    yield unchanged
+    unchanged()
+
+
 @pytest.fixture(scope="module")
 def designs():
     result = []

@@ -33,7 +33,9 @@ def reseal(root, design, expected):
     expected[design.case.case_id] = storage.sha256(content)
 
 
-def test_declared_policy_is_exact_and_no_generation_is_implicit(monkeypatch):
+def test_declared_policy_is_exact_and_no_generation_is_implicit(
+    monkeypatch, preserve_actual_sources
+):
     config = load_protocol()
     verify_frozen_sources(config)
     actual = declared_designs()
@@ -45,7 +47,7 @@ def test_declared_policy_is_exact_and_no_generation_is_implicit(monkeypatch):
     for value in (False, 1, "yes", None):
         with pytest.raises(ValueError, match="AUTHORIZATION_REQUIRED"):
             service.prepare_sources(generation_authorized=value)
-    assert not storage.output_root().exists()
+    preserve_actual_sources()
 
 
 def test_frozen_adapter_reconstruction_has_exact_actual_source_joins(designs):
@@ -364,7 +366,7 @@ def test_new_worker_is_bounded_without_generating_any_source():
     assert payload is None and measurements["status"] == "TERMINATED_RESOURCE_LIMIT"
 
 
-def test_native_worker_rejects_unapproved_generation_under_memory_guard():
+def test_native_worker_rejects_unapproved_generation_under_memory_guard(preserve_actual_sources):
     from loometric.execution import guarded_child
 
     payload, measured = guarded_child(
@@ -375,7 +377,7 @@ def test_native_worker_rejects_unapproved_generation_under_memory_guard():
     )
     assert payload == {"error": {"code": "GENERATION_NOT_AUTHORIZED"}}, measured
     assert measured["returncode"] == 0 and measured["whole_child_wall_seconds"] < 10
-    assert not storage.output_root().exists()
+    preserve_actual_sources()
 
 
 def test_offline_dispatch_uses_frozen_limits_and_never_an_api_endpoint(monkeypatch):

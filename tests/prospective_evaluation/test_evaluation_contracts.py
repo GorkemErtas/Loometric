@@ -355,7 +355,7 @@ print('Private guarded evaluation sealed; reserved reads and mutations denied')
     assert "Private guarded evaluation sealed" in completed.stdout
 
 
-def test_real_evaluation_worker_is_bounded_and_rejects_unknown_operation():
+def test_real_evaluation_worker_is_bounded_and_rejects_unknown_operation(preserve_actual_sources):
     from loometric.execution import guarded_child
 
     payload, measured = guarded_child(
@@ -367,7 +367,7 @@ def test_real_evaluation_worker_is_bounded_and_rejects_unknown_operation():
     assert payload["error"]["code"] == "UNSUPPORTED_EVALUATION_OPERATION", measured
     assert payload["status"] == "INVALID_EVALUATION"
     assert payload["promotion_decision"] == "NO_ML_PROMOTION"
-    assert not storage.output_root().exists()
+    preserve_actual_sources()
 
 
 def test_real_evaluation_worker_deadline_stops_the_whole_process():
