@@ -93,5 +93,7 @@ stage regressions and worst errors remain unresolved; see [EXP-008](docs/experim
   [RF Physics research](docs/experiments/EXP-008-ml-improvement-research.md)
 - [EXP-009 prospective frozen-model protocol](docs/experiments/EXP-009-prospective-frozen-evaluation.md)
   — predeclared; evaluation not executed.
+- [Prospective dataset integrity infrastructure](docs/architecture/prospective-dataset-infrastructure.md)
+  — implemented with private fixtures; actual EXP-009 datasets not generated.
 - [Dataset profile](docs/data_profile.md) and [pre-shift feature policy](docs/prediction_problem.md)
 - [Architecture decisions](docs/decisions/) and [experiment reports](docs/experiments/)

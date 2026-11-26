@@ -378,3 +378,57 @@ The full training/research/browser suites were **not rerun** for this declaratio
 they exercise fitted models and are outside the no-fit preparation scope. No
 prospective runner or execution command exists. All datasets/model binaries/generated
 outputs remain ignored and untracked; the EXP-009 output directory is absent.
+
+## M10A.2 infrastructure addendum (2026-11-26)
+
+The frozen declaration, configuration, thresholds and preceding M10A.1 record
+remain unchanged. M10A.2 implements source production and integrity infrastructure
+only. **Actual EXP-009 datasets have not been generated; no prospective model,
+prediction, score, fit or calibration has been run. NO_ML_PROMOTION remains.**
+
+The separate adapter runs the original generator twice and performs physical
+integrity checks plus complete byte replay before create-only publication. The
+registrar independently reconstructs pre-cutoff catalogs/plans and rematerializes
+the feature joins from verified source buffers. It checks new seed provenance,
+world-scoped entities, exact exposure and temporal metadata, historical reference
+receipts, all matched baseline/disruption inputs and closed independent hashes.
+It never JSON-decodes any label or global-outcome file; opaque row counts are
+verified against source membership. A separate independently receipt-bound ledger
+is written only after all eight cases pass, including a final file rehash.
+
+The dedicated offline worker uses the existing native hard guard at 2,048 MiB,
+1,200 seconds and one numeric thread. Ordinary reserved-file reads/model access
+are denied. Generation is disabled by default and requires separate explicit
+authorization. Existing API workers, routes, serving and frozen artifacts are
+unchanged. The shared worker allowlist receives one fixed additional name.
+See [ADR0025](../decisions/0025-isolated-prospective-dataset-integrity.md) and the
+[implementation guide](../architecture/prospective-dataset-infrastructure.md).
+
+| Executed check | Actual result |
+| --- | --- |
+| Initial new infrastructure tests | 41 passed, 72.28s |
+| Selected final infrastructure/protocol/original generator/native resources/API isolation/OpenAPI/v2 request-contract regression | **187 passed**, 97.66s; no skips |
+| Additional cold-process complete registrar/independent verifier under access guard | **1 passed**, 28.13s; no ML imports or label decoding |
+| Root Ruff lint/format; dependency consistency | Passed; 310 formatted Python files; no broken requirements |
+| Frozen protocol and source/config/pin preservation | Original configuration digest unchanged; all 60 source hashes match |
+| Frozen model preservation, opaque byte verification only | Both independent bundle receipts and all six model/state/metadata hashes match; no deserialization |
+| Historical dataset preservation, no target decoding | All ten manifests and 170 file hashes match their independently retained receipts |
+| Actual prospective output root | Absent; no actual dataset or ledger receipt claimed |
+| Documentation and repository policy | 27 relative links/anchors resolve; 434 tracked/proposed files pass artifact/credential-pattern checks |
+
+Private mechanical fixtures use seeds 99101/99211/99307/99401, 35-day calendars,
+two factories/three styles and temporary directories. They cover successful
+publication/replay/registration, tampering, correctly rehashed leakage/entity
+aliases, policy/manifest closure, matched pairs, opaque row counts, incomplete
+writes, size/path limits, racing changes, authorization and native timeouts.
+The full training/model-serving/browser suites were not run; selected tests
+exercise no trained model. Historical synthetic tests use private mechanical
+inputs and are not prospective evaluation evidence.
+
+Limitations: full-scale generation time/memory and actual new-world/entity/eligible
+counts are unknown. The label-blind registrar verifies the trusted producer's
+replay identity and pre-cutoff joins, not arbitrary newly re-signed target values.
+Whole-evaluation supervision, model inference, validation-label unsealing and
+evaluation remain future work. The implemented source operations have individual
+hard ceilings; no end-to-end execution or evaluation-budget claim is made here.
+Generated artifacts remain ignored/untracked; no merge or service deployment occurs.
