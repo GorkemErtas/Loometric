@@ -139,3 +139,12 @@ Next implement the feature-only sealed prediction pass and an independently
 receipt-bound validation-label reader, then metrics, uncertainty, acceptance and
 whole-run supervision. Commit and verify that implementation before separately
 authorizing actual source generation or evaluation. No M10A.2 command executes it.
+
+## M10A.3 implementation follow-up (2026-11-26)
+
+The [frozen evaluation engine](prospective-frozen-evaluation-engine.md) now supplies
+the separate sealed prediction pass, receipt-bound validation reader, diagnostics,
+acceptance, uncertainty and whole-run supervision described above. This does not
+alter M10A.2 source files or receipts. Actual datasets and evaluation remain
+unexecuted; authorization is still separate. See the EXP-009 addendum for executed
+private-fixture checks and the engine guide for future local use and limitations.

@@ -95,5 +95,7 @@ stage regressions and worst errors remain unresolved; see [EXP-008](docs/experim
   — predeclared; evaluation not executed.
 - [Prospective dataset integrity infrastructure](docs/architecture/prospective-dataset-infrastructure.md)
   — implemented with private fixtures; actual EXP-009 datasets not generated.
+- [Frozen evaluation engine](docs/architecture/prospective-frozen-evaluation-engine.md)
+  — sealed inference, diagnostics and reproduction implemented; actual evaluation not executed.
 - [Dataset profile](docs/data_profile.md) and [pre-shift feature policy](docs/prediction_problem.md)
 - [Architecture decisions](docs/decisions/) and [experiment reports](docs/experiments/)

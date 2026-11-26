@@ -432,3 +432,111 @@ Whole-evaluation supervision, model inference, validation-label unsealing and
 evaluation remain future work. The implemented source operations have individual
 hard ceilings; no end-to-end execution or evaluation-budget claim is made here.
 Generated artifacts remain ignored/untracked; no merge or service deployment occurs.
+
+## M10A.2 pre-merge review and M10A.3 implementation addendum (2026-11-26)
+
+This is an implementation/evidence addendum, not a change to the prospective
+declaration, thresholds or an EXP-009 result. **Actual EXP-009 NOT EXECUTED.
+NO_ML_PROMOTION.** The original declaration-time NOT_GENERATED state stays intact.
+
+### Reviewed base and merge
+
+M10A.2's implementation and documentation commits (`927c92d`, `157b72a`) were
+reviewed for correctness, receipt/access controls, frozen-source preservation and
+backward compatibility. Its selected regression suite was rerun: **188 passed in
+127.65 seconds**, with no skips. Ruff lint/format, dependency checks and read-only
+source/artifact/dataset integrity audits passed. No pre-merge defect remained.
+After fetching origin, main was fast-forwarded from `7dc147d` to
+`157b72aeb78b1eca0f756011a788b9333ab3e734`, pushed, and that exact remote main SHA
+was independently verified. M10A.3 then started on the separate
+`feature/m10a3-frozen-evaluation-engine` branch. No M10A.3 merge is part of this task.
+
+### Implemented scope
+
+The [engine guide](../architecture/prospective-frozen-evaluation-engine.md) and
+[ADR 0026](../decisions/0026-sealed-offline-frozen-evaluation.md) document:
+
+- Closed, pinned verification of both bundles before either trusted executable
+  loader, preserving the four model identities, environment, 13 features, target,
+  units, original training fingerprint and support profile.
+- Outcome-free raw batch inference across all eight cases. Paired input/prediction
+  checks precede a whole-pass disk seal. Scoring consumes reread sealed vectors.
+  Zero-capacity rows remain explicit exclusions; all finite defined-target outputs
+  remain in scientific metrics even when serving policy would abstain.
+- Validation-only access bound directly to independent ledger/manifest receipts,
+  exact IDs, source capacity, label timing and target algebra. Global outcomes,
+  source train/gap/test and historical labels remain inaccessible except opaque
+  integrity hashing. Nonfinite outputs or mismatched evidence invalidate the run.
+- All seven declared metrics, every subgroup with counts, support reasons/statuses,
+  both abstention denominators, secondary common non-abstained policy comparisons,
+  raw ranges, offered-work ceilings, worst IDs and matched error records.
+- Six model contrasts per condition, individual-world and equal-world macro
+  comparisons, paired condition changes and identical-input MAE floor. Exact 256
+  world resamples and 500 declared date-block draws/world supply intervals/digests;
+  only the primary world interval participates in acceptance.
+- Every declared sample, gain, win, regression, stage, tail and disruption guard,
+  including null/empty/zero-reference semantics and unconditional NO_ML_PROMOTION.
+- One isolated 2,048 MiB / 1,200 second process for verification through reporting,
+  one numeric thread, 32-predict-call / 11,520-prediction ceilings and create-only
+  a/b output sets. Final integrity checks occur before the completion manifest.
+  Run A remains pending; only byte-identical run B can finalize research evidence.
+  Independent reproduction verification reopens both closed runs. Supervisor
+  timing/peak telemetry is returned separately from deterministic payloads.
+
+No serving route, schema, promotion gate, original generator, frozen source file,
+model artifact, historical dataset, frozen config or numerical threshold changed.
+Shared resource code only adds the fixed evaluation worker to its allowlist.
+Implementation commit: `9460eca6afd587949f4ce5f62186b159bc414bec`
+(`feat(ml): implement sealed prospective frozen evaluation engine`), pushed and
+verified on the M10A.3 feature branch before this evidence addendum.
+
+### Executed verification
+
+- Selected Python regression: **261 passed in 285.03 seconds**, no skips. This
+  includes all prospective protocol/infrastructure/engine tests then collected,
+  original synthetic generator/contracts, native supervisor regressions, API
+  isolation/OpenAPI and v2 closed-envelope contracts.
+- Two additional native evaluation-worker tests: **2 passed in 0.83 seconds**.
+  They verify the actual fixed worker's rejection and whole-process deadline
+  without generating sources or evaluating models. Total distinct selected tests:
+  **263**, including **75 new engine tests**.
+- Final review moved preliminary source verification into the bounded child so
+  the service performs no unbounded source/model/dataset check. Focused service,
+  failure-mapping and native-worker recheck: **5 passed in 0.70 seconds**.
+- Private complete runs, cold access-guard checks and handmade aggregate/receipt
+  fixtures only: seeds 99101/99211/99307/99401, 35 days, private temporary roots.
+  Mechanical predictors never fit. These are implementation tests, not independent
+  EXP-009 outcomes, model comparisons or new research performance results.
+- Frontend: **183 tests passed**; **12 browser workflows passed** on Windows/Edge
+  against the existing local application. Biome, TypeScript and Vite build passed.
+  Browser checks exercise existing app models/workflows, not the prospective engine.
+- Final root Ruff lint/format passed (322 files); pip dependency check and Git
+  whitespace checks passed.
+- All **60** frozen source/config/dependency pins match. Both closed model bundle
+  manifests and all **six** model/state/metadata file hashes match. All **10**
+  historical dataset manifests and **170** referenced file hashes match. Historical
+  labels/outcomes were hashed as opaque bytes, not decoded in this integrity audit.
+  M10A.2's five core infrastructure files remain unchanged.
+- Actual `data/processed/prospective_evaluation/exp-009` remains absent. Generated
+  datasets, model binaries, local tokens, build/test output, AGENTS.md and the local
+  commit plan remain ignored and untracked.
+
+### Remaining limits and next step
+
+No actual prospective dataset generation, frozen-model experiment, retraining,
+hyperparameter optimization or calibration occurred. Full-scale generation/evaluation
+time and memory, actual valid-target counts/support, prospective scores and actual
+cross-run reproduction remain unmeasured. Private tests cannot establish those facts.
+
+EXP-008's **24.05% benchmark MAE improvement** and **0.82067 R²** remain spent
+synthetic validation evidence. No independent-validation result is added here.
+Hidden disruption is unobservable through the unchanged input contract; stage/tail
+regressions, four-world uncertainty and synthetic-to-factory transport limitations
+remain unresolved. No prediction coverage or factory performance claim is made.
+
+The next separately authorized stage can prepare the eight actual sources, retain
+independent label-blind registrar receipts, then authorize one frozen run and its
+single reproduction, followed by independent verification and append-only reporting
+of all results, including failures. Do not extend samples, retry failed runs,
+increase budgets, tune, change thresholds, inspect reserved labels or promote a
+model in response to prospective evidence. **NO_ML_PROMOTION regardless of results.**
