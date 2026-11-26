@@ -53,7 +53,7 @@ class PredictionService:
                 {
                     "body": body,
                     "receipt": trusted_receipt(),
-                    **({"api_version": 2} if api_version == 2 else {}),
+                    **({"api_version": api_version} if api_version in (2, 3) else {}),
                 }
             )
             payload, measurements = guarded_child(

@@ -153,7 +153,7 @@ async def test_native_integrity_failure_closed_and_invalid_envelope(native_app):
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize("suffix", ["", "/v2"])
+@pytest.mark.parametrize("suffix", ["", "/v2", "/v3"])
 async def test_auth_origin_and_size_limits_do_not_launch_worker(monkeypatch, suffix):
     endpoint = "/api/v1/predictions/synthetic" + suffix
     monkeypatch.setattr(
@@ -200,9 +200,10 @@ async def test_single_inference_slot_is_retained_until_bounded_cleanup(monkeypat
     assert await service.execute("{}") == {"done": True}
 
 
-def test_prediction_worker_uses_existing_hard_watchdog():
+@pytest.mark.parametrize("api_version", [1, 2, 3])
+def test_prediction_worker_uses_existing_hard_watchdog(api_version):
     payload, evidence = guarded_child(
-        json.dumps({"body": "{}", "receipt": "a" * 64}),
+        json.dumps({"body": "{}", "receipt": "a" * 64, "api_version": api_version}),
         768,
         0.001,
         worker_module="loometric.api.prediction_worker",
@@ -212,7 +213,7 @@ def test_prediction_worker_uses_existing_hard_watchdog():
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize("api_version", [1, 2])
+@pytest.mark.parametrize("api_version", [1, 2, 3])
 async def test_task_cancellation_does_not_release_slot_before_cleanup(monkeypatch, api_version):
     from threading import Event
 
@@ -232,7 +233,7 @@ async def test_task_cancellation_does_not_release_slot_before_cleanup(monkeypatc
     await asyncio.sleep(0)
     try:
         with pytest.raises(ApiError) as caught:
-            await service.execute("{}", 3 - api_version)
+            await service.execute("{}", api_version % 3 + 1)
         assert caught.value.status == 429 and not first.done()
     finally:
         release.set()

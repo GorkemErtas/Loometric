@@ -1,0 +1,10 @@
+{
+  "capacity_application_authorized": false,
+  "directory": "data/processed/experimental_ml/v3",
+  "experimental_api_authorized": true,
+  "manifest_sha256": "75dee7b7cd535c3fa9ea2ea5995d2949b88c117de27c16706fc860c6068374cd",
+  "model": "history_boost",
+  "model_version": "synthetic-experimental-v3",
+  "production_serving_authorized": false,
+  "promotion_decision": "NO_ML_PROMOTION"
+}

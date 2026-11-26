@@ -1,11 +1,12 @@
 import captured from "../fixtures/experimental-prediction.response.json?raw";
 import capturedV2 from "../fixtures/experimental-prediction-v2.response.json?raw";
-import { type ModelName, modelNames, type PredictionInputs } from "../src/domain/predictions";
+import capturedV3 from "../fixtures/experimental-prediction-v3.response.json?raw";
+import { legacyModelNames, type ModelName, type PredictionInputs } from "../src/domain/predictions";
 
 // Captured from the real Windows-guarded API, not bundled into application code.
 export function capturedResponse(
   inputs?: PredictionInputs,
-  selected: readonly ModelName[] = modelNames.filter((name) => name !== "rf_physics"),
+  selected: readonly ModelName[] = legacyModelNames.filter((name) => name !== "rf_physics"),
 ) {
   const raw = JSON.parse(captured);
   if (inputs) raw.data.inputs = inputs;
@@ -22,7 +23,7 @@ export function capturedResponse(
 // Captured from the guarded v2 endpoint with all four actual estimators.
 export function capturedV2Response(
   inputs?: PredictionInputs,
-  selected: readonly ModelName[] = modelNames,
+  selected: readonly ModelName[] = legacyModelNames,
 ) {
   const raw = JSON.parse(capturedV2);
   if (inputs) raw.data.inputs = inputs;
@@ -35,4 +36,9 @@ export function capturedV2Response(
   );
   if (!selected.includes("rf_physics")) raw.data.provenance.research_candidate = null;
   return raw;
+}
+
+// Real five-model local inference with explicitly hypothetical mature context.
+export function capturedV3Response() {
+  return JSON.parse(capturedV3);
 }

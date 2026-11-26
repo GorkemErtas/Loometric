@@ -3,9 +3,13 @@ import { ApiError } from "../api/client";
 import { PredictionResults, ScenarioResults } from "../components/PredictionResults";
 import { Badge, Empty, ErrorNotice, Panel } from "../components/ui";
 import {
+  emptyHistory,
   fields,
+  historyIssues,
   initialInputs,
   inputIssues,
+  legacyModelNames,
+  type MatureHistory,
   type ModelName,
   modelLabels,
   modelNames,
@@ -17,7 +21,8 @@ import { useWorkspace } from "../state/Workspace";
 export function Predictions() {
   const { api, sessionId, rejectSession } = useWorkspace();
   const [inputs, setInputs] = useState<PredictionInputs>({ ...initialInputs });
-  const [selection, setSelection] = useState<ModelName | "all">("rf_physics");
+  const [selection, setSelection] = useState<ModelName | "all" | "legacy">("rf_physics");
+  const [history, setHistory] = useState<MatureHistory>({ ...emptyHistory });
   const [declared, setDeclared] = useState(false);
   const [report, setReport] = useState<PredictionReport | null>(null);
   const [before, setBefore] = useState<PredictionReport | null>(null);
@@ -54,7 +59,8 @@ export function Predictions() {
     invalidate();
     setInputs((current) => ({ ...current, [key]: value }));
   }
-  const issues = inputIssues(inputs);
+  const usesHistory = selection === "all" || selection === "history_boost";
+  const issues = [...inputIssues(inputs), ...(usesHistory ? historyIssues(history) : [])];
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (!api || !declared || issues.length || loading) return;
@@ -66,8 +72,13 @@ export function Predictions() {
     try {
       const response = await api.predictSynthetic(
         { ...inputs },
-        selection === "all" ? [...modelNames] : [selection],
+        selection === "all"
+          ? [...modelNames]
+          : selection === "legacy"
+            ? [...legacyModelNames]
+            : [selection],
         controller.signal,
+        history,
       );
       if (current !== revision.current || controller.signal.aborted) return;
       setReport(response.data);
@@ -108,8 +119,13 @@ export function Predictions() {
       </div>
       <div className="prediction-caution">
         <strong>RF Physics · EXP-008.</strong> Retained benchmark MAE improved by 24.05% compared
-        with Forest12. Stage-specific and worst-error regressions remain unresolved. Independent
-        validation is pending.
+        with Forest12. Stage-specific and worst-error regressions remain unresolved. EXP-009
+        prospective validation failed the complete replication criteria.
+      </div>
+      <div className="prediction-caution">
+        <strong>History Boost · EXP-010.</strong> One fixed residual fit passed fresh held-out
+        demonstration guards using mature past-shift context. Missing or stale history abstains.
+        Baseline worst error still increased 9.11%; first unannounced shocks remain uncertain.
       </div>
       {!api && (
         <div className="notice" role="status">
@@ -132,25 +148,28 @@ export function Predictions() {
                 value={selection}
                 onChange={(event) => {
                   invalidate();
-                  setSelection(event.target.value as ModelName | "all");
+                  setSelection(event.target.value as ModelName | "all" | "legacy");
                 }}
               >
                 {modelNames.map((name) => (
                   <option key={name} value={name}>
                     {modelLabels[name]} ·{" "}
-                    {name === "rf_physics"
-                      ? "RESEARCH CANDIDATE"
-                      : name === "grouped_mean"
-                        ? "comparison baseline"
-                        : "EXPERIMENTAL"}
+                    {name === "history_boost"
+                      ? "MATURE HISTORY REQUIRED"
+                      : name === "rf_physics"
+                        ? "RESEARCH CANDIDATE"
+                        : name === "grouped_mean"
+                          ? "comparison baseline"
+                          : "EXPERIMENTAL"}
                   </option>
                 ))}
-                <option value="all">Compare all four models</option>
+                <option value="legacy">Compare all four original models</option>
+                <option value="all">Compare all five models</option>
               </select>
             </label>
             <p>
               Default: RF Physics, an experimental research candidate with lower retained benchmark
-              MAE. No operational promotion or independent validation is implied.
+              MAE. No operational promotion or factory validation is implied.
             </p>
           </div>
           <fieldset>
@@ -205,6 +224,58 @@ export function Predictions() {
               </label>
             </div>
           </fieldset>
+          {usesHistory && (
+            <fieldset>
+              <legend>Mature historical context · optional fifth model</legend>
+              <p>
+                Use only the last seven same-crew and same-line reports available before the
+                30-minute pre-shift cutoff. Mean/std exclude past shifts whose output was limited by
+                offered work. Leave missing history empty; History Boost will abstain. These
+                editable values are hypothetical, not imported factory measurements.
+              </p>
+              <div className="prediction-fields">
+                {(
+                  [
+                    ["history_count", "Mature history count", 0, 7, 1],
+                    ["uncensored_history_count", "Uncensored history count", 0, 7, 1],
+                    ["recent_attainment_mean", "Recent uncensored attainment mean", 0, 3, 0.001],
+                    [
+                      "recent_attainment_std",
+                      "Recent uncensored attainment standard deviation",
+                      0,
+                      3,
+                      0.001,
+                    ],
+                    ["history_age_hours", "Latest mature report age (hours)", 0, 8760, 0.5],
+                  ] as const
+                ).map(([key, label, min, max, step]) => (
+                  <label key={key}>
+                    {label}
+                    <input
+                      type="number"
+                      value={history[key] ?? ""}
+                      min={min}
+                      max={max}
+                      step={step}
+                      onChange={(event) => {
+                        invalidate();
+                        setBefore(null);
+                        const value = event.target.value;
+                        setHistory((current) => ({
+                          ...current,
+                          [key]: value === "" ? (key.endsWith("count") ? 0 : null) : Number(value),
+                        }));
+                      }}
+                    />
+                  </label>
+                ))}
+              </div>
+              <p>
+                At least two uncensored reports and age ≤ 72 hours are required for a candidate
+                point estimate.
+              </p>
+            </fieldset>
+          )}
           <fieldset>
             <legend>Planned crew, time and demand</legend>
             <div className="prediction-fields">

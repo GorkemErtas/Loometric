@@ -75,6 +75,25 @@ def main() -> int:
                 research_model,
             )
 
+        elif version == 3:
+            from loometric.api.prediction_schemas_v2 import SyntheticPredictionRequestV2
+            from loometric.api.prediction_schemas_v3 import SyntheticPredictionRequestV3
+            from loometric.experimental_ml_v2.serving import load_experimental_model
+            from loometric.final_candidate.inference import predict_v3
+
+            contract = SyntheticPredictionRequestV3.model_validate(parsed)
+            metadata, models = load_trusted(request["receipt"])
+            legacy = SyntheticPredictionRequestV2.model_construct(
+                schema_version=2,
+                synthetic=True,
+                prediction_context=contract.prediction_context,
+                inputs=contract.inputs,
+                models=[m for m in contract.models if m != "history_boost"],
+            )
+            research_model = (
+                load_experimental_model(legacy)[1] if "rf_physics" in contract.models else None
+            )
+            prediction = predict_v3(contract, metadata, models, request["receipt"], research_model)
         else:
             raise ValueError("Unsupported API version.")
 

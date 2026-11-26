@@ -1,0 +1,45 @@
+{
+  "byte_identical": [
+    "a.predictions.jsonl=b.predictions.jsonl",
+    "a.report.json=b.report.json"
+  ],
+  "experiment_id": "EXP-010",
+  "frozen_sources_verified": 60,
+  "operations": {
+    "develop": {
+      "execution": {
+        "peak_committed_bytes": 289505280,
+        "whole_child_wall_seconds": 46.46984739999971
+      },
+      "finished_at": "2026-11-26T15:45:30.112190+00:00",
+      "memory_backend": "windows-job-aggregate-commit",
+      "started_at": "2026-11-26T15:44:43.640711+00:00",
+      "status": "ONE_FIT_FROZEN_BEFORE_HELDOUT"
+    },
+    "heldout": {
+      "execution": {
+        "peak_committed_bytes": 269168640,
+        "whole_child_wall_seconds": 49.8501655
+      },
+      "finished_at": "2026-11-26T15:49:19.112250+00:00",
+      "memory_backend": "windows-job-aggregate-commit",
+      "started_at": "2026-11-26T15:48:29.252844+00:00",
+      "status": "FROZEN_HELDOUT_SCORED"
+    },
+    "reproduce": {
+      "execution": {
+        "peak_committed_bytes": 267993088,
+        "whole_child_wall_seconds": 9.299024899999495
+      },
+      "finished_at": "2026-11-26T15:51:17.082112+00:00",
+      "memory_backend": "windows-job-aggregate-commit",
+      "started_at": "2026-11-26T15:51:07.781631+00:00",
+      "status": "REPRODUCED"
+    }
+  },
+  "prediction_sha256": "2bf87db69a022c340f58a88c3dc85c8efe16a779d7595d920f6337de3b0c56ea",
+  "promotion_decision": "NO_ML_PROMOTION",
+  "report_sha256": "efa3b39c1bb7db1fb60c2fcdbe5678c1933e599f8f5e8a89c4692cf03089491c",
+  "source_files_verified": 96,
+  "v3_manifest_sha256": "75dee7b7cd535c3fa9ea2ea5995d2949b88c117de27c16706fc860c6068374cd"
+}

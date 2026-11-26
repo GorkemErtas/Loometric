@@ -82,14 +82,21 @@ function ConnectionDialog({ onClose }: { onClose: () => void }) {
   };
   return (
     <Modal title="Connect to local API" onClose={onClose}>
-      <p>Start the existing FastAPI server, then enter its local origin and session token.</p>
+      <p>
+        Enter the local API origin, or this site's configured HTTPS origin, and your session token.
+      </p>
       <form onSubmit={submit} className="form-stack" autoComplete="off">
         <label>
           API origin
           <input
             name="origin"
             type="url"
-            defaultValue={origin ?? "http://127.0.0.1:8000"}
+            defaultValue={
+              origin ??
+              (window.location.protocol === "https:"
+                ? window.location.origin
+                : "http://127.0.0.1:8000")
+            }
             required
             spellCheck={false}
           />
@@ -110,7 +117,7 @@ function ConnectionDialog({ onClose }: { onClose: () => void }) {
         </label>
         <p className="field-help" id="token-help">
           Kept in this tab’s memory only. Reloading or clearing the session removes it. Use a
-          literal localhost or 127.0.0.1 origin; frontend port 5173 is required by CORS.
+          literal localhost/127.0.0.1 origin, or the current HTTPS site. Credentials stay in memory.
         </p>
         <div className="modal-actions">
           <button type="button" className="button" onClick={onClose}>

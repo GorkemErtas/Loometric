@@ -10,6 +10,8 @@ import {
   jobResult,
 } from "../domain/planning";
 import {
+  emptyHistory,
+  type MatureHistory,
   type ModelName,
   type PredictionInputs,
   predictionReport,
@@ -79,15 +81,17 @@ export const validationGuidance: Record<string, string> = {
     "A qualification must match both its line stage and a supported style stage.",
 };
 
-export function localOrigin(value: string): string {
+export function localOrigin(value: string, currentOrigin = window.location.origin): string {
   try {
     const url = new URL(value);
+    const sameHttpsOrigin = url.protocol === "https:" && url.origin === currentOrigin;
     if (
-      url.protocol !== "http:" ||
-      !["127.0.0.1", "localhost"].includes(url.hostname) ||
-      !url.port ||
-      Number(url.port) < 1024 ||
-      Number(url.port) > 65535 ||
+      (!sameHttpsOrigin &&
+        (url.protocol !== "http:" ||
+          !["127.0.0.1", "localhost"].includes(url.hostname) ||
+          !url.port ||
+          Number(url.port) < 1024 ||
+          Number(url.port) > 65535)) ||
       url.pathname !== "/" ||
       url.search ||
       url.hash ||
@@ -290,12 +294,22 @@ export class ApiClient {
   capabilities() {
     return this.request("/capabilities", capabilities);
   }
-  async predictSynthetic(inputs: PredictionInputs, models: ModelName[], signal?: AbortSignal) {
+  async predictSynthetic(
+    inputs: PredictionInputs,
+    models: ModelName[],
+    signal?: AbortSignal,
+    history: MatureHistory = emptyHistory,
+  ) {
     const useV2 = models.includes("rf_physics");
-    const schemaVersion = useV2 ? 2 : 1;
+    const useV3 = models.includes("history_boost");
+    const schemaVersion = useV3 ? 3 : useV2 ? 2 : 1;
 
     const result = await this.request(
-      useV2 ? "/predictions/synthetic/v2" : "/predictions/synthetic",
+      useV3
+        ? "/predictions/synthetic/v3"
+        : useV2
+          ? "/predictions/synthetic/v2"
+          : "/predictions/synthetic",
       predictionReport,
       {
         schema_version: schemaVersion,
@@ -303,6 +317,7 @@ export class ApiClient {
         prediction_context: "HYPOTHETICAL_PRE_SHIFT",
         inputs,
         models,
+        ...(useV3 ? { history } : {}),
       },
       signal,
     );
@@ -310,7 +325,12 @@ export class ApiClient {
     if (
       result.data.schemaVersion !== schemaVersion ||
       !sameInputs(inputs, result.data.inputs) ||
-      result.data.results.map((r) => r.model).join() !== models.join()
+      result.data.results.map((r) => r.model).join() !== models.join() ||
+      (useV3 &&
+        (result.data.history === null ||
+          (Object.keys(emptyHistory) as (keyof MatureHistory)[]).some(
+            (k) => result.data.history?.[k] !== history[k],
+          )))
     )
       throw new ApiError("contract");
 

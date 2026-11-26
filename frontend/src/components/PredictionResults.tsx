@@ -51,10 +51,23 @@ function ModelCard({ result }: { result: PredictionResult }) {
           </p>
         </div>
       )}
+      {result.model === "history_boost" && (
+        <div className="prediction-weakness">
+          <strong>Mature context · EXP-010</strong>
+          <p>
+            One frozen residual candidate using earlier same-crew/line reports. Missing or stale
+            context abstains.
+          </p>
+          <p>
+            Held-out gains include additional information and new development data. No calibrated
+            band or factory validity.
+          </p>
+        </div>
+      )}
 
       <dl className="prediction-metrics">
         <div>
-          <dt>Validation MAE</dt>
+          <dt>{result.matchedMetrics ? "Matched baseline MAE" : "Validation MAE"}</dt>
           <dd>{result.metrics.mae.toFixed(5)}</dd>
         </div>
         <div>
@@ -66,7 +79,13 @@ function ModelCard({ result }: { result: PredictionResult }) {
           <dd>{result.metrics.r2.toFixed(5)}</dd>
         </div>
       </dl>
-      <p>{result.metrics.samples.toLocaleString()} benchmark validation rows; synthetic only.</p>
+      <p>
+        {result.metrics.samples.toLocaleString()}{" "}
+        {result.matchedMetrics
+          ? "matched baseline held-out rows; equal-world macro metrics"
+          : "benchmark validation rows"}
+        ; synthetic only.
+      </p>
       {result.stageMetrics && (
         <p>
           Selected stage: MAE {result.stageMetrics.mae.toFixed(5)}, n=
@@ -95,6 +114,62 @@ export function PredictionResults({ report }: { report: PredictionReport }) {
   const forest = report.results.find((r) => r.model === "random_forest");
   return (
     <div className="prediction-results" aria-live="polite">
+      {report.historyTrainingRows !== null && (
+        <Panel
+          title="Matched fresh-world evidence · EXP-010"
+          description="All five models scored the same held-out observations. Metrics are equal-world macro averages; max error is the actual condition-wide maximum."
+        >
+          <p>
+            Four new simulated worlds, {report.historyTrainingRows.toLocaleString()} residual
+            training rows, one fit and no parameter search. History Boost uses additional mature
+            reports; this comparison does not isolate algorithm quality. Published holdout outcomes
+            are now inspected.
+          </p>
+          <TableScroll label="Matched held-out model metrics">
+            <table>
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Condition</th>
+                  <th>MAE</th>
+                  <th>RMSE</th>
+                  <th>Macro R²</th>
+                  <th>Bias</th>
+                  <th>P95 abs</th>
+                  <th>Max abs</th>
+                </tr>
+              </thead>
+              <tbody>
+                {report.results.flatMap((result) =>
+                  result.matchedMetrics
+                    ? (["baseline", "disruption"] as const).map((condition) => {
+                        const m = result.matchedMetrics?.[condition];
+                        if (!m) return null;
+                        return (
+                          <tr key={`${result.model}-${condition}`}>
+                            <td>{modelLabels[result.model]}</td>
+                            <td>{condition}</td>
+                            <td>{m.mae.toFixed(5)}</td>
+                            <td>{m.rmse.toFixed(5)}</td>
+                            <td>{m.r2.toFixed(5)}</td>
+                            <td>{m.bias.toFixed(5)}</td>
+                            <td>{m.p95.toFixed(5)}</td>
+                            <td>{m.worst.toFixed(5)}</td>
+                          </tr>
+                        );
+                      })
+                    : [],
+                )}
+              </tbody>
+            </table>
+          </TableScroll>
+          <p>
+            Known limits: the candidate's actual worst baseline error increased 9.11% versus RF
+            Physics. Missing-history control was worse under disruption; first unannounced shocks
+            remain uncertain. NO_ML_PROMOTION applies to every model.
+          </p>
+        </Panel>
+      )}
       <div className="prediction-result-grid">
         {report.results.map((result) => (
           <ModelCard key={result.model} result={result} />
@@ -154,7 +229,7 @@ export function PredictionResults({ report }: { report: PredictionReport }) {
       )}
       <Panel
         title="Model provenance and research limits"
-        description="EXP-006 and EXP-008 research evidence; NO_ML_PROMOTION remains in force."
+        description="Published synthetic research evidence; NO_ML_PROMOTION remains in force."
       >
         <div className="prediction-provenance">
           <p>

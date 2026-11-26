@@ -1,0 +1,28 @@
+{
+  "schema_version": 3,
+  "synthetic": true,
+  "prediction_context": "HYPOTHETICAL_PRE_SHIFT",
+  "models": ["random_forest", "histogram_gradient_boosting", "grouped_mean", "rf_physics", "history_boost"],
+  "inputs": {
+    "stage": "sewing",
+    "shift_kind": "day",
+    "weekday": 0,
+    "planned_workers": 6,
+    "skill_level": 3,
+    "style_complexity": 3,
+    "standard_worker_minutes_per_piece": 4,
+    "planned_machine_available": true,
+    "available_minutes": 420,
+    "planned_downtime_minutes": 30,
+    "opening_wip_pieces": 100,
+    "planned_release_pieces": 500,
+    "order_quantity": 600
+  },
+  "history": {
+    "recent_attainment_mean": 0.85,
+    "recent_attainment_std": 0.1,
+    "history_count": 7,
+    "uncensored_history_count": 4,
+    "history_age_hours": 16
+  }
+}

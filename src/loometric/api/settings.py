@@ -3,6 +3,7 @@
 import os
 import re
 from importlib.resources import files
+from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
@@ -44,8 +45,24 @@ class Settings(BaseModel):
     port: int = Field(default=8000, ge=1024, le=65535)
     # Explicit browser development origins; neither wildcard nor credentialed CORS.
     cors_origins: tuple[str, ...] = ("http://localhost:5173", "http://127.0.0.1:5173")
+    public_origin: str | None = None
 
     def model_post_init(self, context: object) -> None:
+        if self.public_origin is not None:
+            parsed = urlsplit(self.public_origin)
+            try:
+                port = parsed.port
+            except ValueError:
+                raise ValueError("Invalid deployment origin configuration.") from None
+            host = parsed.hostname or ""
+            canonical = "https://" + host + (f":{port}" if port not in (None, 443) else "")
+            if (
+                (port is not None and not 1 <= port <= 65535)
+                or not re.fullmatch(r"[a-z0-9]+(?:[.-][a-z0-9]+)*", host)
+                or len(host) > 253
+                or self.public_origin != canonical
+            ):
+                raise ValueError("A canonical HTTPS deployment origin is required.")
         if not re.fullmatch(r"[A-Za-z0-9_-]{32,128}", self.token.get_secret_value()):
             raise ValueError("Invalid local API configuration.")
         allowed = re.compile(r"http://(?:localhost|127\.0\.0\.1|\[::1\]):([0-9]{1,5})")
@@ -63,6 +80,7 @@ def settings_from_environment() -> Settings:
         return Settings(
             token=SecretStr(os.environ.get("LOOMETRIC_API_TOKEN", "")),
             port=int(os.environ.get("LOOMETRIC_API_PORT", "8000")),
+            public_origin=os.environ.get("LOOMETRIC_PUBLIC_ORIGIN") or None,
         )
     except (ValueError, TypeError):
         raise ValueError("Invalid local API configuration; check token and port.") from None

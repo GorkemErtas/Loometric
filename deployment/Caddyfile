@@ -1,0 +1,25 @@
+{
+    admin off
+}
+
+# Explicit opt-in only. The backend remains bound to 127.0.0.1 with proxy_headers=False.
+{$LOOMETRIC_PUBLIC_ORIGIN} {
+    encode gzip
+    header X-Content-Type-Options nosniff
+    header Referrer-Policy no-referrer
+    header X-Frame-Options DENY
+
+    handle /api/* {
+        reverse_proxy 127.0.0.1:8000 {
+            transport http {
+                response_header_timeout 15s
+            }
+        }
+    }
+
+    handle {
+        root * {$LOOMETRIC_FRONTEND_DIST}
+        try_files {path} /index.html
+        file_server
+    }
+}

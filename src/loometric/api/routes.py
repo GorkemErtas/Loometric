@@ -59,6 +59,19 @@ async def capabilities(request: Request, auth: AUTH) -> SuccessResponse:
             "experimental_predictions": {
                 "endpoint": "/api/v1/predictions/synthetic",
                 "models": ["random_forest", "histogram_gradient_boosting", "grouped_mean"],
+                "versions": {
+                    "2": {
+                        "endpoint": "/api/v1/predictions/synthetic/v2",
+                        "additional_models": ["rf_physics"],
+                    },
+                    "3": {
+                        "endpoint": "/api/v1/predictions/synthetic/v3",
+                        "additional_models": ["rf_physics", "history_boost"],
+                        "history_boost_requires_mature_history": True,
+                        "minimum_uncensored_history": 2,
+                        "maximum_history_age_hours": 72,
+                    },
+                },
                 "status": "EXPERIMENTAL_NOT_PROMOTED",
                 "promotion_decision": "NO_ML_PROMOTION",
                 "artifact_availability": "VERIFIED_ON_EACH_REQUEST_FAIL_CLOSED",
@@ -73,7 +86,7 @@ async def capabilities(request: Request, auth: AUTH) -> SuccessResponse:
                 "prediction": "M01 remains offline; M08C synthetic models are experimental only.",
             },
             "limitations": [
-                "Loopback development API with one shared secret; no public hosting.",
+                "Loopback API with one shared secret; HTTPS gateway requires explicit setup.",
                 "Synthetic conditional results require human review.",
                 "No database, durable jobs or automatic production decisions.",
             ],

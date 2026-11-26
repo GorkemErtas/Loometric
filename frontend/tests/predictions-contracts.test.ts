@@ -4,7 +4,7 @@ import { parseExact } from "../src/domain/json";
 import {
   initialInputs,
   inputIssues,
-  modelNames,
+  legacyModelNames as modelNames,
   predictionReport,
 } from "../src/domain/predictions";
 import { capturedResponse, capturedV2Response } from "./prediction-fixtures";

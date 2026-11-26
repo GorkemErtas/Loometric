@@ -18,7 +18,7 @@ async function connect(page: Page) {
 async function predict(page: Page) {
   const response = page.waitForResponse(
     (r) =>
-      /^\/api\/v1\/predictions\/synthetic(?:\/v2)?$/.test(new URL(r.url()).pathname) &&
+      /^\/api\/v1\/predictions\/synthetic(?:\/v[23])?$/.test(new URL(r.url()).pathname) &&
       r.request().method() === "POST",
   );
   await page.getByRole("button", { name: "Predict", exact: true }).click();
@@ -53,7 +53,7 @@ test("actual experimental estimators, comparison, scenario change, review and ab
   await expect(page.getByRole("article", { name: "RF Physics result" })).toContainText(
     "RESEARCH CANDIDATE",
   );
-  await page.getByLabel("Model", { exact: true }).selectOption("all");
+  await page.getByLabel("Model", { exact: true }).selectOption("legacy");
   const initial = await predict(page);
   expect(initial.results.map((r: { prediction: number }) => r.prediction)).toEqual([
     0.9036296370677777, 0.8945601867754494, 0.7628348220475517, 0.8919168184750277,
@@ -181,4 +181,76 @@ test("input validation, delayed real response cancellation and explicit server f
     path: resolve("..", ".tmp/frontend/m08c-predictions-error.png"),
     fullPage: true,
   });
+});
+
+test("fifth model uses mature history, matched evidence and explicit abstention", async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  const bodies: Record<string, unknown>[] = [];
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("request", (request) => {
+    if (request.url().endsWith("/predictions/synthetic/v3")) bodies.push(request.postDataJSON());
+  });
+  await connect(page);
+  await page.getByLabel("Model", { exact: true }).selectOption("all");
+  const cold = await predict(page);
+  expect(cold.schema_version).toBe(3);
+  expect(cold.results[4].prediction).toBeNull();
+  expect(cold.results[4].support.reason_codes).toContain("MATURE_HISTORY_REQUIRED");
+  for (const [label, value] of [
+    ["Mature history count", "7"],
+    ["Uncensored history count", "4"],
+    ["Recent uncensored attainment mean", "0.85"],
+    ["Recent uncensored attainment standard deviation", "0.1"],
+    ["Latest mature report age (hours)", "16"],
+  ] as const)
+    await page.getByLabel(label, { exact: true }).fill(value);
+  const mature = await predict(page);
+  expect(mature.results.slice(0, 4).map((r: { prediction: number }) => r.prediction)).toEqual([
+    0.9036296370677777, 0.8945601867754494, 0.7628348220475517, 0.8919168184750277,
+  ]);
+  expect(mature.results[4].prediction).toBe(0.834534223925279);
+  expect(mature.differences).toHaveLength(10);
+  expect(mature.promotion_decision).toBe("NO_ML_PROMOTION");
+  expect(mature.capacity_application_authorized).toBe(false);
+  const metrics = page.getByRole("region", { name: "Matched held-out model metrics" });
+  await expect(metrics.getByRole("row")).toHaveCount(11);
+  await expect(metrics).toContainText("0.05590");
+  await expect(metrics).toContainText("0.08894");
+  await expect(page.getByRole("article", { name: "History Boost result" })).toContainText(
+    "0.83453",
+  );
+  await axe(page);
+  await page
+    .getByRole("heading", { name: "Matched fresh-world evidence · EXP-010" })
+    .evaluate((element) => element.scrollIntoView({ block: "start" }));
+  await page.screenshot({ path: resolve("..", ".tmp/frontend/final-predictions-desktop.png") });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("article", { name: "History Boost result" }).scrollIntoViewIfNeeded();
+  await axe(page);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  );
+  await page.screenshot({ path: resolve("..", ".tmp/frontend/final-predictions-mobile.png") });
+  await page.getByLabel("Latest mature report age (hours)", { exact: true }).fill("73");
+  expect((await predict(page)).results[4].prediction).toBeNull();
+  await page.getByLabel("Latest mature report age (hours)", { exact: true }).fill("16");
+  await page.getByLabel("Planned workers", { exact: true }).fill("0");
+  expect(
+    (await predict(page)).results.every((r: { prediction: unknown }) => r.prediction === null),
+  ).toBe(true);
+  expect(bodies).toHaveLength(4);
+  expect(Object.keys(bodies[1] ?? {}).sort()).toEqual([
+    "history",
+    "inputs",
+    "models",
+    "prediction_context",
+    "schema_version",
+    "synthetic",
+  ]);
+  expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+  expect(await page.content()).not.toContain(token);
+  expect(errors).toEqual([]);
 });

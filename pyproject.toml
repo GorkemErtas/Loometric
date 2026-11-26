@@ -25,6 +25,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 "loometric.api" = ["default_limits.json", "default_job_limits.json"]
 "loometric.experimental_ml" = ["trusted_v1.json"]
+"loometric.final_candidate" = ["trusted_v3.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

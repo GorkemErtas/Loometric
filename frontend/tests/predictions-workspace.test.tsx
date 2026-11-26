@@ -79,7 +79,7 @@ it("renders actual response, all-model differences, failed gates and global expl
   vi.stubGlobal("fetch", calls);
   render(<App />);
   const user = await connect();
-  await user.selectOptions(screen.getByLabelText("Model"), "all");
+  await user.selectOptions(screen.getByLabelText("Model"), "legacy");
   await user.click(screen.getByRole("button", { name: "Predict" }));
   expect(await screen.findByText("0.90363")).toBeVisible();
   expect(screen.getByText("0.89456")).toBeVisible();

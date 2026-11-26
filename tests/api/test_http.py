@@ -151,6 +151,9 @@ def test_complete_http_workflow_matches_engines_and_is_reproducible(http, fixtur
     capability = http("GET", "/api/v1/capabilities").json()["data"]
     assert capability["scheduling_methods"] == ["greedy"]
     assert "prediction" in capability["deferred"]
+    versions = capability["experimental_predictions"]["versions"]
+    assert versions["3"]["additional_models"] == ["rf_physics", "history_boost"]
+    assert versions["3"]["history_boost_requires_mature_history"] is True
     planning = fixture_json("planning/capacity-demo.json")
     response = http("POST", "/api/v1/planning/capacity", body={"scenario": planning})
     assert response.status_code == 200, response.text
@@ -328,14 +331,15 @@ def test_media_and_http_errors_are_uniform(http):
 
 def test_openapi_documents_authentication_envelopes_and_errors(http):
     spec = http("GET", "/api/v1/openapi.json", authorized=False).json()
-    assert len(spec["paths"]) == 13
-    for suffix, version, count in (("", 1, 3), ("/v2", 2, 4)):
+    assert len(spec["paths"]) == 14
+    for suffix, version, count in (("", 1, 3), ("/v2", 2, 4), ("/v3", 3, 5)):
         operation = spec["paths"][f"/api/v1/predictions/synthetic{suffix}"]["post"]
         schema = operation["requestBody"]["content"]["application/json"]["schema"]
         assert schema["properties"]["schema_version"]["const"] == version
         models = schema["properties"]["models"]
         assert models["maxItems"] == count
-        assert ("rf_physics" in models["items"]["enum"]) is (version == 2)
+        assert ("rf_physics" in models["items"]["enum"]) is (version >= 2)
+        assert ("history_boost" in models["items"]["enum"]) is (version == 3)
     assert spec["components"]["securitySchemes"]["LocalBearer"]["scheme"] == "bearer"
     for path, methods in spec["paths"].items():
         for method, operation in methods.items():

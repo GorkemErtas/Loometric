@@ -1,12 +1,13 @@
 import { isLosslessNumber } from "lossless-json";
 import { ContractError, list, object, text, texts } from "./json";
 
-export const modelNames = [
+export const legacyModelNames = [
   "random_forest",
   "histogram_gradient_boosting",
   "grouped_mean",
   "rf_physics",
 ] as const;
+export const modelNames = [...legacyModelNames, "history_boost"] as const;
 
 export type ModelName = (typeof modelNames)[number];
 
@@ -15,7 +16,56 @@ export const modelLabels: Record<ModelName, string> = {
   histogram_gradient_boosting: "HistGradientBoosting",
   grouped_mean: "Grouped Mean baseline",
   rf_physics: "RF Physics",
+  history_boost: "History Boost",
 };
+
+export interface MatureHistory {
+  recent_attainment_mean: number | null;
+  recent_attainment_std: number | null;
+  history_count: number;
+  uncensored_history_count: number;
+  history_age_hours: number | null;
+}
+export const emptyHistory: MatureHistory = {
+  recent_attainment_mean: null,
+  recent_attainment_std: null,
+  history_count: 0,
+  uncensored_history_count: 0,
+  history_age_hours: null,
+};
+export function historyIssues(h: MatureHistory): string[] {
+  const issues: string[] = [];
+  if (
+    ![h.history_count, h.uncensored_history_count].every(
+      (n) => Number.isInteger(n) && n >= 0 && n <= 7,
+    ) ||
+    h.uncensored_history_count > h.history_count
+  )
+    issues.push(
+      "History counts must be whole numbers from 0 to 7, with uncensored count no larger than total.",
+    );
+  const available = h.uncensored_history_count >= 2;
+  if (
+    available
+      ? ![h.recent_attainment_mean, h.recent_attainment_std].every(
+          (n) => n !== null && Number.isFinite(n) && n >= 0 && n <= 3,
+        )
+      : h.recent_attainment_mean !== null || h.recent_attainment_std !== null
+  )
+    issues.push(
+      "Mean and standard deviation require at least two uncensored mature reports; otherwise leave both empty.",
+    );
+  if (
+    h.history_count > 0
+      ? h.history_age_hours === null ||
+        !Number.isFinite(h.history_age_hours) ||
+        h.history_age_hours < 0 ||
+        h.history_age_hours > 8760
+      : h.history_age_hours !== null
+  )
+    issues.push("History age must describe an existing mature report, from 0 to 8760 hours.");
+  return issues;
+}
 
 export interface PredictionInputs {
   stage: string;
@@ -146,7 +196,22 @@ function fingerprint(value: unknown): string {
   if (!/^[a-f0-9]{64}$/.test(result)) throw new ContractError();
   return result;
 }
+function readHistory(value: unknown): MatureHistory {
+  const raw = object(value);
+  if (Object.keys(raw).length !== 5) throw new ContractError();
+  const nullable = (value: unknown) => (value === null ? null : finite(value));
+  const h: MatureHistory = {
+    recent_attainment_mean: nullable(raw.recent_attainment_mean),
+    recent_attainment_std: nullable(raw.recent_attainment_std),
+    history_count: finite(raw.history_count),
+    uncensored_history_count: finite(raw.uncensored_history_count),
+    history_age_hours: nullable(raw.history_age_hours),
+  };
+  if (historyIssues(h).length) throw new ContractError();
+  return h;
+}
 const rfPhysicsManifest = "55b09223c57e6c52261a71bc777edddc6116b88b8ffae3f7b0f9cc9075cc51f0";
+const historyManifest = "75dee7b7cd535c3fa9ea2ea5995d2949b88c117de27c16706fc860c6068374cd";
 function metrics(value: unknown) {
   const raw = object(value);
   const result = {
@@ -199,10 +264,12 @@ function readResult(value: unknown) {
     histogram_gradient_boosting: "hist-31",
     grouped_mean: "grouped_mean",
     rf_physics: "rf_physics",
+    history_boost: "history_boost",
   }[model];
 
-  const isResearch = model === "rf_physics";
-  if (isResearch) {
+  const isHistory = model === "history_boost";
+  const isResearch = model === "rf_physics" || isHistory;
+  if (model === "rf_physics") {
     const provenance = object(raw.provenance);
     if (
       provenance.experiment_id !== "EXP-008" ||
@@ -217,17 +284,36 @@ function readResult(value: unknown) {
     )
       throw new ContractError();
   }
+  if (isHistory) {
+    const p = object(raw.provenance);
+    if (
+      p.experiment_id !== "EXP-010" ||
+      p.manifest_sha256 !== historyManifest ||
+      p.fresh_validation !== false ||
+      p.requires_mature_history !== true ||
+      p.support_profile_source !== "NEW_DEVELOPMENT_TRAINING_ONLY" ||
+      raw.descriptive_band !== null ||
+      raw.global_feature_importance !== null
+    )
+      throw new ContractError();
+  }
 
   if (
     raw.identity !== expectedIdentity ||
     raw.model_version !==
-      (isResearch ? "synthetic-experimental-v2" : "synthetic-experimental-v1") ||
+      (isHistory
+        ? "synthetic-experimental-v3"
+        : isResearch
+          ? "synthetic-experimental-v2"
+          : "synthetic-experimental-v1") ||
     raw.model_status !==
-      (isResearch
-        ? "RESEARCH_CANDIDATE"
-        : model === "grouped_mean"
-          ? "BASELINE_COMPARISON_ONLY"
-          : "EXPERIMENTAL_NOT_PROMOTED") ||
+      (isHistory
+        ? "EXPERIMENTAL_HISTORY_CANDIDATE"
+        : isResearch
+          ? "RESEARCH_CANDIDATE"
+          : model === "grouped_mean"
+            ? "BASELINE_COMPARISON_ONLY"
+            : "EXPERIMENTAL_NOT_PROMOTED") ||
     !["ABSTAIN", "REVIEW_REQUIRED", "SUPPORTED_EXPERIMENTAL"].includes(text(support.status))
   )
     throw new ContractError();
@@ -302,6 +388,26 @@ function readResult(value: unknown) {
       Math.abs(importance.reduce((sum, r) => sum + r.importance, 0) - 1) > 1e-8)
   )
     throw new ContractError();
+  const matched = raw.matched_metrics === undefined ? null : object(raw.matched_metrics);
+  const readMatched = (condition: "baseline" | "disruption") => {
+    if (!matched) throw new ContractError();
+    const value = object(matched[condition]);
+    if (
+      finite(value.p95_absolute_error) < 0 ||
+      finite(value.actual_worst_absolute_error) < finite(value.p95_absolute_error) ||
+      metrics(value).samples !== 1426
+    )
+      throw new ContractError();
+    return {
+      ...metrics(value),
+      bias: finite(value.bias),
+      p95: finite(value.p95_absolute_error),
+      worst: finite(value.actual_worst_absolute_error),
+    };
+  };
+  const matchedMetrics = matched
+    ? { baseline: readMatched("baseline"), disruption: readMatched("disruption") }
+    : null;
   return {
     model,
     identity: text(raw.identity),
@@ -311,9 +417,12 @@ function readResult(value: unknown) {
     support: text(support.status),
     reasons,
     band,
-    metrics: metrics(raw.validation_metrics),
+    metrics: matchedMetrics?.baseline ?? metrics(raw.validation_metrics),
+    matchedMetrics,
     stageMetrics:
-      raw.validation_stage_metrics === null ? null : metrics(raw.validation_stage_metrics),
+      matchedMetrics || raw.validation_stage_metrics === null
+        ? null
+        : metrics(raw.validation_stage_metrics),
     failures,
     maximumStageRegression,
     worstErrorRegression,
@@ -324,7 +433,7 @@ export function predictionReport(value: unknown) {
   const raw = object(value);
   const schemaVersion = finite(raw.schema_version);
   if (
-    ![1, 2].includes(schemaVersion) ||
+    ![1, 2, 3].includes(schemaVersion) ||
     raw.synthetic !== true ||
     raw.prediction_context !== "HYPOTHETICAL_PRE_SHIFT" ||
     raw.target !== "standard_capacity_attainment" ||
@@ -337,7 +446,9 @@ export function predictionReport(value: unknown) {
   const results = list(raw.results).map(readResult);
   if (
     results.length < 1 ||
-    results.length > (schemaVersion === 2 ? 4 : 3) ||
+    results.length > (schemaVersion === 3 ? 5 : schemaVersion === 2 ? 4 : 3) ||
+    (schemaVersion !== 3 && results.some((r) => r.model === "history_boost")) ||
+    (schemaVersion !== 3 && results.some((r) => r.matchedMetrics !== null)) ||
     (schemaVersion === 1 && results.some((r) => r.model === "rf_physics")) ||
     new Set(results.map((r) => r.model)).size !== results.length
   )
@@ -379,7 +490,7 @@ export function predictionReport(value: unknown) {
     const research = object(provenance.research_candidate);
 
     if (
-      schemaVersion !== 2 ||
+      ![2, 3].includes(schemaVersion) ||
       research.model !== "rf_physics" ||
       research.experiment_id !== "EXP-008" ||
       research.fresh_validation !== false
@@ -389,14 +500,46 @@ export function predictionReport(value: unknown) {
     researchManifest = fingerprint(research.manifest_sha256);
 
     if (researchManifest !== rfPhysicsManifest) throw new ContractError();
-  } else if (schemaVersion === 2 && provenance.research_candidate !== null) {
+  } else if (schemaVersion >= 2 && provenance.research_candidate !== null) {
     throw new ContractError();
   }
+  let historyTrainingRows: number | null = null;
+  if (results.some((r) => r.model === "history_boost")) {
+    const h = object(provenance.history_candidate);
+    if (
+      schemaVersion !== 3 ||
+      h.model !== "history_boost" ||
+      h.experiment_id !== "EXP-010" ||
+      h.manifest_sha256 !== historyManifest ||
+      h.fresh_validation !== false ||
+      h.matched_evaluation !== "FOUR_NEW_WORLD_HELDOUT_ONLINE_MATURE_HISTORY" ||
+      results.some((r) => r.matchedMetrics === null)
+    )
+      throw new ContractError();
+    historyTrainingRows = finite(h.training_rows);
+    if (historyTrainingRows !== 5700) throw new ContractError();
+  } else if (schemaVersion === 3 && provenance.history_candidate !== null) {
+    throw new ContractError();
+  }
+
+  const history = schemaVersion === 3 ? readHistory(raw.history) : null;
+  const candidate = results.find((r) => r.model === "history_boost");
+  if (
+    candidate &&
+    candidate.prediction !== null &&
+    (!history ||
+      history.uncensored_history_count < 2 ||
+      history.history_age_hours === null ||
+      history.history_age_hours > 72)
+  )
+    throw new ContractError();
 
   const execution = object(raw.execution);
   return {
     schemaVersion,
     researchManifest,
+    historyTrainingRows,
+    history,
     inputs: readInputs(raw.inputs),
     inputFingerprint: fingerprint(raw.input_fingerprint),
     results,

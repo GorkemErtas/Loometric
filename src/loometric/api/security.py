@@ -6,6 +6,7 @@ import logging
 import re
 from secrets import compare_digest
 from typing import Annotated
+from urllib.parse import urlsplit
 from uuid import uuid4
 
 from fastapi import Depends, Request
@@ -53,11 +54,18 @@ class LocalBoundaryMiddleware:
             r"(?:localhost|127\.0\.0\.1|\[::1\])(?::([0-9]{1,5}))?",
             hosts[0] if len(hosts) == 1 else "",
         )
-        if match is None or (match[1] is not None and not 1 <= int(match[1]) <= 65535):
+        proxy_host = (
+            urlsplit(self.settings.public_origin).netloc if self.settings.public_origin else None
+        )
+        trusted_proxy_host = len(hosts) == 1 and proxy_host is not None and hosts[0] == proxy_host
+        if not trusted_proxy_host and (
+            match is None or (match[1] is not None and not 1 <= int(match[1]) <= 65535)
+        ):
             raise ApiError(403, "LOCAL_HOST_REQUIRED", "A literal local Host header is required.")
         origins = headers.getlist("origin")
         origin = origins[0] if len(origins) == 1 else None
-        if origins and (len(origins) != 1 or origin not in self.settings.cors_origins):
+        allowed_origins = (*self.settings.cors_origins, self.settings.public_origin)
+        if origins and (len(origins) != 1 or origin not in allowed_origins):
             raise ApiError(403, "ORIGIN_REJECTED", "Browser origin is not allowed.")
         lengths = headers.getlist("content-length")
         if len(lengths) > 1 or (lengths and not re.fullmatch(r"[0-9]{1,12}", lengths[0])):

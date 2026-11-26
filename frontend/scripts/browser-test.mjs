@@ -148,7 +148,7 @@ try {
   ]);
   const browser = start(
     process.execPath,
-    [join(frontend, "node_modules/@playwright/test/cli.js"), "test"],
+    [join(frontend, "node_modules/@playwright/test/cli.js"), "test", ...process.argv.slice(2)],
     frontend,
     { ...cleanEnv, LOOMETRIC_BROWSER_TOKEN: token, LOOMETRIC_BROWSER_ORIGIN: origin },
   );
