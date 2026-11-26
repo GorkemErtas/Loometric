@@ -83,6 +83,13 @@ On 4,833 **spent synthetic benchmark validation** rows, RF Physics MAE is
 not independent validation or factory-performance evidence. Hidden disruptions,
 stage regressions and worst errors remain unresolved; see [EXP-008](docs/experiments/EXP-008-ml-improvement-research.md).
 
+[EXP-009 prospective frozen evaluation](docs/experiments/EXP-009-prospective-frozen-results.md)
+completed on four new synthetic worlds with byte-identical A/B results. RF Physics
+baseline macro MAE is **0.115372**, **4.79% lower than Forest12** and **12.22% lower
+than Grouped Mean**. Disruption MAE is **0.203759**. The primary bootstrap interval
+includes zero and 31 numerical guards fail: **REPLICATION_NOT_SUPPORTED**.
+These inspected synthetic outcomes do not establish factory validity or authorize promotion.
+
 ## Documentation
 
 - [Dashboard setup and workflows](frontend/README.md)
@@ -92,10 +99,11 @@ stage regressions and worst errors remain unresolved; see [EXP-008](docs/experim
 - [Prediction contracts](docs/architecture/experimental-ml-inference.md) and
   [RF Physics research](docs/experiments/EXP-008-ml-improvement-research.md)
 - [EXP-009 prospective frozen-model protocol](docs/experiments/EXP-009-prospective-frozen-evaluation.md)
-  — predeclared; evaluation not executed.
+  and [actual results](docs/experiments/EXP-009-prospective-frozen-results.md)
+  — completed under the unchanged declaration; NO_ML_PROMOTION.
 - [Prospective dataset integrity infrastructure](docs/architecture/prospective-dataset-infrastructure.md)
-  — implemented with private fixtures; actual EXP-009 datasets not generated.
+  — eight actual cases generated, reproduced and independently registered; raw outputs ignored.
 - [Frozen evaluation engine](docs/architecture/prospective-frozen-evaluation-engine.md)
-  — sealed inference, diagnostics and reproduction implemented; actual evaluation not executed.
+  — sealed inference, diagnostics and independently verified byte-identical reproduction.
 - [Dataset profile](docs/data_profile.md) and [pre-shift feature policy](docs/prediction_problem.md)
 - [Architecture decisions](docs/decisions/) and [experiment reports](docs/experiments/)

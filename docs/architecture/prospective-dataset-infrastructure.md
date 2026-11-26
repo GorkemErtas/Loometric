@@ -148,3 +148,14 @@ acceptance, uncertainty and whole-run supervision described above. This does not
 alter M10A.2 source files or receipts. Actual datasets and evaluation remain
 unexecuted; authorization is still separate. See the EXP-009 addendum for executed
 private-fixture checks and the engine guide for future local use and limitations.
+
+## M10A.4 actual source follow-up (2026-11-26)
+
+The eight authorized actual cases have now passed two-pass generation, label-blind
+registration and independent verification. Source receipt metadata was committed
+and pushed before frozen scoring. Ledger SHA:
+`cb0acaa9513c06769d88272ec53bc22890603122751956352630f417556eb2a9`.
+See the [source receipts](../experiments/EXP-009-source-receipts.json) and
+[actual experiment record](../experiments/EXP-009-prospective-frozen-results.md).
+Original source code, parameters and reserved-label boundaries are unchanged;
+all actual raw datasets and run artifacts remain ignored. NO_ML_PROMOTION.

@@ -1,0 +1,144 @@
+{
+  "deterministic_payloads_exclude_this_telemetry": true,
+  "experiment_id": "EXP-009",
+  "full_evaluation_runs": 2,
+  "journal_files_sha256": {
+    "prepare.request.json": "999e87137724e2130fe33cb9cb5084d992cc638a226305065f86c7f5386f2e65",
+    "prepare.response.json": "c73f74b586eb3f7c27ea82c4adece0d4dfdf1817b4632f69f5c6ac8dd082f3cf",
+    "register.request.json": "bedd53865ed0e06f42ed8539c924a1236ec9bf48b34d6d4b2e5f198e7e44407e",
+    "register.response.json": "26cd41ea374c1ef0fb8dfcf5b3ff3c0ca16df21ef1688033268d772a92e00e0f",
+    "run-a.request.json": "15b98b67d69be99f1033cdfd169f6973fb484c4514d7189680f08dd299023cf4",
+    "run-a.response.json": "423f521cb7c680a112dd87b01198b318f1c7bb08e32c53f4faaa83fd303e87a9",
+    "run-b.request.json": "b19cecc806a2584a0c88d5b79c0fbb3fdfb3d95ac75ed645c5bac6bf376c45b6",
+    "run-b.response.json": "0e89919dc0640c090b75a827eeb5e90e5d4d0847bd0a6dd172c231178c49b7ec",
+    "verify-reproduction.request.json": "a2503f8c17dc1776746f2b9ae6ca604f8e4259e8fca19c2b6e2f9baa72a35d0f",
+    "verify-reproduction.response.json": "aec8a6714cea7bf3e5184969c95b5aface4a496555570ab2c42d645645e76b3b",
+    "verify-sources.request.json": "93a2afd7a3f2e1e4c54bc34dea123db35e3d4f40dbbde8020bf71ed9e67fcec5",
+    "verify-sources.response.json": "78423bfb029634b0c7397f3e24cb76a9e459b76a83f0d8f4cc8f2601556c9c97"
+  },
+  "milestone": "M10A.4",
+  "no_failures_or_retries": true,
+  "operations": {
+    "prepare": {
+      "finished_at": "2026-11-26T14:41:53.614759+00:00",
+      "result": {
+        "datasets": {
+          "exp-009-development-101-baseline": "ff03e5966a2118a39d50cf04b4796620b171db7f22109d85ecca60140dd7d132",
+          "exp-009-development-101-disruption": "48e39af2240dc388d5fb5fedc46bf0244b886b5740147f3c82fff4072e306fda",
+          "exp-009-development-211-baseline": "4c8e33c2991f24f6142c7481427557260462db5560802be939937a844b79405f",
+          "exp-009-development-211-disruption": "6a13c8e119b39772b180043633c3110aa99d3d231cc6a2f9977c769eaa717a36",
+          "exp-009-development-307-baseline": "63a90833a45dad49ceeaab2a96f0727c444ec89e44712735c9bdbd5ede9b23c6",
+          "exp-009-development-307-disruption": "41516dc4e424aa3fbc8a0bf7da3c4725ad47c62c8418591b723cb87baf178534",
+          "exp-009-development-401-baseline": "1509ae565895dbdfd54937d392d3357d0e4c1d77f1f5ff5dba1a9ad298f89366",
+          "exp-009-development-401-disruption": "6aea968ae11a4bb849b2387aec01ba4ca4417643ced73161f863efe215c44f25"
+        },
+        "execution": {
+          "peak_committed_bytes": 55898112,
+          "returncode": 0,
+          "whole_child_wall_seconds": 49.596907700000884
+        },
+        "memory_backend": "windows-job-aggregate-commit",
+        "numeric_threads": 1,
+        "promotion_decision": "NO_ML_PROMOTION",
+        "status": "SOURCE_GENERATION_REPLAY_VERIFIED"
+      },
+      "started_at": "2026-11-26T14:41:03.991052+00:00"
+    },
+    "register": {
+      "finished_at": "2026-11-26T14:42:31.727266+00:00",
+      "result": {
+        "cases": 8,
+        "execution": {
+          "peak_committed_bytes": 76488704,
+          "returncode": 0,
+          "whole_child_wall_seconds": 18.84245649999866
+        },
+        "ledger_sha256": "cb0acaa9513c06769d88272ec53bc22890603122751956352630f417556eb2a9",
+        "memory_backend": "windows-job-aggregate-commit",
+        "numeric_threads": 1,
+        "promotion_decision": "NO_ML_PROMOTION",
+        "status": "REGISTERED_LABEL_BLIND_REPLAY_VERIFIED"
+      },
+      "started_at": "2026-11-26T14:42:12.839148+00:00"
+    },
+    "run-a": {
+      "finished_at": "2026-11-26T14:46:46.813356+00:00",
+      "result": {
+        "decision": "PENDING_REPRODUCTION",
+        "execution": {
+          "peak_committed_bytes": 308555776,
+          "returncode": 0,
+          "whole_child_wall_seconds": 50.211693000001105
+        },
+        "manifest_sha256": "5f317667fbdaaa4fa03fe4c836f578e0965217837436b4a50546ffd9eaa834ba",
+        "memory_backend": "windows-job-aggregate-commit",
+        "numeric_threads": 1,
+        "promotion_decision": "NO_ML_PROMOTION",
+        "status": "SEALED_PENDING_REPRODUCTION"
+      },
+      "started_at": "2026-11-26T14:45:56.552438+00:00"
+    },
+    "run-b": {
+      "finished_at": "2026-11-26T14:48:25.589632+00:00",
+      "result": {
+        "decision": "REPLICATION_NOT_SUPPORTED",
+        "execution": {
+          "peak_committed_bytes": 310964224,
+          "returncode": 0,
+          "whole_child_wall_seconds": 51.56788470000174
+        },
+        "manifest_sha256": "704a49c3f933ba16452218b6e49bc63c15cfd169e06439e6a52ef6edb8775b9d",
+        "memory_backend": "windows-job-aggregate-commit",
+        "numeric_threads": 1,
+        "promotion_decision": "NO_ML_PROMOTION",
+        "status": "REPRODUCTION_VERIFIED"
+      },
+      "started_at": "2026-11-26T14:47:34.019581+00:00"
+    },
+    "verify-reproduction": {
+      "finished_at": "2026-11-26T14:49:15.116156+00:00",
+      "result": {
+        "decision": "REPLICATION_NOT_SUPPORTED",
+        "execution": {
+          "peak_committed_bytes": 130633728,
+          "returncode": 0,
+          "whole_child_wall_seconds": 17.89095610000004
+        },
+        "memory_backend": "windows-job-aggregate-commit",
+        "numeric_threads": 1,
+        "promotion_decision": "NO_ML_PROMOTION",
+        "status": "REPRODUCTION_VERIFIED"
+      },
+      "started_at": "2026-11-26T14:48:57.221271+00:00"
+    },
+    "verify-sources": {
+      "finished_at": "2026-11-26T14:43:20.955895+00:00",
+      "result": {
+        "cases": 8,
+        "execution": {
+          "peak_committed_bytes": 72306688,
+          "returncode": 0,
+          "whole_child_wall_seconds": 16.778930799999216
+        },
+        "ledger_sha256": "cb0acaa9513c06769d88272ec53bc22890603122751956352630f417556eb2a9",
+        "memory_backend": "windows-job-aggregate-commit",
+        "numeric_threads": 1,
+        "promotion_decision": "NO_ML_PROMOTION",
+        "status": "INDEPENDENT_LEDGER_AND_SOURCES_VERIFIED"
+      },
+      "started_at": "2026-11-26T14:43:04.154637+00:00"
+    }
+  },
+  "packages": {
+    "joblib": "1.6.0",
+    "loometric": "0.1.0",
+    "numpy": "2.5.5",
+    "pandas": "3.1.1",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1",
+    "threadpoolctl": "3.8.0"
+  },
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.13.14",
+  "schema_version": 1
+}

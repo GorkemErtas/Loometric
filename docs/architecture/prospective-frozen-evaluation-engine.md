@@ -172,3 +172,19 @@ prospective performance remain unmeasured. Retained EXP-008's 24.05% MAE gain an
 0.82067 R² are spent synthetic validation diagnostics, not new independent results.
 Hidden disruptions contain no new predictive signal; group/tail failures and
 transport limitations may persist. NO_ML_PROMOTION applies to every possible result.
+
+## M10A.4 actual execution follow-up (2026-11-26)
+
+After explicit authorization and final M10A.3 review/merge, the eight actual
+sources were generated twice per case and independently registered before scoring.
+Exactly one frozen A and its single B reproduction completed within the original
+budgets. An independent verifier accepted all five deterministic payloads as
+byte-identical. The decision was **REPLICATION_NOT_SUPPORTED**: all 48 minimum
+checks passed, but 31 of 77 numerical guards failed. **NO_ML_PROMOTION.**
+
+The earlier sections describe M10A.3's implementation-time state. Actual numerical
+results, per-world/stage tables, every guard, support coverage, resource usage,
+receipts, read-only audit commands and limitations now live in the
+[M10A.4 experiment record](../experiments/EXP-009-prospective-frozen-results.md).
+The engine, protocol, artifacts and serving behavior remain unchanged. Actual
+outputs remain create-only and ignored; no retry, fitting or tuning occurred.

@@ -552,3 +552,27 @@ See the [source receipts](EXP-009-source-receipts.json) and
 [M10A.4 execution record](EXP-009-prospective-frozen-results.md).
 These append-only records do not change the declaration, frozen config, model
 artifacts, scientific criteria, budgets, reserved-label boundaries or NO_ML_PROMOTION.
+
+## M10A.4 completed evaluation addendum (2026-11-26)
+
+Exactly one frozen run A and its single B reproduction completed. A separate
+read-only verifier accepted all five deterministic payloads as byte-identical.
+The full [actual result report](EXP-009-prospective-frozen-results.md),
+[aggregate evidence](EXP-009-results.json) and
+[separate execution telemetry](EXP-009-execution-record.json) record all four
+models, conditions, worlds, stages, support populations, uncertainty and every guard.
+
+Verified outcome: **REPLICATION_NOT_SUPPORTED; NO_ML_PROMOTION**. All 48 minimum
+checks passed; 31 of 77 numerical checks failed. RF Physics baseline macro MAE
+0.115371917 improves 4.791651% against Forest12 and 12.217182% against Grouped Mean;
+its disruption macro MAE is 0.203758627. The primary RF Physics-minus-Forest12
+baseline world interval is [-0.016125522, +0.000273278], failing its upper < 0 rule.
+Stage/tail failures remain; no pooled gain overrides them. This is prospective
+evidence from new synthetic worlds, not externally validated factory performance.
+The inspected EXP-009 validation outcomes are now spent for adaptive development;
+B is reproduction of the same observations, not another independent sample.
+
+No model, frozen source, declaration, threshold, dataset size, resource budget,
+serving contract or promotion gate changed. No retraining, tuning, calibration,
+sample extension or failed-experiment retry occurred. Original reserved labels
+and unscored prospective partitions remain opaque. Full raw outputs stay ignored.
