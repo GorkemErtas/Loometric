@@ -1,0 +1,389 @@
+{
+  "schema_version": 1,
+  "experiment_id": "EXP-009",
+  "policy_version": "prospective-frozen-evaluation-v1",
+  "preparation_milestone": "M10A.1",
+  "execution_requires_separate_authorization": true,
+  "source_revision": "2427b0948f33c4a7224555b92a97b73ce50095d3",
+  "frozen_bundles": {
+    "v1": {
+      "directory": "data/processed/experimental_ml/v1",
+      "manifest_sha256": "bc5e255d8d58fc49e8b37bb44d58647c47402d4cf5f46a525ff9a1b513d28a34",
+      "files": {
+        "grouped_mean.json": "6e952eeb9335441d92ed8783258ab0070256beef7eabb217b5bc7d60597823b4",
+        "histogram_gradient_boosting.joblib": "c608da41ae1ea348f02155551bbff4ed82659527d8c649002f75e63dd99d4680",
+        "metadata.json": "2647561b8146d1bea27428b26e15fb55510172b1159f0c3cc11759edf7e8ed74",
+        "random_forest.joblib": "790f9916209ffc1854e18b6033de9f5864c181d6593ed82768d8a3ca4b83401f"
+      }
+    },
+    "v2": {
+      "directory": "data/processed/experimental_ml/v2",
+      "manifest_sha256": "55b09223c57e6c52261a71bc777edddc6116b88b8ffae3f7b0f9cc9075cc51f0",
+      "files": {
+        "metadata.json": "25e365c1df75206a2934ab3ecbd487f407a7676c1ed44fc4024951f9956c1d86",
+        "rf_physics.joblib": "4f64df4485927c1fdc6eb4bd4a1d65f70a0d6dd9634e002c0f17a427a8d2a30c"
+      }
+    }
+  },
+  "models": [
+    {
+      "name": "grouped_mean",
+      "identity": "grouped_mean",
+      "bundle": "v1",
+      "file": "grouped_mean.json"
+    },
+    {
+      "name": "random_forest",
+      "identity": "forest-12",
+      "bundle": "v1",
+      "file": "random_forest.joblib"
+    },
+    {
+      "name": "histogram_gradient_boosting",
+      "identity": "hist-31",
+      "bundle": "v1",
+      "file": "histogram_gradient_boosting.joblib"
+    },
+    {
+      "name": "rf_physics",
+      "identity": "rf_physics",
+      "bundle": "v2",
+      "file": "rf_physics.joblib"
+    }
+  ],
+  "frozen_files_sha256": {
+    "configs/ml_improvement_v1.json": "76a9ca3de82846dcafd4af9396b53119b4f0d371d91bc4aaa3680d8992e66f0c",
+    "configs/synthetic_ml_v1.json": "4fbe747f204b2d8c51fda58b4cef26214cb8b4b8c0a628977fb494e18329dd7b",
+    "configs/synthetic_training_v1.json": "cbf17fe071beae711ce09e16f2a55a74d0637cc485068622f04a626ad9d32acc",
+    "requirements/exp-001.txt": "b7feb2f6add8d9607dcd7fea6282d97027e5bcf3dc9662fb7feec627467f62f3",
+    "requirements/exp-002.txt": "1b9ebefb640638fe0e7702eff04482756a3e2934f669dc4256bcf6203681d8cd",
+    "requirements/m03b.txt": "96e001972f95bc52e9d7dd360560e9cfe346de7603a2d6521f915597c38c5ce4",
+    "requirements/m05a.txt": "d9bf91a3a0e26ba8d96c24414f8fd126f71f0983f9ac8272131ab11cdc06dabb",
+    "src/loometric/api/prediction_schemas.py": "8868abd313a96bad4031c1bfca6991a9937fca4d08ce33b6dca4c10a4568e973",
+    "src/loometric/api/prediction_schemas_v2.py": "cdfc2d267cb1a79fe81c605fa212f6b7792d34bc937d791298ae0432c9529940",
+    "src/loometric/experimental_ml/__init__.py": "7f9c02cede51025873434b578b67dee33fa12b568c7266c7a6416672f9b12a89",
+    "src/loometric/experimental_ml/__main__.py": "2a4f00cabe772501ae72e34fe9cd27a20104714fd0ce426d132d0aa11def5fbc",
+    "src/loometric/experimental_ml/artifacts.py": "1fe564e624cdaade0d761d60893eea346cdc85cbc8b64bab6a1ebbc591a68fff",
+    "src/loometric/experimental_ml/constants.py": "e19ba5b99e26d872d7b5d408a041fb02bfacf1595ad973a348ce54e0d48e633b",
+    "src/loometric/experimental_ml/inference.py": "c7660f0c19f9ccdec8b2cdba3edad660f620f235b7bf1d0e5c713d980e266b76",
+    "src/loometric/experimental_ml/publish.py": "781eb847a5bde137734c3e83b2d302c8f1c9c474e208a130e2c45834d9ae72b9",
+    "src/loometric/experimental_ml/trusted_v1.json": "5c665795588c5e76f0a87b03db6eb418e44baa0cb7b76aa98291a988d75ff479",
+    "src/loometric/experimental_ml_v2/__init__.py": "9474b03b5360d3f1ce98dee624cf47197470782112413b6b64e1078b4791a520",
+    "src/loometric/experimental_ml_v2/artifacts.py": "69e4a91fc057eb6201fd6c5c52bd599baf37304198bdf83883be0a1a6b821000",
+    "src/loometric/experimental_ml_v2/compare.py": "032b2c2ab886090f75ffbdf3605f740f45be20e911bea27c114b3b89609baa07",
+    "src/loometric/experimental_ml_v2/constants.py": "52751440c18111108600bfbbfdb976a72f53eefffd7a2b8878cbf559e3cedfc4",
+    "src/loometric/experimental_ml_v2/inference.py": "00b74f319d2d812377a98ba0ee3eda4579a3d7dd183f5b0f16a640381f74c930",
+    "src/loometric/experimental_ml_v2/parity.py": "c90bbbb52a483164b91f8d7c57bb6f0b0ce9a014f356888345d0cdfbfab6c70a",
+    "src/loometric/experimental_ml_v2/publish.py": "84daccf721b2feb64765c5e7cceaff343f9a9c8b90557a24bf01fe3dc1b8d19c",
+    "src/loometric/experimental_ml_v2/serving.py": "144abda3f9b8597a89cac4d3fc91ecda3370642decb23af153ac89e2790cd73f",
+    "src/loometric/ml_research/__init__.py": "94769c2773a8dc79957a2a9fbbf74ca7a733941474b9afc1f546e42702026c8a",
+    "src/loometric/ml_research/__main__.py": "383dbacab14811458ef2932f1a263efc1bbd172e8a7f15980a5529c2d1880ef5",
+    "src/loometric/ml_research/artifacts.py": "753d5a7cbe5e564a2f8902f404a07f59cfe5a35ce504db5a5c7fd8247c7b7cf8",
+    "src/loometric/ml_research/diagnosis.py": "0a07e6654df219e665a060830c908e15d3b868844a27675a99b60820e976f10e",
+    "src/loometric/ml_research/features.py": "bb5beb90149b9375a1817d2b5a7bbab01f2c80bc73a7d1a7fdcb4280e7b6f1f2",
+    "src/loometric/ml_research/inspection.py": "bcc2d30684eebfc7979fe3666ed50dbb50dc9afafd33a664589041d00210bf9a",
+    "src/loometric/ml_research/models.py": "430b9a57231e814a3731777e7dd5946368a7d475708e9b5fb400f36c9ec772b2",
+    "src/loometric/ml_research/protocol.py": "b99f15dcbd319fa753a432fb40715c6651d91cfd7846a8bb297bc3409da9b447",
+    "src/loometric/ml_research/risk.py": "3363b6e615baca388a4d1d910f0bd0c6c0bbccfd9c7fc530d35b26d91e6dde59",
+    "src/loometric/ml_research/selection.py": "8ff94cd575a506cab4006eb1ab47ce18fdab545c5371e58c9dd5aca97f7b8d3b",
+    "src/loometric/ml_research/study.py": "81158af84ae5078255061e03c4a3ad833c642a0e0798f6e28489c42aec848a5f",
+    "src/loometric/planning/availability.py": "ada1408088933069b29b4eb62013f64c715435380dffaccbe49e1fce1a4cb3d6",
+    "src/loometric/planning/domain.py": "7585e955b53c38a88afb5ff5e485a8ebbbefe37e0f7f6a5a620f87339f9b6876",
+    "src/loometric/synthetic_ml/__init__.py": "3bcee88e842bf856c5c5a2e5efb46bb20c87b7cdc0486b15a5f20cac2e69422b",
+    "src/loometric/synthetic_ml/__main__.py": "add01e12126c82230c9e1ae435f19792adf390626809e19db591e9254eff2278",
+    "src/loometric/synthetic_ml/audit.py": "3458e2ab97334b1bb5e509b08753b73a3858e4e3127d9f42c34247e34ae35e1d",
+    "src/loometric/synthetic_ml/cli.py": "e84dfbd43af605a6af75208e017bbc7566556aa41bbd5279ce80f54ee4ca8868",
+    "src/loometric/synthetic_ml/configuration.py": "5e91033066cc03950ea8f1ae717eae4e3b0e4f97cfcd04c6343c1ae07a0d1c1b",
+    "src/loometric/synthetic_ml/contracts.py": "24b966a062a90e3c5606d0ac0c4f83aba19b243870aa5c5e15447cae23a1ca46",
+    "src/loometric/synthetic_ml/features.py": "9e0827096a162b1bf27d4be6a07860544e060e7b29b83acf0d3aeeb21b4d0df0",
+    "src/loometric/synthetic_ml/generation.py": "f479f1ce8f08968d1fdc557a41d5b82c0ccc971e410002d84f7e29b864840ed2",
+    "src/loometric/synthetic_ml/splitting.py": "1bedcc92a745fd1b3dae9eda19bc97701bd0b54531713281d1923c8813865f1b",
+    "src/loometric/synthetic_ml/storage.py": "c619d72cf8bac02339b7e43016e03e38e6620e415dc3c17c95f49a3109e27ef4",
+    "src/loometric/synthetic_ml/validation.py": "3aeb6ff038ed5fe4e15bf4e24aaa44fa5312f89519983738b5456eace9623f44",
+    "src/loometric/synthetic_training/__init__.py": "1604a11d34f2d2ca6a881590c311765fe1c924ce792ab5784435df96d2720b24",
+    "src/loometric/synthetic_training/__main__.py": "0cf01fca217155cbdee3eb47eeb0f65a5a93d11b2853571a5191086b791726b0",
+    "src/loometric/synthetic_training/artifacts.py": "a23a1144275e4994431917584dc979a4a568d250f1ec642c08838ed970786bcb",
+    "src/loometric/synthetic_training/cli.py": "d4b13bb03fadd4f80f4f3a0b14ab5817e792ba912703d4e1620fe42a36660230",
+    "src/loometric/synthetic_training/configuration.py": "de5a4fe8cfc090e1f8cf0998e414f23c89617869ade17fc86e6bfadc725510b7",
+    "src/loometric/synthetic_training/data.py": "2a3f5134001cda1c69cc50645e57fe106bcce43e96fe5993835ce808f62e3291",
+    "src/loometric/synthetic_training/folds.py": "4ebb88234066ee04920530a0e5ddf77eb744a07f9638a744311c7dbbf663ab7d",
+    "src/loometric/synthetic_training/metrics.py": "da7b67b724842cd6473a00c9d554771fb6fc249d001707261d8b91508f629ce0",
+    "src/loometric/synthetic_training/models.py": "00a8d3f07fe0923c8cb819971d8ebbdc99e6d301ff76f5a18a0cf10617e519e5",
+    "src/loometric/synthetic_training/risk.py": "ce47965f36efed5a76c4f253b2531ea5b4615118055df81631001f15d1225113",
+    "src/loometric/synthetic_training/selection.py": "c8bc350f00f7d9b3e6404d532a12305899b602e95bb369b4324346aed89311c4",
+    "src/loometric/synthetic_training/study.py": "4a963f64957c8899d47f051b7aa0859e39bcbb756d6b99a13e77361b5cdaa067"
+  },
+  "contract": {
+    "feature_columns": [
+      "stage",
+      "shift_kind",
+      "weekday",
+      "planned_workers",
+      "skill_level",
+      "style_complexity",
+      "standard_worker_minutes_per_piece",
+      "planned_machine_available",
+      "available_minutes",
+      "planned_downtime_minutes",
+      "opening_wip_pieces",
+      "planned_release_pieces",
+      "order_quantity"
+    ],
+    "target": "standard_capacity_attainment",
+    "units": "dimensionless_standard_worker_minutes_per_planned_worker_minute",
+    "prediction_minutes_before_shift": 30,
+    "snapshot_minutes_before_cutoff": 5,
+    "shift_minutes": 480,
+    "undefined_target_policy": "AUDIT_ZERO_PLANNED_CAPACITY_NO_IMPUTATION_NO_PREDICTION",
+    "feature_schema": "synthetic-ml-v1-13",
+    "clipping_allowed": false,
+    "new_predictors_allowed": false
+  },
+  "worlds": {
+    "seeds": [
+      101,
+      211,
+      307,
+      401
+    ],
+    "conditions": [
+      "baseline",
+      "disruption"
+    ],
+    "historical_seeds_forbidden": [
+      19,
+      42,
+      73
+    ],
+    "parameters": {
+      "start_date": "2032-01-05",
+      "calendar_days": 112,
+      "factories": 3,
+      "lines_per_stage": 2,
+      "styles": 6,
+      "workers_min": 4,
+      "workers_max": 16,
+      "standard_hundredths_min": 50,
+      "standard_hundredths_max": 1500,
+      "workload_percent_min": 35,
+      "workload_percent_max": 160,
+      "planned_downtime_max": 60,
+      "process_noise_bps": 1800,
+      "difficult_per_thousand": 25,
+      "label_delay_minutes": 120,
+      "embargo_dates": 1
+    },
+    "world_id_template": "exp-009-world-{seed}",
+    "case_id_template": "exp-009-development-{seed}-{condition}",
+    "entity_key": [
+      "world_id",
+      "local_entity_id"
+    ],
+    "pair_key": [
+      "world_id",
+      "local_observation_id"
+    ],
+    "source_partition_scored": "validation",
+    "opaque_label_partitions": [
+      "train",
+      "gap",
+      "test"
+    ],
+    "global_outcomes_read_by_evaluator": false,
+    "historical_calendar_label_upper_bound": "2031-01-08T00:00:00+00:00",
+    "condition_pairing": [
+      "identical_plans",
+      "identical_features",
+      "identical_membership",
+      "identical_entities",
+      "common_random_streams"
+    ],
+    "disruption": {
+      "additional_loss_minutes": 60,
+      "rate_multiplier_numerator": 4,
+      "rate_multiplier_denominator": 5,
+      "new_predictive_signal": false
+    }
+  },
+  "sample_size": {
+    "working_dates_per_world": 96,
+    "score_dates_per_case": 18,
+    "rows_per_date": 20,
+    "planned_rows_per_case": 360,
+    "planned_rows_per_stage_per_case": 72,
+    "cases": 8,
+    "unique_paired_score_observations": 1440,
+    "condition_score_exposures": 2880,
+    "source_rows_per_case": 2720,
+    "all_source_exposures": 21760,
+    "minimum_valid_targets_per_case": 300,
+    "minimum_valid_targets_per_stage_case": 50,
+    "minimum_score_dates_with_valid_targets": 15,
+    "minimum_stage_dates_with_valid_targets": 15,
+    "minimum_stage_lines": 2,
+    "minimum_stage_crews": 4,
+    "size_extension_allowed": false
+  },
+  "storage": {
+    "dataset_version": "synthetic-prospective-exp009-v1",
+    "source_generator_version": "stage-shift-process-v1",
+    "root": "data/processed/prospective_evaluation/exp-009",
+    "datasets_subdirectory": "datasets",
+    "receipts_file": "receipts/datasets.json",
+    "evaluation_runs": [
+      "runs/a",
+      "runs/b"
+    ],
+    "publication": "CREATE_ONLY_MANIFEST_LAST",
+    "receipt_registration": "LABEL_BLIND_BEFORE_SCORING_EXPECTED_LEDGER_SHA256_SUPPLIED_INDEPENDENTLY",
+    "reproduce_source_bytes_before_scoring": true,
+    "reproduce_evaluation_bytes": true,
+    "deterministic_receipts_exclude": [
+      "wall_time",
+      "peak_memory",
+      "execution_timestamp"
+    ],
+    "prospective_receipts_state": "NOT_GENERATED"
+  },
+  "evaluation": {
+    "scientific_population": "ALL_DEFINED_TARGETS_RAW_FROZEN_PREDICTIONS",
+    "finite_out_of_policy_outputs": "SCORE_UNCLIPPED_AND_REPORT_POLICY_ABSTENTION",
+    "nonfinite_output_policy": "INVALID_EVALUATION_NO_COMPLETE_CASE_RESCUE",
+    "report_support_population": "ALL_PLANNED_ROWS_AND_DEFINED_TARGETS_SEPARATELY",
+    "policy_comparison_population": "COMMON_NONABSTAINED_IDS_SECONDARY_ONLY",
+    "support_profile_sha256": "f2e50ecd9b0a589d88a3706f3a31a17f621a5de13b1bf3b9a33380dbaca1e4a3",
+    "training_fingerprint": "8ae08345a01c025b5e34a736b848100bc530c4987ac0d750543a7e07847171e8",
+    "metrics": [
+      "mae",
+      "rmse",
+      "r2",
+      "bias",
+      "p95_absolute_error",
+      "worst_absolute_error",
+      "p95_positive_error"
+    ],
+    "quantile_method": "linear",
+    "bias_sign": "prediction_minus_actual",
+    "r2_undefined": "NULL_IF_FEWER_THAN_TWO_OR_CONSTANT_TARGET",
+    "empty_slice_policy": "EXPLICIT_ZERO_COUNT_NULL_METRICS",
+    "subgroups": [
+      "stage",
+      "shift_kind",
+      "staffing_band",
+      "workload_band",
+      "interruption_band",
+      "calendar_week",
+      "factory",
+      "line",
+      "crew",
+      "style",
+      "support_status"
+    ],
+    "staffing_upper_bounds": [
+      5,
+      10
+    ],
+    "workload_upper_bounds": [
+      "3/5",
+      "1"
+    ],
+    "interruption_upper_bounds": [
+      0,
+      30
+    ],
+    "low_support_rows": 30,
+    "cell_counts": [
+      "rows",
+      "dates",
+      "factories",
+      "lines",
+      "crews",
+      "styles"
+    ],
+    "primary_comparison": [
+      "rf_physics",
+      "random_forest"
+    ],
+    "pairwise_model_pairs": 6,
+    "comparisons": [
+      "matched_model_errors_within_seed_condition",
+      "paired_baseline_disruption_error_change",
+      "identical_input_absolute_error_lower_bound"
+    ],
+    "aggregation": "EQUAL_SEED_MACRO_SEPARATE_CONDITIONS",
+    "paired_prediction_absolute_tolerance": 1e-12,
+    "calibration_allowed": false,
+    "new_candidate_prediction_band": false
+  },
+  "uncertainty": {
+    "primary": {
+      "method": "EXHAUSTIVE_PAIRED_WORLD_CLUSTER_BOOTSTRAP",
+      "worlds": 4,
+      "ordered_resamples": 256,
+      "percentiles": [
+        0.025,
+        0.975
+      ],
+      "statistic": "MACRO_MAE_LEFT_MINUS_RIGHT"
+    },
+    "sensitivity": {
+      "method": "PAIRED_START_DATE_BLOCK_WITHIN_WORLD",
+      "repeats": 500,
+      "seed": 20261126,
+      "preserve_all_models_and_conditions": true,
+      "used_for_acceptance": false,
+      "rng": "random.Random(int.from_bytes(SHA256(UTF8(key)),big))",
+      "key_template": "EXP-009|date-bootstrap-v1|20261126|{world_id}|{replicate}",
+      "date_draw": "N_DATES_WITH_REPLACEMENT_FROM_SORTED_LOCAL_SCORE_DATES"
+    },
+    "interpretation": "DESCRIPTIVE_FOUR_WORLD_RESAMPLING_NOT_FACTORY_CONFIDENCE_OR_PREDICTION_COVERAGE",
+    "multiple_comparisons": "ONE_PRIMARY_BASELINE_CONTRAST_SECONDARY_DESCRIPTIVE_NO_WINNER_SEARCH"
+  },
+  "acceptance": {
+    "scope": "REPLICATION_EVIDENCE_ONLY_NOT_PROMOTION",
+    "minimum_baseline_macro_mae_gain_vs_group_percent": 5,
+    "minimum_baseline_macro_mae_gain_vs_forest_percent": 2,
+    "minimum_baseline_world_wins_vs_forest": 3,
+    "maximum_baseline_world_regression_vs_forest_percent": 5,
+    "primary_world_interval_upper_bound_must_be_below": 0,
+    "maximum_stage_mae_regression_vs_group_percent": 5,
+    "maximum_p95_absolute_regression_vs_group_percent": 5,
+    "maximum_p95_positive_regression_vs_group_percent": 5,
+    "maximum_worst_error_regression_vs_group_percent": 10,
+    "maximum_disruption_macro_mae_regression_vs_group_percent": 0,
+    "maximum_disruption_seed_mae_regression_vs_group_percent": 10,
+    "stage_and_tail_scope": "EVERY_SEED_CONDITION_WITH_NO_POOLED_RESCUE",
+    "nonfinite_or_mismatched_evidence": "INVALID_EVALUATION",
+    "insufficient_counts": "INCONCLUSIVE",
+    "failed_numerical_guard": "REPLICATION_NOT_SUPPORTED",
+    "all_guards_pass": "FROZEN_CANDIDATE_REPLICATION_SUPPORTED",
+    "zero_reference_policy": "BOTH_ZERO_PASS_OTHERWISE_POSITIVE_CANDIDATE_FAIL_PERCENT_NULL",
+    "historical_promotion_gates_unchanged": true
+  },
+  "budget": {
+    "maximum_estimator_fits": 0,
+    "maximum_hyperparameter_trials": 0,
+    "maximum_calibration_fits": 0,
+    "maximum_cases": 8,
+    "maximum_raw_model_predict_calls_per_run": 32,
+    "maximum_scored_predictions_per_run": 11520,
+    "maximum_full_runs": 2,
+    "numeric_threads": 1,
+    "memory_limit_mib": 2048,
+    "whole_run_deadline_seconds": 1200,
+    "maximum_file_mib": 32,
+    "maximum_dataset_bundle_mib": 64,
+    "maximum_output_root_mib": 768,
+    "maximum_source_replays_per_case": 2,
+    "timeout_policy": "ABORT_KEEP_INCOMPLETE_NO_BUDGET_ESCALATION"
+  },
+  "invariants": {
+    "promotion_decision": "NO_ML_PROMOTION",
+    "production_serving_authorized": false,
+    "capacity_application_authorized": false,
+    "reserved_historical_labels_decoded": false,
+    "training_allowed": false,
+    "hyperparameter_optimization_allowed": false,
+    "serving_changes_allowed": false
+  }
+}

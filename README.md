@@ -91,5 +91,7 @@ stage regressions and worst errors remain unresolved; see [EXP-008](docs/experim
   [scenario comparison](docs/architecture/what-if-scenario-engine.md)
 - [Prediction contracts](docs/architecture/experimental-ml-inference.md) and
   [RF Physics research](docs/experiments/EXP-008-ml-improvement-research.md)
+- [EXP-009 prospective frozen-model protocol](docs/experiments/EXP-009-prospective-frozen-evaluation.md)
+  — predeclared; evaluation not executed.
 - [Dataset profile](docs/data_profile.md) and [pre-shift feature policy](docs/prediction_problem.md)
 - [Architecture decisions](docs/decisions/) and [experiment reports](docs/experiments/)
