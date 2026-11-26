@@ -540,3 +540,15 @@ single reproduction, followed by independent verification and append-only report
 of all results, including failures. Do not extend samples, retry failed runs,
 increase budgets, tune, change thresholds, inspect reserved labels or promote a
 model in response to prospective evidence. **NO_ML_PROMOTION regardless of results.**
+
+## M10A.4 source-registration addendum (2026-11-26)
+
+The user explicitly authorized actual generation and frozen A/B evaluation after
+M10A.3's final review/merge. The eight declared sources have now passed two-pass
+generation, separate label-blind registration and independent verification before
+scoring. The independently retained ledger SHA is
+`cb0acaa9513c06769d88272ec53bc22890603122751956352630f417556eb2a9`.
+See the [source receipts](EXP-009-source-receipts.json) and
+[M10A.4 execution record](EXP-009-prospective-frozen-results.md).
+These append-only records do not change the declaration, frozen config, model
+artifacts, scientific criteria, budgets, reserved-label boundaries or NO_ML_PROMOTION.
