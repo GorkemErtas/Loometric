@@ -1,5 +1,7 @@
 import { type ReactNode, useEffect, useRef } from "react";
 import type { ApiError } from "../api/client";
+import { apiFailureMessages } from "../i18n/errors";
+import { useI18n } from "../i18n/I18n";
 
 export function Icon({ name, size = 20 }: { name: string; size?: number }) {
   const paths: Record<string, ReactNode> = {
@@ -152,15 +154,17 @@ export function Stat({
   detail: string;
   icon?: string;
 }) {
+  const { label: textLabel } = useI18n();
+
   return (
     <div className="stat">
       <div className="stat-top">
-        <span>{label}</span>
+        <span>{textLabel(String(label))}</span>
         {icon && <Icon name={icon} size={18} />}
       </div>
       <div className="stat-value">
         {value}
-        {unit && <span className="stat-unit">{unit}</span>}
+        {unit && <span className="stat-unit">{textLabel(unit)}</span>}
       </div>
       <p>{detail}</p>
     </div>
@@ -177,39 +181,47 @@ export function Empty({ title, children }: { title: string; children: ReactNode 
 }
 
 export function TableScroll({ label, children }: { label: string; children: ReactNode }) {
+  const { label: textLabel } = useI18n();
+
   return (
     // biome-ignore lint/a11y/noNoninteractiveTabindex: A named scroll region must be reachable for horizontal keyboard scrolling.
-    <section className="table-scroll" tabIndex={0} aria-label={label}>
+    <section className="table-scroll" tabIndex={0} aria-label={textLabel(String(label))}>
       {children}
     </section>
   );
 }
 export function JsonBlock({ label, children }: { label: string; children: string }) {
+  const { label: textLabel } = useI18n();
+
   return (
     // biome-ignore lint/a11y/noNoninteractiveTabindex: A named JSON scroll region needs keyboard access to its complete contents.
-    <section className="json-scroll" tabIndex={0} aria-label={label}>
+    <section className="json-scroll" tabIndex={0} aria-label={textLabel(String(label))}>
       <pre>{children}</pre>
     </section>
   );
 }
 export function ErrorNotice({ error }: { error: ApiError }) {
+  const { t, codeLabel } = useI18n();
+
   return (
     <div className="notice notice-error" role="alert">
       <Icon name="info" />
       <div>
-        <strong>Request unavailable</strong>
-        <p>{error.message}</p>
+        <strong>{t("Request unavailable")}</strong>
+        <p>{t(apiFailureMessages[error.kind])}</p>
         {error.code && (
           <p>
-            <code>{error.code}</code>
+            <span>{codeLabel(error.code)}</span>
           </p>
         )}
         {error.retryAfterMs !== null && (
           <small>
-            Retry guidance: wait at least {Math.ceil(error.retryAfterMs / 1000)} seconds.
+            {t("Retry guidance: wait at least {p0} seconds.", {
+              p0: Math.ceil(error.retryAfterMs / 1000),
+            })}
           </small>
         )}
-        {error.requestId && <small>Request ID: {error.requestId}</small>}
+        {error.requestId && <small>{t("Request ID: {p0}", { p0: error.requestId })}</small>}
       </div>
     </div>
   );
@@ -231,6 +243,8 @@ export function Modal({
   onClose: () => void;
   children: ReactNode;
 }) {
+  const { t } = useI18n();
+
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const previous = document.activeElement;
@@ -245,7 +259,12 @@ export function Modal({
     <dialog ref={dialog} className="modal" aria-label={title} onCancel={onClose}>
       <div className="modal-heading">
         <h2>{title}</h2>
-        <button className="icon-button" type="button" aria-label="Close dialog" onClick={onClose}>
+        <button
+          className="icon-button"
+          type="button"
+          aria-label={t("Close dialog")}
+          onClick={onClose}
+        >
           <Icon name="close" />
         </button>
       </div>

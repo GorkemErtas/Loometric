@@ -1,16 +1,19 @@
 import type { ReactNode } from "react";
-import { formatExact, visualPercent } from "../domain/exact";
+import { visualPercent } from "../domain/exact";
 import type { CapacityReport } from "../domain/models";
+import { useI18n } from "../i18n/I18n";
 import { useWorkspace } from "../state/Workspace";
 import { Badge, Empty, ErrorNotice, Panel } from "./ui";
 
 export function CapacityContent({ children }: { children: (report: CapacityReport) => ReactNode }) {
+  const { t } = useI18n();
+
   const { capacity, status, error, mode, refresh, health } = useWorkspace();
   if (status === "loading")
     return (
       <div className="loading-state" role="status">
         <span className="spinner" />
-        Loading the local capacity report…
+        {t("Loading the local capacity report…")}
       </div>
     );
   if (error)
@@ -20,34 +23,36 @@ export function CapacityContent({ children }: { children: (report: CapacityRepor
         <div className="inline-actions">
           {health && (
             <button type="button" className="button" onClick={refresh}>
-              Retry capacity request
+              {t("Retry capacity request")}
             </button>
           )}
-          <span>Use Configure API to connect or replace the session.</span>
+          <span>{t("Use Configure API to connect or replace the session.")}</span>
         </div>
       </>
     );
   if (!capacity)
     return (
-      <Empty title="No capacity report loaded">
+      <Empty title={t("No capacity report loaded")}>
         {mode === "api"
-          ? "Connect the local API to request a report for the selected dataset."
-          : "This input has no saved capacity preview. Connect the local API to assess it."}
+          ? t("Connect the local API to request a report for the selected dataset.")
+          : t("This input has no saved capacity preview. Connect the local API to assess it.")}
       </Empty>
     );
   return children(capacity);
 }
 export function CapacityBars({ report }: { report: CapacityReport }) {
+  const { t, formatExact } = useI18n();
+
   return (
     <figure className="capacity-figure">
       <figcaption className="chart-legend">
         <span>
           <i className="legend-dot" />
-          Available elapsed minutes
+          {t("Available elapsed minutes")}
         </span>
         <span>
           <i className="legend-dot legend-muted" />
-          Blocked minutes
+          {t("Blocked minutes")}
         </span>
       </figcaption>
       <div className="capacity-bars">
@@ -64,54 +69,64 @@ export function CapacityBars({ report }: { report: CapacityReport }) {
             </div>
             <div className="bar-value">
               <strong>{formatExact(slot.available)}</strong>
-              <span> / {formatExact(slot.gross)} min</span>
+              <span>
+                {" "}
+                / {formatExact(slot.gross)} {t("min")}
+              </span>
             </div>
           </div>
         ))}
       </div>
       <p className="chart-note">
-        Each bar is one assignment’s available / gross elapsed minutes. These slots are not
-        allocated to orders.
+        {t(
+          "Each bar is one assignment’s available / gross elapsed minutes. These slots are not allocated to orders.",
+        )}
       </p>
     </figure>
   );
 }
 export function Provenance() {
+  const { t, backendText } = useI18n();
+
   const { dataset, mode, requestId, capacity } = useWorkspace();
   if (!dataset) return null;
   return (
     <Panel
-      title="Data provenance"
+      title={t("Data provenance")}
       action={
         <Badge>
           {mode === "preview"
-            ? "Bundled fixture"
+            ? t("Bundled fixture")
             : capacity
-              ? "API response"
-              : "Input only · no API report"}
+              ? t("API response")
+              : t("Input only · no API report")}
         </Badge>
       }
     >
       <dl className="provenance-grid">
         <div>
-          <dt>Source input</dt>
+          <dt>{t("Source input")}</dt>
           <dd>
-            <code>{dataset.sourceFile}</code>
+            <code>
+              {dataset.validatedFingerprint
+                ? t("Local user workspace · exact serialized input (LF)")
+                : dataset.sourceFile}
+            </code>
           </dd>
         </div>
         <div>
-          <dt>Scenario ID</dt>
+          <dt>{t("Scenario ID")}</dt>
           <dd>{dataset.planning.id}</dd>
         </div>
         <div className="full-width">
-          <dt>Source SHA-256 (LF-normalized text)</dt>
+          <dt>{t("Source SHA-256 (LF-normalized text)")}</dt>
           <dd>
             <code>{dataset.sourceHash}</code>
           </dd>
         </div>
         {requestId && (
           <div className="full-width">
-            <dt>Capacity request ID</dt>
+            <dt>{t("Capacity request ID")}</dt>
             <dd>
               <code>{requestId}</code>
             </dd>
@@ -119,10 +134,12 @@ export function Provenance() {
         )}
       </dl>
       <details className="details-block">
-        <summary>Planning assumptions ({dataset.planning.assumptions.length})</summary>
+        <summary>
+          {t("Planning assumptions ({p0})", { p0: dataset.planning.assumptions.length })}
+        </summary>
         <ul>
           {dataset.planning.assumptions.map((value) => (
-            <li key={value}>{value}</li>
+            <li key={value}>{dataset.validatedFingerprint ? value : backendText(value)}</li>
           ))}
         </ul>
       </details>

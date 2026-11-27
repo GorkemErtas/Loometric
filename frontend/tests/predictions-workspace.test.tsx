@@ -4,6 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import capacity from "../fixtures/capacity-demo.report.json?raw";
 import { App } from "../src/App";
 import { initialInputs, type ModelName, type PredictionInputs } from "../src/domain/predictions";
+import { languageStorageKey } from "../src/i18n/locale";
 import { capturedResponse, capturedV2Response } from "./prediction-fixtures";
 
 const id = "00000000-0000-4000-8000-000000000001";
@@ -101,7 +102,7 @@ it("renders actual response, all-model differences, failed gates and global expl
   expect(
     calls.mock.calls.some(([url]) => /\/jobs|\/dispatch|\/scenarios\/compare/.test(String(url))),
   ).toBe(false);
-  expect(localStorage.length + sessionStorage.length).toBe(0);
+  expect(localStorage.length + sessionStorage.length).toBe(1);
 });
 it("pins a scenario, shows changed inputs and compares only actual subsequent responses", async () => {
   vi.stubGlobal("fetch", transport());
@@ -119,7 +120,7 @@ it("pins a scenario, shows changed inputs and compares only actual subsequent re
   const table = await screen.findByRole("region", { name: "Before and after model predictions" });
   expect(within(table).getByText("RF Physics")).toBeVisible();
   const inputs = screen.getByRole("region", { name: "Scenario input differences" });
-  expect(within(inputs).getByText("planned workers")).toBeVisible();
+  expect(within(inputs).getByText("Planned workers")).toBeVisible();
   expect(within(inputs).getByText("8")).toBeVisible();
   expect(screen.getByText(/Differences are not proven causal effects/)).toBeVisible();
 });
@@ -179,7 +180,7 @@ it("blocks inconsistent values and displays safe API errors without fallback", a
   });
   await user.click(screen.getByRole("button", { name: "Predict" }));
   expect(await screen.findByRole("alert")).toHaveTextContent("Request unavailable");
-  expect(screen.getByText("EXPERIMENTAL_ARTIFACT_UNAVAILABLE")).toBeVisible();
+  expect(screen.getByText("Trusted experimental model artifacts unavailable")).toBeVisible();
   expect(screen.queryByText(/private exception/)).not.toBeInTheDocument();
   expect(screen.queryByText("0.90363")).not.toBeInTheDocument();
 });
@@ -207,12 +208,12 @@ it("renders review and zero-capacity abstention without an invented estimate", a
   render(<App />);
   const user = await connect();
   await user.click(screen.getByRole("button", { name: "Predict" }));
-  expect(await screen.findByText("REVIEW REQUIRED")).toBeVisible();
+  expect(await screen.findByText("Review required")).toBeVisible();
   fireEvent.change(screen.getByLabelText("Planned workers", { exact: true }), {
     target: { value: "0" },
   });
   await user.click(screen.getByRole("button", { name: "Predict" }));
-  expect(await screen.findByText("Abstained")).toBeVisible();
+  expect(await screen.findByText("Abstained", { selector: ".prediction-value" })).toBeVisible();
   expect(screen.queryByText("0.90363")).not.toBeInTheDocument();
 });
 it("session replacement clears a pinned prediction and cancels pending research work", async () => {
@@ -231,4 +232,9 @@ it("session replacement clears a pinned prediction and cancels pending research 
     ).not.toBeInTheDocument(),
   );
   expect(screen.queryByText("0.89192")).not.toBeInTheDocument();
+});
+
+beforeEach(() => {
+  localStorage.clear();
+  localStorage.setItem(languageStorageKey, "en-US");
 });

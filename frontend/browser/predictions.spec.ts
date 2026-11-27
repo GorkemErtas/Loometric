@@ -16,10 +16,21 @@ async function connect(page: Page) {
   await page.getByLabel("I am testing hypothetical synthetic pre-shift conditions.").check();
 }
 async function predict(page: Page) {
+  const invalid = await page
+    .locator(".prediction-form input:invalid, .prediction-form select:invalid")
+    .evaluateAll((elements) =>
+      elements.map((element) => ({
+        id: element.id,
+        name: element.getAttribute("name"),
+        message: (element as HTMLInputElement).validationMessage,
+      })),
+    );
+  expect(invalid).toEqual([]);
   const response = page.waitForResponse(
     (r) =>
       /^\/api\/v1\/predictions\/synthetic(?:\/v[23])?$/.test(new URL(r.url()).pathname) &&
       r.request().method() === "POST",
+    { timeout: 15000 },
   );
   await page.getByRole("button", { name: "Predict", exact: true }).click();
   const actual = await response;
@@ -82,7 +93,7 @@ test("actual experimental estimators, comparison, scenario change, review and ab
   await expect(differences).toContainText("0.90363");
   await expect(differences).toContainText("0.77581");
   await expect(page.getByRole("region", { name: "Scenario input differences" })).toContainText(
-    "planned workers",
+    "Planned workers",
   );
   await page.screenshot({
     path: resolve("..", ".tmp/frontend/m08c-scenario-comparison.png"),
@@ -92,7 +103,7 @@ test("actual experimental estimators, comparison, scenario change, review and ab
   const review = await predict(page);
   expect(review.results[0].support.status).toBe("REVIEW_REQUIRED");
   await expect(page.getByRole("article", { name: "Random Forest result" })).toContainText(
-    "REVIEW REQUIRED",
+    "Review required",
   );
   await page.getByLabel("Planned workers", { exact: true }).fill("0");
   const zero = await predict(page);
@@ -119,7 +130,7 @@ test("actual experimental estimators, comparison, scenario change, review and ab
   expect(requests.some((path) => /\/scheduling|\/jobs|\/scenarios\/compare/.test(path))).toBe(
     false,
   );
-  expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+  expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(1);
   expect(await page.content()).not.toContain(token);
   expect(errors).toEqual([]);
 });
@@ -173,7 +184,9 @@ test("input validation, delayed real response cancellation and explicit server f
     }),
   );
   await page.getByRole("button", { name: "Predict", exact: true }).click();
-  await expect(page.getByRole("alert")).toContainText("EXPERIMENTAL_ARTIFACT_UNAVAILABLE");
+  await expect(page.getByRole("alert")).toContainText(
+    "Trusted experimental model artifacts unavailable",
+  );
   await expect(page.getByText("private diagnostics")).toHaveCount(0);
   await expect(page.getByRole("article", { name: "RF Physics result" })).toHaveCount(0);
   await axe(page);
@@ -250,7 +263,14 @@ test("fifth model uses mature history, matched evidence and explicit abstention"
     "schema_version",
     "synthetic",
   ]);
-  expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+  expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(1);
   expect(await page.content()).not.toContain(token);
   expect(errors).toEqual([]);
+});
+
+// Existing workflow assertions explicitly exercise the selectable English locale.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("loometric.language", "en-US");
+  });
 });

@@ -1,142 +1,165 @@
 import { modelLabels, type PredictionReport, type PredictionResult } from "../domain/predictions";
+import { useI18n } from "../i18n/I18n";
 import { Badge, Panel, TableScroll } from "./ui";
 
-export const ratio = (value: number | null) => (value === null ? "Abstained" : value.toFixed(5));
 function ModelCard({ result }: { result: PredictionResult }) {
+  const { t, codeLabel, number, percent, ratio } = useI18n();
+
   return (
-    <article className="prediction-card" aria-label={`${modelLabels[result.model]} result`}>
+    <article
+      className="prediction-card"
+      aria-label={t("{p0} result", { p0: modelLabels[result.model] })}
+    >
       <div className="prediction-card-heading">
         <h3>{modelLabels[result.model]}</h3>
         <Badge tone="amber">
           {result.model === "rf_physics"
-            ? "RESEARCH CANDIDATE"
+            ? t("RESEARCH CANDIDATE")
             : result.model === "grouped_mean"
-              ? "BASELINE"
-              : "EXPERIMENTAL"}
+              ? t("BASELINE")
+              : t("EXPERIMENTAL")}
         </Badge>
       </div>
       <div className="prediction-value">{ratio(result.prediction)}</div>
-      <p>Standard capacity attainment · dimensionless ratio</p>
+      <p>{t("Standard capacity attainment · dimensionless ratio")}</p>
       <strong
         className={
           result.support === "SUPPORTED_EXPERIMENTAL" ? "prediction-supported" : "prediction-review"
         }
       >
-        {result.support.replaceAll("_", " ")}
+        {codeLabel(result.support)}
       </strong>
       <ul className="prediction-reasons">
         {result.reasons.map((reason) => (
-          <li key={reason}>{reason.replaceAll("_", " ")}</li>
+          <li key={reason}>{codeLabel(reason)}</li>
         ))}
       </ul>
       {result.band && (
         <div className="prediction-band">
-          <strong>Descriptive error band</strong>
+          <strong>{t("Descriptive error band")}</strong>
+          <p>{t("{p0} to {p1}", { p0: ratio(result.band.lower), p1: ratio(result.band.upper) })}</p>
           <p>
-            {ratio(result.band.lower)} to {ratio(result.band.upper)}
-          </p>
-          <p>
-            Training out-of-fold P90 residual radius. Uncalibrated; no coverage guarantee. Retained
-            benchmark coverage: {(result.band.coverage * 100).toFixed(2)}%.
+            {t(
+              "Training out-of-fold P90 residual radius. Uncalibrated; no coverage guarantee. Retained benchmark coverage: {p0}.",
+              { p0: percent(result.band.coverage, 2) },
+            )}
           </p>
         </div>
       )}
       {result.model === "rf_physics" && (
         <div className="prediction-weakness">
-          <strong>Research evidence · EXP-008</strong>
-          <p>24.05% lower retained benchmark MAE compared with Forest12.</p>
+          <strong>{t("Research evidence · EXP-008")}</strong>
+          <p>{t("24.05% lower retained benchmark MAE compared with Forest12.")}</p>
           <p>
-            Spent validation only. Stage and worst-error gates remain unresolved. No independently
-            calibrated prediction band is available.
+            {t(
+              "Spent validation only. Stage and worst-error gates remain unresolved. No independently calibrated prediction band is available.",
+            )}
           </p>
         </div>
       )}
       {result.model === "history_boost" && (
         <div className="prediction-weakness">
-          <strong>Mature context · EXP-010</strong>
+          <strong>{t("Mature context · EXP-010")}</strong>
           <p>
-            One frozen residual candidate using earlier same-crew/line reports. Missing or stale
-            context abstains.
+            {t(
+              "One frozen residual candidate using earlier same-crew/line reports. Missing or stale context abstains.",
+            )}
           </p>
           <p>
-            Held-out gains include additional information and new development data. No calibrated
-            band or factory validity.
+            {t(
+              "Held-out gains include additional information and new development data. No calibrated band or factory validity.",
+            )}
           </p>
         </div>
       )}
 
       <dl className="prediction-metrics">
         <div>
-          <dt>{result.matchedMetrics ? "Matched baseline MAE" : "Validation MAE"}</dt>
-          <dd>{result.metrics.mae.toFixed(5)}</dd>
+          <dt>{result.matchedMetrics ? t("Matched baseline MAE") : t("Validation MAE")}</dt>
+          <dd>{number(result.metrics.mae, 5)}</dd>
         </div>
         <div>
           <dt>RMSE</dt>
-          <dd>{result.metrics.rmse.toFixed(5)}</dd>
+          <dd>{number(result.metrics.rmse, 5)}</dd>
         </div>
         <div>
           <dt>R²</dt>
-          <dd>{result.metrics.r2.toFixed(5)}</dd>
+          <dd>{number(result.metrics.r2, 5)}</dd>
         </div>
       </dl>
       <p>
-        {result.metrics.samples.toLocaleString()}{" "}
-        {result.matchedMetrics
-          ? "matched baseline held-out rows; equal-world macro metrics"
-          : "benchmark validation rows"}
-        ; synthetic only.
+        {t("{p0} {p1}; synthetic only.", {
+          p0: number(result.metrics.samples),
+          p1: result.matchedMetrics
+            ? t("matched baseline held-out rows; equal-world macro metrics")
+            : t("benchmark validation rows"),
+        })}
       </p>
       {result.stageMetrics && (
         <p>
-          Selected stage: MAE {result.stageMetrics.mae.toFixed(5)}, n=
-          {result.stageMetrics.samples.toLocaleString()}.
+          {t("Selected stage: MAE {p0}, n={p1}.", {
+            p0: number(result.stageMetrics.mae, 5),
+            p1: number(result.stageMetrics.samples),
+          })}
         </p>
       )}
       {result.failures.length > 0 && (
         <div className="prediction-weakness">
-          <strong>Failed promotion gates</strong>
-          <p>{result.failures.join(", ").replaceAll("_", " ")}</p>
+          <strong>{t("Failed promotion gates")}</strong>
+          <p>{result.failures.map(codeLabel).join(", ")}</p>
           <p>
-            Maximum stage regression: +{result.maximumStageRegression?.toFixed(2)}%. Worst-error
-            change: {result.worstErrorRegression?.toFixed(2)}%.
+            {t("Maximum stage regression: +{p0}. Worst-error change: {p1}.", {
+              p0:
+                result.maximumStageRegression == null
+                  ? t("Not reported")
+                  : percent(result.maximumStageRegression / 100, 2),
+              p1:
+                result.worstErrorRegression == null
+                  ? t("Not reported")
+                  : percent(result.worstErrorRegression / 100, 2),
+            })}
           </p>
         </div>
       )}
       <p className="prediction-identity">
         {result.identity} · {result.version}
         <br />
-        {result.status}
+        {codeLabel(result.status)}
       </p>
     </article>
   );
 }
 export function PredictionResults({ report }: { report: PredictionReport }) {
+  const { t, backendText, codeLabel, dateLabel, number, percent, ratio } = useI18n();
+
   const forest = report.results.find((r) => r.model === "random_forest");
   return (
     <div className="prediction-results" aria-live="polite">
       {report.historyTrainingRows !== null && (
         <Panel
-          title="Matched fresh-world evidence · EXP-010"
-          description="All five models scored the same held-out observations. Metrics are equal-world macro averages; max error is the actual condition-wide maximum."
+          title={t("Matched fresh-world evidence · EXP-010")}
+          description={t(
+            "All five models scored the same held-out observations. Metrics are equal-world macro averages; max error is the actual condition-wide maximum.",
+          )}
         >
           <p>
-            Four new simulated worlds, {report.historyTrainingRows.toLocaleString()} residual
-            training rows, one fit and no parameter search. History Boost uses additional mature
-            reports; this comparison does not isolate algorithm quality. Published holdout outcomes
-            are now inspected.
+            {t(
+              "Four new simulated worlds, {p0} residual training rows, one fit and no parameter search. History Boost uses additional mature reports; this comparison does not isolate algorithm quality. Published holdout outcomes are now inspected.",
+              { p0: number(report.historyTrainingRows) },
+            )}
           </p>
-          <TableScroll label="Matched held-out model metrics">
+          <TableScroll label={t("Matched held-out model metrics")}>
             <table>
               <thead>
                 <tr>
-                  <th>Model</th>
-                  <th>Condition</th>
+                  <th>{t("Model")}</th>
+                  <th>{t("Condition")}</th>
                   <th>MAE</th>
                   <th>RMSE</th>
-                  <th>Macro R²</th>
-                  <th>Bias</th>
-                  <th>P95 abs</th>
-                  <th>Max abs</th>
+                  <th>{t("Macro R²")}</th>
+                  <th>{t("Bias")}</th>
+                  <th>{t("P95 abs")}</th>
+                  <th>{t("Max abs")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -146,15 +169,15 @@ export function PredictionResults({ report }: { report: PredictionReport }) {
                         const m = result.matchedMetrics?.[condition];
                         if (!m) return null;
                         return (
-                          <tr key={`${result.model}-${condition}`}>
+                          <tr key={`${result.model}-${codeLabel(condition)}`}>
                             <td>{modelLabels[result.model]}</td>
-                            <td>{condition}</td>
-                            <td>{m.mae.toFixed(5)}</td>
-                            <td>{m.rmse.toFixed(5)}</td>
-                            <td>{m.r2.toFixed(5)}</td>
-                            <td>{m.bias.toFixed(5)}</td>
-                            <td>{m.p95.toFixed(5)}</td>
-                            <td>{m.worst.toFixed(5)}</td>
+                            <td>{codeLabel(condition)}</td>
+                            <td>{number(m.mae, 5)}</td>
+                            <td>{number(m.rmse, 5)}</td>
+                            <td>{number(m.r2, 5)}</td>
+                            <td>{number(m.bias, 5)}</td>
+                            <td>{number(m.p95, 5)}</td>
+                            <td>{number(m.worst, 5)}</td>
                           </tr>
                         );
                       })
@@ -164,9 +187,9 @@ export function PredictionResults({ report }: { report: PredictionReport }) {
             </table>
           </TableScroll>
           <p>
-            Known limits: the candidate's actual worst baseline error increased 9.11% versus RF
-            Physics. Missing-history control was worse under disruption; first unannounced shocks
-            remain uncertain. NO_ML_PROMOTION applies to every model.
+            {t(
+              "Known limits: the candidate's actual worst baseline error increased 9.11% versus RF Physics. Missing-history control was worse under disruption; first unannounced shocks remain uncertain. NO_ML_PROMOTION applies to every model.",
+            )}
           </p>
         </Panel>
       )}
@@ -177,16 +200,18 @@ export function PredictionResults({ report }: { report: PredictionReport }) {
       </div>
       {report.differences.length > 0 && (
         <Panel
-          title="Same-input model comparison"
-          description="Signed differences in attainment ratio; no model is operationally promoted."
+          title={t("Same-input model comparison")}
+          description={t(
+            "Signed differences in attainment ratio; no model is operationally promoted.",
+          )}
         >
-          <TableScroll label="Model prediction differences">
+          <TableScroll label={t("Model prediction differences")}>
             <table>
               <thead>
                 <tr>
-                  <th>Left model</th>
-                  <th>Right model</th>
-                  <th>Left minus right</th>
+                  <th>{t("Left model")}</th>
+                  <th>{t("Right model")}</th>
+                  <th>{t("Left minus right")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -204,20 +229,22 @@ export function PredictionResults({ report }: { report: PredictionReport }) {
       )}
       {forest && forest.importance.length > 0 && (
         <Panel
-          title="Global Random Forest behavior"
-          description="Computed training impurity importance, aggregated over one-hot categories."
+          title={t("Global Random Forest behavior")}
+          description={t(
+            "Computed training impurity importance, aggregated over one-hot categories.",
+          )}
         >
           <div className="prediction-explanation">
             <p>
-              This describes the fitted forest globally. It does not explain this individual
-              prediction. Correlated inputs and feature cardinality can distort importance. No
-              causal or SHAP explanation is claimed.
+              {t(
+                "This describes the fitted forest globally. It does not explain this individual prediction. Correlated inputs and feature cardinality can distort importance. No causal or SHAP explanation is claimed.",
+              )}
             </p>
             <ol className="importance-list">
               {forest.importance.slice(0, 6).map((row) => (
                 <li key={row.feature}>
-                  <span>{row.feature.replaceAll("_", " ")}</span>
-                  <strong>{(row.importance * 100).toFixed(2)}%</strong>
+                  <span>{codeLabel(row.feature)}</span>
+                  <strong>{percent(row.importance, 2)}</strong>
                   <span className="importance-track" aria-hidden="true">
                     <i style={{ width: `${row.importance * 100}%` }} />
                   </span>
@@ -228,35 +255,43 @@ export function PredictionResults({ report }: { report: PredictionReport }) {
         </Panel>
       )}
       <Panel
-        title="Model provenance and research limits"
-        description="Published synthetic research evidence; NO_ML_PROMOTION remains in force."
+        title={t("Model provenance and research limits")}
+        description={t("Published synthetic research evidence; NO_ML_PROMOTION remains in force.")}
       >
         <div className="prediction-provenance">
           <p>
-            {report.dataset} · {report.experiment} · {report.trainingRows.toLocaleString()} original
-            training rows ({report.trainingFirst} to {report.trainingLast}).
+            {t("{p0} · {p1} · {p2} original training rows ({p3} to {p4}).", {
+              p0: report.dataset,
+              p1: report.experiment,
+              p2: number(report.trainingRows),
+              p3: dateLabel(report.trainingFirst),
+              p4: dateLabel(report.trainingLast),
+            })}
           </p>
           <p>
-            Manifest SHA-256 <code>{report.manifest}</code>
+            {t("Manifest SHA-256")} <code>{report.manifest}</code>
           </p>
           {report.researchManifest && (
             <p>
-              EXP-008 research candidate manifest SHA-256 <code>{report.researchManifest}</code>
+              {t("EXP-008 research candidate manifest SHA-256")}{" "}
+              <code>{report.researchManifest}</code>
             </p>
           )}
           <p>
-            Training payload <code>{report.trainingFingerprint}</code>
+            {t("Training payload")} <code>{report.trainingFingerprint}</code>
           </p>
           <p>
-            Input receipt <code>{report.inputFingerprint}</code>
+            {t("Input receipt")} <code>{report.inputFingerprint}</code>
           </p>
           <p>
-            Whole isolated request: {report.seconds.toFixed(3)} seconds, including startup,
-            integrity checks and model loading.
+            {t(
+              "Whole isolated request: {p0} seconds, including startup, integrity checks and model loading.",
+              { p0: number(report.seconds, 3) },
+            )}
           </p>
           <ul>
             {report.limitations.map((value) => (
-              <li key={value}>{value}</li>
+              <li key={value}>{backendText(value)}</li>
             ))}
           </ul>
         </div>
@@ -271,6 +306,8 @@ export function ScenarioResults({
   before: PredictionReport;
   after: PredictionReport | null;
 }) {
+  const { t, codeLabel, number, ratio } = useI18n();
+
   const changed = after
     ? (Object.keys(before.inputs) as (keyof PredictionReport["inputs"])[]).filter(
         (key) => before.inputs[key] !== after.inputs[key],
@@ -278,47 +315,60 @@ export function ScenarioResults({
     : [];
   return (
     <Panel
-      title="Hypothetical scenario comparison"
-      description="A pinned API response and a new request. Differences are not proven causal effects."
+      title={t("Hypothetical scenario comparison")}
+      description={t(
+        "A pinned API response and a new request. Differences are not proven causal effects.",
+      )}
     >
       <div className="prediction-scenario-summary">
         <p>
-          Before: saved in this tab from a real API response. Modify one or more inputs, then
-          predict again.
+          {t(
+            "Before: saved in this tab from a real API response. Modify one or more inputs, then predict again.",
+          )}
         </p>
-        {after && changed.length === 0 && <p>No input differences between these requests.</p>}
+        {after && changed.length === 0 && (
+          <p>{t("No input differences between these requests.")}</p>
+        )}
       </div>
       {after ? (
         <>
-          <TableScroll label="Scenario input differences">
+          <TableScroll label={t("Scenario input differences")}>
             <table>
               <thead>
                 <tr>
-                  <th>Input</th>
-                  <th>Before</th>
-                  <th>After</th>
+                  <th>{t("Input")}</th>
+                  <th>{t("Before")}</th>
+                  <th>{t("After")}</th>
                 </tr>
               </thead>
               <tbody>
                 {changed.map((key) => (
                   <tr key={key}>
-                    <td>{key.replaceAll("_", " ")}</td>
-                    <td>{String(before.inputs[key])}</td>
-                    <td>{String(after.inputs[key])}</td>
+                    <td>{codeLabel(key)}</td>
+                    <td>
+                      {typeof before.inputs[key] === "number"
+                        ? number(before.inputs[key])
+                        : codeLabel(String(before.inputs[key]))}
+                    </td>
+                    <td>
+                      {typeof after.inputs[key] === "number"
+                        ? number(after.inputs[key])
+                        : codeLabel(String(after.inputs[key]))}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </TableScroll>
-          <TableScroll label="Before and after model predictions">
+          <TableScroll label={t("Before and after model predictions")}>
             <table>
               <thead>
                 <tr>
-                  <th>Model</th>
-                  <th>Before</th>
-                  <th>After</th>
-                  <th>After minus before</th>
-                  <th>After support</th>
+                  <th>{t("Model")}</th>
+                  <th>{t("Before")}</th>
+                  <th>{t("After")}</th>
+                  <th>{t("After minus before")}</th>
+                  <th>{t("After support")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -336,7 +386,7 @@ export function ScenarioResults({
                             : b.prediction - a.prediction,
                         )}
                       </td>
-                      <td>{b.support.replaceAll("_", " ")}</td>
+                      <td>{codeLabel(b.support)}</td>
                     </tr>
                   ) : null;
                 })}
@@ -344,13 +394,14 @@ export function ScenarioResults({
             </table>
           </TableScroll>
           <p className="prediction-scenario-summary">
-            Only models present in both requests are compared. No schedule or capacity profile is
-            changed.
+            {t(
+              "Only models present in both requests are compared. No schedule or capacity profile is changed.",
+            )}
           </p>
         </>
       ) : (
         <p className="prediction-scenario-summary">
-          Waiting for the next real prediction. No after value is assumed.
+          {t("Waiting for the next real prediction. No after value is assumed.")}
         </p>
       )}
     </Panel>

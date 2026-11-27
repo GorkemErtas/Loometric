@@ -6,6 +6,7 @@ import competitionRaw from "../fixtures/competition.capacity.json?raw";
 import { App, Workspace } from "../src/App";
 import { datasets } from "../src/demo/catalog";
 import { object, parseExact } from "../src/domain/json";
+import { languageStorageKey } from "../src/i18n/locale";
 import { WorkspaceProvider } from "../src/state/Workspace";
 
 const id = "00000000-0000-4000-8000-000000000001";
@@ -96,7 +97,7 @@ describe("read-only workspace", () => {
     await user.selectOptions(screen.getByLabelText("Planning dataset"), "competition");
     expect(screen.queryByText("Completed units")).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Load saved outcome" }));
-    expect(screen.getByText("VALID_PARTIAL")).toBeVisible();
+    expect(screen.getByText("Valid partial schedule")).toBeVisible();
     expect(screen.getByText("Completed units")).toBeVisible();
     expect(screen.getAllByText("46.875%", { selector: ".stat-value" })).toHaveLength(2);
     await user.selectOptions(screen.getByLabelText("Planning dataset"), "capacity");
@@ -149,7 +150,7 @@ describe("API ownership and visible failures", () => {
     expect(screen.getByText("API response")).toBeVisible();
     expect(screen.getByText(id)).toBeVisible();
     expect(document.body.textContent).not.toContain(secret);
-    expect(localStorage.length + sessionStorage.length).toBe(0);
+    expect(localStorage.length + sessionStorage.length).toBe(1);
     await navigate("system");
     expect(screen.getByText("v1")).toBeVisible();
     await userEvent
@@ -224,4 +225,9 @@ describe("API ownership and visible failures", () => {
       datasets[1]?.planning.id,
     );
   });
+});
+
+beforeEach(() => {
+  localStorage.clear();
+  localStorage.setItem(languageStorageKey, "en-US");
 });

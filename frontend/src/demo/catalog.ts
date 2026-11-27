@@ -19,7 +19,7 @@ export const datasets: readonly Dataset[] = [
   {
     key: "capacity",
     name: "Capacity foundation",
-    description: "M02 · varied crews, downtime and independent checks",
+    description: "Varied crews, downtime and independent checks",
     sourceFile: sources.capacity.file,
     sourceHash: sources.capacity.sha256,
     planning: planningInput(capacityRaw),
@@ -31,7 +31,7 @@ export const datasets: readonly Dataset[] = [
   {
     key: "competition",
     name: "Competing orders",
-    description: "M03A · one shared line and a saved partial schedule",
+    description: "One shared line and a saved partial schedule",
     sourceFile: sources.competition.file,
     sourceHash: sources.competition.sha256,
     planning: planningInput(competitionRaw.planning),
@@ -45,19 +45,19 @@ export const datasets: readonly Dataset[] = [
       [
         "capacityScenario",
         "Capacity what-if",
-        "M04 · one qualified crew, downtime and a declared reserve shift",
+        "One qualified crew, downtime and a declared reserve shift",
         capacityScenario,
       ],
       [
         "routingScenario",
         "Routing trade-off",
-        "M04 · additional capacity can worsen greedy choices",
+        "Additional capacity can worsen greedy choices",
         routingScenario,
       ],
       [
         "parallel",
         "Parallel production",
-        "M03A · multiple stages, routing and late completions",
+        "Multiple stages, routing and late completions",
         parallel,
       ],
     ] as const

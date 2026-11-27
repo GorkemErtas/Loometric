@@ -9,6 +9,8 @@ import { datasets } from "../src/demo/catalog";
 import { calendarBands, geometry } from "../src/domain/gantt";
 import { encodeExact, object, parseExact } from "../src/domain/json";
 import { dispatchReport, jobResult } from "../src/domain/planning";
+import { I18nProvider } from "../src/i18n/I18n";
+import { languageStorageKey } from "../src/i18n/locale";
 import { validateResult } from "../src/state/PlanningWorkspace";
 import { dispatchFixture, jobFixture } from "./planning-fixtures";
 
@@ -161,9 +163,9 @@ describe("verified planning UI", () => {
     expect(document.querySelectorAll(".gantt-operation")).toHaveLength(2);
     expect(screen.getByText("UNSCHEDULED", { selector: ".unfinished-list .badge" })).toBeVisible();
     await userEvent.setup().click(screen.getByRole("button", { name: /^Inspect operation A/ }));
-    expect(screen.getByRole("dialog")).toHaveTextContent("2030-01-07T05:00:00+00:00");
+    expect(screen.getByRole("dialog")).toHaveTextContent("Jan 07, 2030, 05:00 +00:00");
     expect(screen.getByRole("dialog")).toHaveTextContent("Elapsed duration from endpoints");
-    expect(localStorage.length + sessionStorage.length).toBe(0);
+    expect(localStorage.length + sessionStorage.length).toBe(1);
   });
   it("builds/reviews ordered exact changes and displays only backend comparison deltas", async () => {
     const user = userEvent.setup(),
@@ -252,11 +254,13 @@ describe("verified planning UI", () => {
       left: "0%",
     });
     render(
-      <Gantt
-        plan={{ ...plan, feasible: false, status: "INVALID", metrics: null }}
-        horizon={plan.horizon}
-        planning={source.planning}
-      />,
+      <I18nProvider initialLocale="en-US">
+        <Gantt
+          plan={{ ...plan, feasible: false, status: "INVALID", metrics: null }}
+          horizon={plan.horizon}
+          planning={source.planning}
+        />
+      </I18nProvider>,
     );
     expect(document.querySelectorAll(".gantt-operation")).toHaveLength(0);
     expect(screen.getByText(/independent verification rejected/)).toBeVisible();
@@ -278,7 +282,7 @@ describe("bounded job UI", () => {
       fetcher.mock.calls.filter((c) => String(c[0]).endsWith("/jobs/scheduling")),
     ).toHaveLength(1);
     expect(screen.getByRole("region", { name: "Producer & solver evidence" })).toHaveTextContent(
-      "Selected: greedy",
+      "Selected: Greedy",
     );
     expect(screen.getByRole("region", { name: "Producer & solver evidence" })).toHaveTextContent(
       "UNKNOWN",
@@ -297,7 +301,7 @@ describe("bounded job UI", () => {
     await reference();
     await submit();
     await userEvent.setup().click(screen.getByRole("button", { name: "Cancel server job" }));
-    expect(await screen.findAllByText("CANCELLED", { exact: true })).toHaveLength(2);
+    expect(await screen.findAllByText("Cancelled", { exact: true })).toHaveLength(2);
     expect(fetcher.mock.calls.filter((c) => c[1]?.method === "DELETE")).toHaveLength(1);
     expect(fetcher.mock.calls.some((c) => String(c[0]).endsWith("/result"))).toBe(false);
   });
@@ -311,7 +315,7 @@ describe("bounded job UI", () => {
     await userEvent.setup().click(screen.getByRole("button", { name: "Cancel server job" }));
     expect(await screen.findByText(/Completion won the race/)).toBeVisible();
     await screen.findByText("Verified job result", {}, { timeout: 5000 });
-    expect(screen.queryByText("CANCELLED", { exact: true })).not.toBeInTheDocument();
+    expect(screen.queryByText("Cancelled", { exact: true })).not.toBeInTheDocument();
   });
   it.each([410, 404, 401])(
     "stops on missing/expired/authentication status HTTP %s",
@@ -379,4 +383,9 @@ describe("bounded job UI", () => {
       ),
     ).toThrow();
   });
+});
+
+beforeEach(() => {
+  localStorage.clear();
+  localStorage.setItem(languageStorageKey, "en-US");
 });

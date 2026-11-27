@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { CapacityBars, CapacityContent, Provenance } from "../components/Reports";
 import { Badge, Empty, Notice, Panel, Stat, TableScroll } from "../components/ui";
-import { formatExact, sumExact } from "../domain/exact";
+import { sumExact } from "../domain/exact";
 import type { CapacityReport } from "../domain/models";
+import { useI18n } from "../i18n/I18n";
 
 function CapacityDetails({ report }: { report: CapacityReport }) {
+  const { t, backendText, codeLabel, formatExact, stageName } = useI18n();
+
   const [order, setOrder] = useState("");
   const [compatibleOnly, setCompatibleOnly] = useState(true);
   const assessments = report.assessments.filter(
@@ -14,50 +17,50 @@ function CapacityDetails({ report }: { report: CapacityReport }) {
     <>
       <div className="stat-grid stat-grid-three">
         <Stat
-          label="Available elapsed time"
+          label={t("Available elapsed time")}
           value={formatExact(sumExact(report.slots.map((slot) => slot.available)))}
           unit="minutes"
-          detail="Sum across unique assignment slots"
+          detail={t("Sum across unique assignment slots")}
         />
         <Stat
-          label="Available crew time"
+          label={t("Available crew time")}
           value={formatExact(sumExact(report.slots.map((slot) => slot.workerMinutes)))}
           unit="worker-minutes"
-          detail="Available time × declared workers (M02)"
+          detail={t("Available time × declared workers")}
         />
         <Stat
-          label="Effective standard capacity"
+          label={t("Effective standard capacity")}
           value={formatExact(sumExact(report.slots.map((slot) => slot.standardMinutes)))}
-          unit="standard worker-minutes"
-          detail="Reported capacity using assumed efficiency"
+          unit={t("standard worker-minutes")}
+          detail={t("Reported capacity using assumed efficiency")}
         />
       </div>
       <Panel
-        title="Capacity by assignment"
-        description="Available time after the union of declared blocked intervals"
-        action={<Badge tone="teal">{report.status}</Badge>}
+        title={t("Capacity by assignment")}
+        description={t("Available time after the union of declared blocked intervals")}
+        action={<Badge tone="teal">{codeLabel(report.status)}</Badge>}
       >
         <CapacityBars report={report} />
-        <TableScroll label="Capacity report scrollable table">
+        <TableScroll label={t("Capacity report scrollable table")}>
           <table>
             <thead>
               <tr>
-                <th scope="col">Assignment / line</th>
-                <th scope="col">Stage / shift</th>
+                <th scope="col">{t("Assignment / line")}</th>
+                <th scope="col">{t("Stage / shift")}</th>
                 <th scope="col" className="numeric">
-                  Crew
+                  {t("Crew")}
                 </th>
                 <th scope="col" className="numeric">
-                  Available min
+                  {t("Available min")}
                 </th>
                 <th scope="col" className="numeric">
-                  Worker-min
+                  {t("Worker-min")}
                 </th>
                 <th scope="col" className="numeric">
-                  Standard worker-min
+                  {t("Standard worker-min")}
                 </th>
                 <th scope="col" className="numeric">
-                  Blocked min
+                  {t("Blocked min")}
                 </th>
               </tr>
             </thead>
@@ -69,7 +72,7 @@ function CapacityDetails({ report }: { report: CapacityReport }) {
                     <span className="cell-secondary">{slot.lineId}</span>
                   </th>
                   <td>
-                    <span className="cell-primary">{slot.stage}</span>
+                    <span className="cell-primary">{stageName(slot.stage)}</span>
                     <span className="cell-secondary">{slot.shiftId}</span>
                   </td>
                   <td className="numeric">{formatExact(slot.workers)}</td>
@@ -79,9 +82,15 @@ function CapacityDetails({ report }: { report: CapacityReport }) {
                   <td className="numeric">
                     <details className="blocked-details">
                       <summary>{formatExact(slot.blocked)}</summary>
-                      <span>Breaks: {formatExact(slot.breaks)} min</span>
-                      <span>Additional downtime: {formatExact(slot.downtime)} min</span>
-                      <span>Additional unavailable: {formatExact(slot.unavailability)} min</span>
+                      <span>{t("Breaks: {p0} min", { p0: formatExact(slot.breaks) })}</span>
+                      <span>
+                        {t("Additional downtime: {p0} min", { p0: formatExact(slot.downtime) })}
+                      </span>
+                      <span>
+                        {t("Additional unavailable: {p0} min", {
+                          p0: formatExact(slot.unavailability),
+                        })}
+                      </span>
                     </details>
                   </td>
                 </tr>
@@ -90,22 +99,24 @@ function CapacityDetails({ report }: { report: CapacityReport }) {
           </table>
         </TableScroll>
         {report.slots.length === 0 && (
-          <Empty title="No capacity slots">This report contains no line–shift assignments.</Empty>
+          <Empty title={t("No capacity slots")}>
+            {t("This report contains no line–shift assignments.")}
+          </Empty>
         )}
       </Panel>
       <Panel
-        title="Independent output assessments"
-        description="Potential pieces for one order stage in one slot, considered in isolation"
+        title={t("Independent output assessments")}
+        description={t("Potential pieces for one order stage in one slot, considered in isolation")}
       >
         <div className="table-toolbar">
           <label className="inline-field">
-            Order
+            {t("Order")}
             <select
-              aria-label="Filter assessments by order"
+              aria-label={t("Filter assessments by order")}
               value={order}
               onChange={(event) => setOrder(event.target.value)}
             >
-              <option value="">All orders</option>
+              <option value="">{t("All orders")}</option>
               {report.orders.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.id}
@@ -119,41 +130,41 @@ function CapacityDetails({ report }: { report: CapacityReport }) {
               checked={compatibleOnly}
               onChange={(event) => setCompatibleOnly(event.target.checked)}
             />
-            Compatible routes only
+            {t("Compatible routes only")}
           </label>
-          <span className="muted">{assessments.length} assessments</span>
+          <span className="muted">{t("{p0} assessments", { p0: assessments.length })}</span>
         </div>
-        <TableScroll label="Capacity report scrollable table">
+        <TableScroll label={t("Capacity report scrollable table")}>
           <table>
             <thead>
               <tr>
-                <th scope="col">Order / style</th>
-                <th scope="col">Stage</th>
-                <th scope="col">Slot / line</th>
+                <th scope="col">{t("Order / style")}</th>
+                <th scope="col">{t("Stage")}</th>
+                <th scope="col">{t("Slot / line")}</th>
                 <th scope="col" className="numeric">
-                  Potential pieces
+                  {t("Potential pieces")}
                 </th>
                 <th scope="col" className="numeric">
-                  Required standard min
+                  {t("Required standard min")}
                 </th>
-                <th scope="col">Independent check</th>
+                <th scope="col">{t("Independent check")}</th>
               </tr>
             </thead>
             <tbody>
               {assessments.map((item) => (
-                <tr key={`${item.orderId}:${item.stage}:${item.slotId}`}>
+                <tr key={`${item.orderId}:${stageName(item.stage)}:${item.slotId}`}>
                   <th scope="row">
                     <span className="cell-primary">{item.orderId}</span>
                     <span className="cell-secondary">{item.styleId}</span>
                   </th>
-                  <td>{item.stage}</td>
+                  <td>{stageName(item.stage)}</td>
                   <td>
                     <span className="cell-primary">{item.slotId}</span>
                     <span className="cell-secondary">{item.lineId}</span>
                   </td>
                   <td className="numeric">
                     {item.potentialUnits === null ? (
-                      <span className="muted">Not applicable</span>
+                      <span className="muted">{t("Not applicable")}</span>
                     ) : (
                       formatExact(item.potentialUnits)
                     )}
@@ -161,10 +172,10 @@ function CapacityDetails({ report }: { report: CapacityReport }) {
                   <td className="numeric">{formatExact(item.requiredStandard)}</td>
                   <td>
                     <Badge tone={item.independentFeasible ? "teal" : "amber"}>
-                      {item.independentFeasible ? "Fits independently" : "Restricted"}
+                      {item.independentFeasible ? t("Fits independently") : t("Restricted")}
                     </Badge>
                     <span className="cell-secondary">
-                      {item.reasons.join(" · ") || "No restriction codes"}
+                      {item.reasons.map(codeLabel).join(" · ") || t("No restriction codes")}
                     </span>
                   </td>
                 </tr>
@@ -173,18 +184,18 @@ function CapacityDetails({ report }: { report: CapacityReport }) {
           </table>
         </TableScroll>
         {assessments.length === 0 && (
-          <Empty title="No matching assessments">
-            Adjust the order or route compatibility filter.
+          <Empty title={t("No matching assessments")}>
+            {t("Adjust the order or route compatibility filter.")}
           </Empty>
         )}
       </Panel>
       <Panel
-        title="Assessment boundaries"
-        description="Independent capacity estimates · no allocation performed"
+        title={t("Assessment boundaries")}
+        description={t("Independent capacity estimates · no allocation performed")}
       >
         <ul className="limitation-list">
           {report.limitations.map((item) => (
-            <li key={item}>{item}</li>
+            <li key={item}>{backendText(item)}</li>
           ))}
         </ul>
       </Panel>
@@ -192,12 +203,15 @@ function CapacityDetails({ report }: { report: CapacityReport }) {
   );
 }
 export function Capacity() {
+  const { t } = useI18n();
+
   return (
     <div className="page-stack">
       <Notice>
-        <strong>Independent assessment only.</strong> Multiple orders can each appear to fit the
-        same slot. Potential outputs must not be added together or interpreted as a globally
-        feasible schedule.
+        <strong>{t("Independent assessment only.")}</strong>{" "}
+        {t(
+          "Multiple orders can each appear to fit the same slot. Potential outputs must not be added together or interpreted as a globally feasible schedule.",
+        )}
       </Notice>
       <CapacityContent>
         {(report) => <CapacityDetails key={report.scenarioId} report={report} />}

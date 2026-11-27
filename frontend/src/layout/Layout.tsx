@@ -1,5 +1,6 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { Badge, Icon, Modal } from "../components/ui";
+import { useI18n } from "../i18n/I18n";
 import { usePlanning } from "../state/PlanningWorkspace";
 import { useWorkspace } from "../state/Workspace";
 
@@ -33,7 +34,7 @@ export const routes = [
   {
     key: "capacity",
     label: "Capacity",
-    description: "Explore independent order-stage-slot assessments from M02.",
+    description: "Explore independent order-stage-slot assessments.",
   },
   {
     key: "scheduling",
@@ -69,6 +70,8 @@ export function useRoute(): Route {
   return route;
 }
 function ConnectionDialog({ onClose }: { onClose: () => void }) {
+  const { t, formValidation } = useI18n();
+
   const { connect, origin } = useWorkspace();
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -81,13 +84,15 @@ function ConnectionDialog({ onClose }: { onClose: () => void }) {
     void connect(address, token);
   };
   return (
-    <Modal title="Connect to local API" onClose={onClose}>
+    <Modal title={t("Connect to local API")} onClose={onClose}>
       <p>
-        Enter the local API origin, or this site's configured HTTPS origin, and your session token.
+        {t(
+          "Enter the local API origin, or this site's configured HTTPS origin, and your session token.",
+        )}
       </p>
-      <form onSubmit={submit} className="form-stack" autoComplete="off">
+      <form {...formValidation} onSubmit={submit} className="form-stack" autoComplete="off">
         <label>
-          API origin
+          {t("API origin")}
           <input
             name="origin"
             type="url"
@@ -102,7 +107,7 @@ function ConnectionDialog({ onClose }: { onClose: () => void }) {
           />
         </label>
         <label>
-          Bearer token
+          {t("Bearer token")}
           <input
             name="token"
             type="password"
@@ -116,15 +121,16 @@ function ConnectionDialog({ onClose }: { onClose: () => void }) {
           />
         </label>
         <p className="field-help" id="token-help">
-          Kept in this tab’s memory only. Reloading or clearing the session removes it. Use a
-          literal localhost/127.0.0.1 origin, or the current HTTPS site. Credentials stay in memory.
+          {t(
+            "Kept in this tab’s memory only. Reloading or clearing the session removes it. Use a literal localhost/127.0.0.1 origin, or the current HTTPS site. Credentials stay in memory.",
+          )}
         </p>
         <div className="modal-actions">
           <button type="button" className="button" onClick={onClose}>
-            Cancel
+            {t("Cancel")}
           </button>
           <button className="button button-primary" type="submit">
-            Connect & load capacity
+            {t("Connect & load capacity")}
           </button>
         </div>
       </form>
@@ -132,15 +138,21 @@ function ConnectionDialog({ onClose }: { onClose: () => void }) {
   );
 }
 export function Layout({ route, children }: { route: Route; children: React.ReactNode }) {
+  const { t, locale, setLocale, label: textLabel } = useI18n();
+
   const { catalog, dataset, mode, status, selectDataset } = useWorkspace();
   const { jobs } = usePlanning();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [connectionOpen, setConnectionOpen] = useState(false);
   const current = routes.find((item) => item.key === route) ?? routes[0];
+  const currentLabel = t(current.label);
   useEffect(() => {
-    document.title = `${current.label} · Loometric`;
+    document.title = `${currentLabel} · Loometric`;
+  }, [currentLabel]);
+  useEffect(() => {
+    if (!route) return;
     document.getElementById("workspace-content")?.focus({ preventScroll: true });
-  }, [current]);
+  }, [route]);
   const label =
     status === "loading"
       ? "Connecting / loading"
@@ -159,12 +171,12 @@ export function Layout({ route, children }: { route: Route; children: React.Reac
           document.getElementById("workspace-content")?.focus({ preventScroll: true });
         }}
       >
-        Skip to content
+        {t("Skip to content")}
       </button>
       <aside
         id="workspace-navigation"
         className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`}
-        aria-label="Workspace navigation"
+        aria-label={t("Workspace navigation")}
       >
         <a className="brand" href="/#/overview">
           <span className="brand-mark" aria-hidden="true">
@@ -174,11 +186,11 @@ export function Layout({ route, children }: { route: Route; children: React.Reac
             <i />
           </span>
           <span>
-            Loometric<span className="brand-sub">PRODUCTION INTELLIGENCE</span>
+            Loometric<span className="brand-sub">{t("PRODUCTION INTELLIGENCE")}</span>
           </span>
         </a>
-        <div className="nav-section-label">WORKSPACE</div>
-        <nav aria-label="Main navigation">
+        <div className="nav-section-label">{t("WORKSPACE")}</div>
+        <nav aria-label={t("Main navigation")}>
           {routes.map((item) => (
             <a
               key={item.key}
@@ -188,19 +200,19 @@ export function Layout({ route, children }: { route: Route; children: React.Reac
               onClick={() => setMobileOpen(false)}
             >
               <Icon name={item.key} />
-              {item.label}
+              {textLabel(item.label)}
               {route === item.key && <span className="nav-current" />}
             </a>
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <span className="local-dot" /> LOCAL WORKSPACE
+          <span className="local-dot" /> {t("LOCAL WORKSPACE")}
           <p>
-            Synthetic planning data
+            {t("Synthetic planning data")}
             <br />
-            M07A · Production data workspace
+            {t("Production data workspace")}
           </p>
-          <span className="sidebar-version">No live factory connection</span>
+          <span className="sidebar-version">{t("No live factory connection")}</span>
         </div>
       </aside>
       <div className="workspace-shell">
@@ -208,7 +220,7 @@ export function Layout({ route, children }: { route: Route; children: React.Reac
           <div className="breadcrumb">
             <button
               className="icon-button menu-toggle"
-              aria-label="Toggle navigation"
+              aria-label={t("Toggle navigation")}
               aria-controls="workspace-navigation"
               aria-expanded={mobileOpen}
               type="button"
@@ -216,11 +228,30 @@ export function Layout({ route, children }: { route: Route; children: React.Reac
             >
               <Icon name="menu" />
             </button>
-            <span>Workspace</span>
+            <span>{t("Workspace")}</span>
             <span className="breadcrumb-slash">/</span>
-            <strong>{current.label}</strong>
+            <strong>{textLabel(current.label)}</strong>
           </div>
           <div className="topbar-right">
+            <fieldset className="language-selector" aria-label={t("Language")}>
+              {(
+                [
+                  ["tr-TR", "TR", "Türkçe"],
+                  ["en-US", "EN", "English"],
+                ] as const
+              ).map(([value, short, name]) => (
+                <button
+                  key={value}
+                  type="button"
+                  lang={value}
+                  aria-label={name}
+                  aria-pressed={locale === value}
+                  onClick={() => setLocale(value)}
+                >
+                  {short}
+                </button>
+              ))}
+            </fieldset>
             <span
               className={`connection-label ${status === "error" ? "connection-error" : ""}`}
               role="status"
@@ -228,7 +259,7 @@ export function Layout({ route, children }: { route: Route; children: React.Reac
               <span
                 className={`status-dot ${mode === "api" && status === "connected" ? "status-ok" : ""}`}
               />
-              {label}
+              {textLabel(label)}
             </span>
             <button
               className="button button-small"
@@ -236,72 +267,75 @@ export function Layout({ route, children }: { route: Route; children: React.Reac
               onClick={() => setConnectionOpen(true)}
             >
               <Icon name="link" size={15} />
-              Configure API
+              {t("Configure API")}
             </button>
           </div>
         </header>
         <main id="workspace-content" tabIndex={-1}>
           <div className="page-heading">
             <div>
-              <div className="eyebrow">PRODUCTION WORKSPACE</div>
-              <h1>{current.label}</h1>
-              <p>{current.description}</p>
+              <div className="eyebrow">{t("PRODUCTION WORKSPACE")}</div>
+              <h1>{textLabel(current.label)}</h1>
+              <p>{textLabel(current.description)}</p>
             </div>
             <div className="dataset-control">
-              <label htmlFor="dataset-select">Planning dataset</label>
+              <label htmlFor="dataset-select">{t("Planning dataset")}</label>
               <select
                 id="dataset-select"
                 value={dataset?.key ?? ""}
                 onChange={(event) => selectDataset(event.target.value)}
                 disabled={catalog.length === 0}
               >
-                {catalog.length === 0 && <option value="">No datasets available</option>}
+                {catalog.length === 0 && <option value="">{t("No datasets available")}</option>}
                 {catalog.map((item) => (
                   <option key={item.key} value={item.key}>
-                    {item.name}
+                    {textLabel(item.name)}
                   </option>
                 ))}
               </select>
               {jobs.length > 0 && (
                 <small className="context-change-warning">
-                  Changing dataset/session discards local job IDs. Copy them first; server jobs may
-                  continue.
+                  {t(
+                    "Changing dataset/session discards local job IDs. Copy them first; server jobs may continue.",
+                  )}
                 </small>
               )}
             </div>
           </div>
           <div className="source-strip">
-            <Badge tone="amber">SYNTHETIC</Badge>
+            <Badge tone="amber">{t("SYNTHETIC")}</Badge>
             <strong>
               {route === "predictions"
-                ? "Experimental ML research"
+                ? t("Experimental ML research")
                 : mode === "preview"
-                  ? "Fixture preview"
-                  : "Local API mode"}
+                  ? t("Fixture preview")
+                  : t("Local API mode")}
             </strong>
             <span>
               {route === "predictions"
-                ? "synthetic-ml-v1 · independent of planning dataset"
-                : (dataset?.planning.id ?? "No dataset selected")}
+                ? t("synthetic-ml-v1 · independent of planning dataset")
+                : (dataset?.planning.id ?? t("No dataset selected"))}
             </span>
             <span className="source-strip-end">
               {route === "predictions"
-                ? "M08C · NO_ML_PROMOTION"
+                ? t("NO_ML_PROMOTION")
                 : mode === "preview"
                   ? dataset?.previewCapacity
-                    ? "Saved M02 report · explicit demo mode"
-                    : "Input-only preview · connect API for reports"
+                    ? t("Saved capacity report · explicit demo mode")
+                    : t("Input-only preview · connect API for reports")
                   : route === "data"
-                    ? "M07A · synthetic data editor"
+                    ? t("Synthetic data editor")
                     : ["scheduling", "scenarios", "jobs"].includes(route)
-                      ? "M05A / M05B · interactive planning"
-                      : "M05A · read-only inspection"}
+                      ? t("Interactive planning")
+                      : t("Read-only inspection")}
             </span>
           </div>
           {children}
           <footer className="page-footer">
-            <span>Loometric · Local production planning</span>
-            <span>Inputs, capacity estimates and verified schedules are labeled separately.</span>
+            <span>{t("Loometric · Local production planning")}</span>
+            <span>
+              {t("Inputs, capacity estimates and verified schedules are labeled separately.")}
+            </span>
           </footer>
         </main>
       </div>

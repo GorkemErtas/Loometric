@@ -220,7 +220,7 @@ export function executionBlock(
   capabilities: Capabilities | null,
 ): string | null {
   if (!dataset?.instance)
-    return "This M02 input is a capacity scenario, not an executable scheduling instance. Select a frozen M03/M04 instance.";
+    return "This input is a capacity scenario, not an executable scheduling instance. Select a scheduling or scenario instance.";
   const orders = dataset.planning.orders.length,
     stages = dataset.planning.orders.reduce((total, o) => total + o.stages.length, 0);
   const limit = (key: string, ceiling: bigint) => {

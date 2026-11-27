@@ -12,10 +12,13 @@ import {
 import { Badge, Empty, ErrorNotice, Notice, Panel, TableScroll } from "../components/ui";
 import { trackingDelay, trackingLimits } from "../domain/jobs";
 import { terminal } from "../domain/planning";
+import { useI18n } from "../i18n/I18n";
 import { type Receipt, safeError, usePlanning } from "../state/PlanningWorkspace";
 import { useWorkspace } from "../state/Workspace";
 
 function JobTracker({ receipt }: { receipt: Receipt }) {
+  const { t, validationMessage, codeLabel, clockLabel } = useI18n();
+
   const { api, rejectSession } = useWorkspace();
   const { storeInfo, storeResult, forgetJob } = usePlanning();
   const [tracking, setTracking] = useState(
@@ -144,66 +147,70 @@ function JobTracker({ receipt }: { receipt: Receipt }) {
   const info = receipt.info;
   return (
     <Panel
-      title="Selected job lifecycle"
-      description="Actual server status and phase; no percentage progress"
+      title={t("Selected job lifecycle")}
+      description={t("Actual server status and phase; no percentage progress")}
       action={
         <Badge
           tone={info.status === "SUCCEEDED" ? "teal" : info.status === "FAILED" ? "red" : "amber"}
         >
-          {info.status}
+          {codeLabel(info.status)}
         </Badge>
       }
     >
       <div className="job-identity">
         <label>
-          Copyable job ID
+          {t("Copyable job ID")}
           <input
             readOnly
             value={info.id}
-            aria-label="Job ID"
+            aria-label={t("Job ID")}
             onFocus={(event) => event.target.select()}
           />
         </label>
         <span>
-          {info.kind} · {info.phase}
+          {codeLabel(info.kind)} · {codeLabel(info.phase)}
         </span>
         <span role="status">
           {tracking
-            ? `Polling sequentially · at least ${trackingLimits.interval / 1000} s between requests`
-            : "Local polling stopped"}
-          {cancelling ? " · cancellation request pending" : ""}
+            ? t("Polling sequentially · at least {p0} s between requests", {
+                p0: trackingLimits.interval / 1000,
+              })
+            : t("Local polling stopped")}
+          {cancelling ? t(" · cancellation request pending") : ""}
         </span>
       </div>
       <dl className="provenance-grid">
         <div>
-          <dt>Submitted / started (server timestamps)</dt>
+          <dt>{t("Submitted / started (server timestamps)")}</dt>
           <dd>
-            {info.submitted}
+            {clockLabel(info.submitted)}
             <br />
-            {info.started ?? "Not started"}
+            {info.started ? clockLabel(info.started) : t("Not started")}
           </dd>
         </div>
         <div>
-          <dt>Completed / retention deadline</dt>
+          <dt>{t("Completed / retention deadline")}</dt>
           <dd>
-            {info.completed ?? "Not terminal"}
+            {info.completed ? clockLabel(info.completed) : t("Not terminal")}
             <br />
-            {info.expires ?? "Not reported"}
+            {info.expires ? clockLabel(info.expires) : t("Not reported")}
           </dd>
         </div>
         <div>
-          <dt>Cancellation / retained result</dt>
+          <dt>{t("Cancellation / retained result")}</dt>
           <dd>
-            {info.cancellationRequested ? "Stop requested" : "No stop requested"} ·{" "}
-            {info.hasResult ? "Server reports result available" : "No server result available"}
+            {info.cancellationRequested ? t("Stop requested") : t("No stop requested")} ·{" "}
+            {info.hasResult
+              ? t("Server reports result available")
+              : t("No server result available")}
           </dd>
         </div>
         <div>
-          <dt>Failure category</dt>
-          <dd>{info.errorCode ?? "None reported"}</dd>
+          <dt>{t("Failure category")}</dt>
+          <dd>{info.errorCode ? codeLabel(info.errorCode) : t("None reported")}</dd>
         </div>
         <div className="full-width">
-          <dt>Latest metadata request ID</dt>
+          <dt>{t("Latest metadata request ID")}</dt>
           <dd>
             <code>{receipt.requestId}</code>
           </dd>
@@ -220,7 +227,7 @@ function JobTracker({ receipt }: { receipt: Receipt }) {
             setTracking(true);
           }}
         >
-          Resume / refresh status
+          {t("Resume / refresh status")}
         </button>
         <button
           type="button"
@@ -232,7 +239,7 @@ function JobTracker({ receipt }: { receipt: Receipt }) {
             setNote("Only local polling paused; the server job was not cancelled.");
           }}
         >
-          Pause local tracking
+          {t("Pause local tracking")}
         </button>
         <button
           type="button"
@@ -240,17 +247,17 @@ function JobTracker({ receipt }: { receipt: Receipt }) {
           disabled={!api || !info.canCancel || cancelling}
           onClick={() => void cancel()}
         >
-          {cancelling ? "Requesting cancellation…" : "Cancel server job"}
+          {cancelling ? t("Requesting cancellation…") : t("Cancel server job")}
         </button>
         {terminal(info.status) && (
           <button type="button" className="text-link" onClick={() => forgetJob(info.id)}>
-            Forget terminal local receipt
+            {t("Forget terminal local receipt")}
           </button>
         )}
       </div>
       {note && (
         <p className="tracking-note" role="status">
-          {note}
+          {validationMessage(note)}
         </p>
       )}
       {error && (
@@ -262,6 +269,8 @@ function JobTracker({ receipt }: { receipt: Receipt }) {
   );
 }
 export function Jobs() {
+  const { t, codeLabel } = useI18n();
+
   const { dataset } = useWorkspace();
   const { jobs, activeJob, setActiveJob } = usePlanning();
   const selected = jobs.find((job) => job.info.id === activeJob);
@@ -270,30 +279,30 @@ export function Jobs() {
     <div className="page-stack">
       <PlanningGate />
       <Notice>
-        Volatile local jobs: one active, two waiting, at most 32 server records. This workspace
-        retains at most eight receipts in this dataset/session. Server results expire after 300
-        seconds; restart loses records. Copy job IDs. Leaving this page pauses polling; changing
-        dataset/session clears local tracking, not server work. There is no job-list or restart
-        recovery endpoint.
+        {t(
+          "Volatile local jobs: one active, two waiting, at most 32 server records. This workspace retains at most eight receipts in this dataset/session. Server results expire after 300 seconds; restart loses records. Copy job IDs. Leaving this page pauses polling; changing dataset/session clears local tracking, not server work. There is no job-list or restart recovery endpoint.",
+        )}
       </Notice>
       <ActionStatus />
       <Panel
-        title="Session job receipts"
-        description={`${jobs.length} / 8 local receipts · IDs and results are kept only in memory`}
+        title={t("Session job receipts")}
+        description={t("{p0} / 8 local receipts · IDs and results are kept only in memory", {
+          p0: jobs.length,
+        })}
         action={
           <a className="text-link" href="/#/scheduling">
-            Open scheduling →
+            {t("Open scheduling →")}
           </a>
         }
       >
-        <TableScroll label="Local job receipts">
+        <TableScroll label={t("Local job receipts")}>
           <table>
             <thead>
               <tr>
-                <th scope="col">Job ID</th>
-                <th scope="col">Type</th>
-                <th scope="col">Server status / phase</th>
-                <th scope="col">Inspect</th>
+                <th scope="col">{t("Job ID")}</th>
+                <th scope="col">{t("Type")}</th>
+                <th scope="col">{t("Server status / phase")}</th>
+                <th scope="col">{t("Inspect")}</th>
               </tr>
             </thead>
             <tbody>
@@ -302,21 +311,21 @@ export function Jobs() {
                   <th scope="row">
                     <code>{receipt.info.id}</code>
                   </th>
-                  <td>{receipt.info.kind}</td>
+                  <td>{codeLabel(receipt.info.kind)}</td>
                   <td>
                     <Badge tone={receipt.info.status === "SUCCEEDED" ? "teal" : "neutral"}>
-                      {receipt.info.status}
+                      {codeLabel(receipt.info.status)}
                     </Badge>
-                    <span className="cell-secondary">{receipt.info.phase}</span>
+                    <span className="cell-secondary">{codeLabel(receipt.info.phase)}</span>
                   </td>
                   <td>
                     <button
                       type="button"
                       className="text-link"
                       onClick={() => setActiveJob(receipt.info.id)}
-                      aria-label={`Inspect job ${receipt.info.id}`}
+                      aria-label={t("Inspect job {p0}", { p0: receipt.info.id })}
                     >
-                      Inspect
+                      {t("Inspect")}
                     </button>
                   </td>
                 </tr>
@@ -325,10 +334,10 @@ export function Jobs() {
           </table>
         </TableScroll>
         {jobs.length === 0 && (
-          <Empty title="No submitted jobs in this context">
-            Run reference scheduling, then submit a bounded scheduling or reviewed what-if
-            comparison job. A lost POST reply may leave work without a local receipt; POST is never
-            retried automatically.
+          <Empty title={t("No submitted jobs in this context")}>
+            {t(
+              "Run reference scheduling, then submit a bounded scheduling or reviewed what-if comparison job. A lost POST reply may leave work without a local receipt; POST is never retried automatically.",
+            )}
           </Empty>
         )}
       </Panel>
@@ -336,12 +345,14 @@ export function Jobs() {
       {selected?.result && dataset && (
         <>
           <div className="report-receipt">
-            <Badge tone="teal">Verified job result</Badge>
+            <Badge tone="teal">{t("Verified job result")}</Badge>
             <span>
-              Result request ID: <code>{selected.resultRequestId}</code>
+              {t("Result request ID:")} <code>{selected.resultRequestId}</code>
             </span>
             <span>
-              Measured whole-child wall seconds: {selected.result.wallSeconds ?? "Not reported"}
+              {t("Measured whole-child wall seconds: {p0}", {
+                p0: selected.result.wallSeconds ?? t("Not reported"),
+              })}
             </span>
           </div>
           {output?.kind === "scheduling" ? (
@@ -349,13 +360,13 @@ export function Jobs() {
               <PlanSummary metrics={output.evaluation.selected.metrics} />
               <EvaluationEvidence evaluation={output.evaluation} />
               <Gantt
-                title="Selected optimizer-job Gantt"
+                title={t("Selected optimizer-job Gantt")}
                 plan={output.evaluation.selected}
                 horizon={output.horizon}
                 planning={dataset.planning}
               />
               <details className="panel advanced-comparisons">
-                <summary>All metrics & same-instance algorithm comparison</summary>
+                <summary>{t("All metrics & same-instance algorithm comparison")}</summary>
                 <AlgorithmComparison evaluation={output.evaluation} />
               </details>
             </>

@@ -123,14 +123,16 @@ test("five pages, real API session, explicit verified outcome and clearing crede
   await expect(page.locator(".capacity-bar-row")).toHaveCount(1);
   await expect(page.getByText("Completed units", { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Load saved outcome" }).click();
-  await expect(page.getByText("VALID_PARTIAL", { exact: true })).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText("Valid partial schedule", { exact: true })).toBeVisible({
+    timeout: 15000,
+  });
   await expect(page.getByText("Completed units", { exact: true })).toBeVisible();
   await expect(page.getByText("46.875%", { exact: true })).toHaveCount(2);
   await accessible(page);
   await page.screenshot({ path: capture("verified-existing-outcome"), fullPage: true });
   expect(
     await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length })),
-  ).toEqual({ local: 0, session: 0 });
+  ).toEqual({ local: 1, session: 0 });
   expect(await page.content()).not.toContain(token);
   await page.getByRole("link", { name: "API & system", exact: true }).click();
   await page.getByRole("button", { name: "Clear session & use fixture preview" }).click();
@@ -190,4 +192,11 @@ test("development filesystem denies raw data, local instructions and model artif
     const blocked = await request.get(`/@fs/${resolve("..", path).replaceAll("\\", "/")}`);
     expect([403, 404]).toContain(blocked.status());
   }
+});
+
+// Existing workflow assertions explicitly exercise the selectable English locale.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("loometric.language", "en-US");
+  });
 });

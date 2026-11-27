@@ -1,11 +1,12 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import capacity from "../fixtures/competition.capacity.json?raw";
 import { App } from "../src/App";
 import { datasets } from "../src/demo/catalog";
 import { encodeExact, parseExact } from "../src/domain/json";
 import { cloneInput, planningOf, rows } from "../src/domain/production";
+import { languageStorageKey } from "../src/i18n/locale";
 import { ProductionProvider, useProduction } from "../src/state/ProductionWorkspace";
 import { useWorkspace, WorkspaceProvider } from "../src/state/Workspace";
 
@@ -165,7 +166,7 @@ describe("draft validation, activation and ownership", () => {
     fireEvent.click(screen.getByRole("button", { name: "Edit quantity" }));
     expect(screen.getByLabelText("Active input")).toHaveTextContent(before);
     expect(encodeExact(instance)).toBe(before);
-    expect(localStorage.length + sessionStorage.length).toBe(0);
+    expect(localStorage.length + sessionStorage.length).toBe(1);
   });
   it.each(["Edit quantity", "Switch dataset", "Disconnect"])(
     "ignores late validation after %s and never activates its stale receipt",
@@ -260,4 +261,9 @@ describe("guided production forms", () => {
     expect(screen.getByRole("button", { name: "Export scheduling JSON" })).toBeDisabled();
     expect(rows(planningOf(instance).styles)).toHaveLength(1);
   });
+});
+
+beforeEach(() => {
+  localStorage.clear();
+  localStorage.setItem(languageStorageKey, "en-US");
 });

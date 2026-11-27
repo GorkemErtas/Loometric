@@ -196,7 +196,7 @@ test("creates production data through forms, validates, activates, schedules and
   await page.getByRole("button", { name: "Add change to review" }).click();
   await page.getByRole("button", { name: "Review exact specification" }).click();
   await page.getByRole("button", { name: "Run reviewed greedy comparison" }).click();
-  await expect(page.locator(".comparison-headline")).toContainText("BETTER", { timeout: 15000 });
+  await expect(page.locator(".comparison-headline")).toContainText("Better", { timeout: 15000 });
   await page.getByRole("link", { name: "Production scheduling", exact: true }).click();
   await page.getByRole("button", { name: "Submit bounded CP-SAT job" }).click();
   await expect(page.getByText("Verified job result", { exact: true })).toBeVisible({
@@ -204,7 +204,7 @@ test("creates production data through forms, validates, activates, schedules and
   });
   expect(paths.filter((p) => p === "POST /api/v1/scheduling/validate")).toHaveLength(1);
   expect(paths.filter((p) => p === "POST /api/v1/scheduling/dispatch")).toHaveLength(1);
-  expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+  expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(1);
   expect(created).not.toContain(token);
   expect(errors).toEqual([]);
 });
@@ -258,4 +258,11 @@ test("local import/export is lossless and offline; bad imports leave the existin
       fullPage: true,
     });
   }
+});
+
+// Existing workflow assertions explicitly exercise the selectable English locale.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("loometric.language", "en-US");
+  });
 });

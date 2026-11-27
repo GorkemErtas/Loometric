@@ -1,3 +1,4 @@
+import { I18nProvider } from "./i18n/I18n";
 import { Layout, useRoute } from "./layout/Layout";
 import { Capacity } from "./pages/Capacity";
 import { Jobs } from "./pages/Jobs";
@@ -15,9 +16,11 @@ import { useWorkspace, WorkspaceProvider } from "./state/Workspace";
 
 export function Workspace() {
   return (
-    <ProductionProvider>
-      <WorkspaceViews />
-    </ProductionProvider>
+    <I18nProvider>
+      <ProductionProvider>
+        <WorkspaceViews />
+      </ProductionProvider>
+    </I18nProvider>
   );
 }
 function WorkspaceViews() {

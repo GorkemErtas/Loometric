@@ -13,6 +13,7 @@ import {
   rows,
   WorkspaceInputError,
 } from "../domain/production";
+import { useI18n } from "../i18n/I18n";
 import { useProduction } from "../state/ProductionWorkspace";
 import { useWorkspace } from "../state/Workspace";
 
@@ -27,6 +28,8 @@ const steps = [
   "Review & validate",
 ];
 function Basics() {
+  const { t, validationMessage, formValidation } = useI18n();
+
   const { draft, replace, setEditing, invalidate } = useProduction();
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -59,10 +62,13 @@ function Basics() {
   };
   return (
     <Panel
-      title="Planning assumptions"
-      description="Set the horizon and fixed calendar offset before creating your resources. These are hypothetical production inputs."
+      title={t("Planning assumptions")}
+      description={t(
+        "Set the horizon and fixed calendar offset before creating your resources. These are hypothetical production inputs.",
+      )}
     >
       <form
+        {...formValidation}
         className="form-stack production-form"
         onSubmit={save}
         onChange={() => {
@@ -73,10 +79,10 @@ function Basics() {
       >
         <div className="production-field-grid">
           <label>
-            Horizon start (with offset)
+            {t("Horizon start (with offset)")}
             <input
               name="start"
-              aria-label="Horizon start (with offset)"
+              aria-label={t("Horizon start (with offset)")}
               type="text"
               required
               defaultValue={text(horizon.start)}
@@ -84,11 +90,11 @@ function Basics() {
               maxLength={128}
             />
             <small>
-              Include seconds and an explicit offset. All boundaries align to whole minutes.
+              {t("Include seconds and an explicit offset. All boundaries align to whole minutes.")}
             </small>
           </label>
           <label>
-            Horizon end (with offset)
+            {t("Horizon end (with offset)")}
             <input
               name="end"
               type="text"
@@ -99,10 +105,10 @@ function Basics() {
             />
           </label>
           <label>
-            Fixed calendar UTC offset (minutes)
+            {t("Fixed calendar UTC offset (minutes)")}
             <input
               name="offset"
-              aria-label="Fixed calendar UTC offset (minutes)"
+              aria-label={t("Fixed calendar UTC offset (minutes)")}
               type="text"
               inputMode="numeric"
               required
@@ -114,40 +120,44 @@ function Basics() {
               maxLength={5}
             />
             <small>
-              For example, enter 180 for +03:00, 0 for UTC, or -300 for -05:00. Shift starts must
-              use this offset; no daylight-saving rules are inferred.
+              {t(
+                "For example, enter 180 for +03:00, 0 for UTC, or -300 for -05:00. Shift starts must use this offset; no daylight-saving rules are inferred.",
+              )}
             </small>
           </label>
         </div>
         <label>
-          Synthetic planning assumptions (one per line)
+          {t("Synthetic planning assumptions (one per line)")}
           <textarea
             name="assumptions"
-            aria-label="Synthetic planning assumptions (one per line)"
+            aria-label={t("Synthetic planning assumptions (one per line)")}
             rows={4}
             required
             defaultValue={(planning.assumptions as string[]).join("\n")}
             maxLength={32768}
           />
           <small>
-            Describe hypothetical standards, dedicated crews and efficiency. Only synthetic inputs
-            belong here. Empty lines are errors.
+            {t(
+              "Describe hypothetical standards, dedicated crews and efficiency. Only synthetic inputs belong here. Empty lines are errors.",
+            )}
           </small>
         </label>
         <Notice>
-          The frozen policy uses full batches and nonpreemptive stages on one qualified line, with
-          release dates and ordered precedence. Materials, setups, shared crews, initial WIP and ML
-          capacity are unsupported.
+          {t(
+            "The frozen policy uses full batches and nonpreemptive stages on one qualified line, with release dates and ordered precedence. Materials, setups, shared crews, initial WIP and ML capacity are unsupported.",
+          )}
         </Notice>
         {error && (
           <p role="alert" className="error-notice">
-            {error}
+            {validationMessage(error)}
           </p>
         )}
-        {saved && <p role="status">Planning assumptions saved. Continue with product styles.</p>}
+        {saved && (
+          <p role="status">{t("Planning assumptions saved. Continue with product styles.")}</p>
+        )}
         <div className="panel-actions">
           <button type="submit" className="button button-primary">
-            Save planning assumptions
+            {t("Save planning assumptions")}
           </button>
           <button
             type="reset"
@@ -158,7 +168,7 @@ function Basics() {
               setSaved(false);
             }}
           >
-            Discard unsaved changes
+            {t("Discard unsaved changes")}
           </button>
         </div>
       </form>
@@ -166,6 +176,8 @@ function Basics() {
   );
 }
 export function ProductionData() {
+  const { t, validationMessage, locale, label: textLabel } = useI18n();
+
   const { draft, replace, step, setStep, editing, receipt, busy, message, validate, activate } =
     useProduction();
   const { api, capabilities, dataset, catalog, sessionId } = useWorkspace();
@@ -226,18 +238,20 @@ export function ProductionData() {
   return (
     <div className="page-stack production-workspace">
       <Panel
-        title="Your synthetic production input"
-        description="Build a scheduling instance from forms, or edit a copy of an existing template. Work stays in this tab until you explicitly validate or activate it."
-        action={<Badge tone="amber">SYNTHETIC ONLY</Badge>}
+        title={t("Your synthetic production input")}
+        description={t(
+          "Build a scheduling instance from forms, or edit a copy of an existing template. Work stays in this tab until you explicitly validate or activate it.",
+        )}
+        action={<Badge tone="amber">{t("SYNTHETIC ONLY")}</Badge>}
       >
         <p>
-          Keep an exported JSON copy before reloading. Replacing the draft discards its edits and
-          validation. Activating a copy replaces the current user input and clears earlier results
-          and local job IDs; server jobs may continue.
+          {t(
+            "Keep an exported JSON copy before reloading. Replacing the draft discards its edits and validation. Activating a copy replaces the current user input and clears earlier results and local job IDs; server jobs may continue.",
+          )}
         </p>
         <div className="production-template-controls">
           <label>
-            Reusable input template
+            {t("Reusable input template")}
             <select
               value={template}
               disabled={editing || busy}
@@ -246,12 +260,12 @@ export function ProductionData() {
                 setReplacement(null);
               }}
             >
-              <option value="">Choose an executable input</option>
+              <option value="">{t("Choose an executable input")}</option>
               {catalog
                 .filter((d) => d.instance)
                 .map((d) => (
                   <option value={d.key} key={d.key}>
-                    {d.name}
+                    {textLabel(d.name)}
                   </option>
                 ))}
             </select>
@@ -262,7 +276,7 @@ export function ProductionData() {
             disabled={!template || editing || busy}
             onClick={() => setReplacement("copy")}
           >
-            Edit a template copy
+            {t("Edit a template copy")}
           </button>
           <button
             type="button"
@@ -270,14 +284,15 @@ export function ProductionData() {
             disabled={editing || busy}
             onClick={() => setReplacement("new")}
           >
-            Start an empty input
+            {t("Start an empty input")}
           </button>
         </div>
         {replacement && (
           <div className="notice">
             <p>
-              Replace the current draft and discard its edits? Original template files and the
-              active dataset are preserved.
+              {t(
+                "Replace the current draft and discard its edits? Original template files and the active dataset are preserved.",
+              )}
             </p>
             <div className="panel-actions">
               <button
@@ -292,17 +307,17 @@ export function ProductionData() {
                   setReplacement(null);
                 }}
               >
-                Replace draft
+                {t("Replace draft")}
               </button>
               <button type="button" className="button" onClick={() => setReplacement(null)}>
-                Keep current draft
+                {t("Keep current draft")}
               </button>
             </div>
           </div>
         )}
         <div className="production-transfer-controls">
           <label>
-            Import local scheduling JSON (replaces draft)
+            {t("Import local scheduling JSON (replaces draft)")}
             <input
               type="file"
               accept=".json,application/json"
@@ -314,8 +329,9 @@ export function ProductionData() {
               }}
             />
             <small>
-              At most 256 KiB; strict UTF-8, schema 1, depth 24. Import performs preliminary checks
-              only and sends no network request. Inspection CSV is unsupported.
+              {t(
+                "At most 256 KiB; strict UTF-8, schema 1, depth 24. Import performs preliminary checks only and sends no network request. Inspection CSV is unsupported.",
+              )}
             </small>
           </label>
           <button
@@ -324,77 +340,96 @@ export function ProductionData() {
             disabled={issues.length > 0 || editing || busy}
             onClick={download}
           >
-            Export scheduling JSON
+            {t("Export scheduling JSON")}
           </button>
         </div>
         {fileError && (
           <p role="alert" className="error-notice">
-            {fileError}
+            {validationMessage(fileError)}
           </p>
         )}
       </Panel>
-      <nav aria-label="Production data steps" className="production-steps">
+      <nav aria-label={t("Production data steps")} className="production-steps">
         {steps.map((name, i) => (
           <button
             type="button"
-            key={name}
+            key={textLabel(name)}
             aria-current={step === i ? "step" : undefined}
             disabled={editing || busy}
             onClick={() => setStep(i)}
           >
             <span>{i + 1}</span>
-            {name}
+            {textLabel(name)}
           </button>
         ))}
       </nav>
       <p className="field-help" role="status">
-        Step {step + 1} of {steps.length}: {steps[step]}.{" "}
-        {editing
-          ? "Save or cancel the open form before moving to another step."
-          : `${issues.length} preliminary issue${issues.length === 1 ? "" : "s"}. Frontend checks are not authoritative.`}
+        {t("Step {p0} of {p1}: {p2}. {p3}", {
+          p0: step + 1,
+          p1: steps.length,
+          p2: textLabel(steps[step] ?? ""),
+          p3: editing
+            ? t("Save or cancel the open form before moving to another step.")
+            : t("{p0} preliminary issue{p1}. Frontend checks are not authoritative.", {
+                p0: issues.length,
+                p1: locale === "en-US" && issues.length !== 1 ? "s" : "",
+              }),
+        })}
       </p>
       <div key={step}>
         {step === 0 && <Basics key={encodeExact(draft.instance_id)} />}
         {step === 1 && (
           <EntitySection
             kind="styles"
-            title="Product styles"
-            description="Define supported stages and exact standard worker-minutes per piece. Style definitions can be reused by many orders."
+            title={t("Product styles")}
+            description={t(
+              "Define supported stages and exact standard worker-minutes per piece. Style definitions can be reused by many orders.",
+            )}
           />
         )}
         {step === 2 && (
           <EntitySection
             kind="orders"
-            title="Production orders"
-            description="Declare integer piece quantities, priority (1 highest), release/due dates and an ordered route through supported style stages."
+            title={t("Production orders")}
+            description={t(
+              "Declare integer piece quantities, priority (1 highest), release/due dates and an ordered route through supported style stages.",
+            )}
           />
         )}
         {step === 3 && (
           <div className="page-stack">
             <EntitySection
               kind="lines"
-              title="Production lines"
-              description="Each line has one stage and a dedicated crew. Availability and crew size are explicit assumptions."
+              title={t("Production lines")}
+              description={t(
+                "Each line has one stage and a dedicated crew. Availability and crew size are explicit assumptions.",
+              )}
             />
             <EntitySection
               kind="capabilities"
-              title="Line capabilities"
-              description="Explicit line/style/stage qualification is required. Matching stage names alone does not create a capability."
+              title={t("Line capabilities")}
+              description={t(
+                "Explicit line/style/stage qualification is required. Matching stage names alone does not create a capability.",
+              )}
             />
           </div>
         )}
         {step === 4 && (
           <EntitySection
             kind="capacity_profiles"
-            title="Capacity profiles"
-            description="Assign an effective date, synthetic source and exact efficiency fraction to a line. Profile selection is explicit in the calendar; no latest-profile inference occurs."
+            title={t("Capacity profiles")}
+            description={t(
+              "Assign an effective date, synthetic source and exact efficiency fraction to a line. Profile selection is explicit in the calendar; no latest-profile inference occurs.",
+            )}
           />
         )}
         {step === 5 && (
           <EntitySection
             kind="shifts"
-            title="Shifts"
-            description="Declare dated start/end times and positioned breaks. Reuse shift definitions across distinct lines. Python checks all interval interactions."
+            title={t("Shifts")}
+            description={t(
+              "Declare dated start/end times and positioned breaks. Reuse shift definitions across distinct lines. Python checks all interval interactions.",
+            )}
           />
         )}
         {step === 6 && (
@@ -402,25 +437,33 @@ export function ProductionData() {
             <WorkingDates />
             <EntitySection
               kind="assignments"
-              title="Shift assignments"
-              description="Choose a line, declared shift and a profile belonging to that line. The profile must be effective on the explicit shift start working date."
+              title={t("Shift assignments")}
+              description={t(
+                "Choose a line, declared shift and a profile belonging to that line. The profile must be effective on the explicit shift start working date.",
+              )}
             />
             <EntitySection
               kind="planned_downtime"
-              title="Planned downtime"
-              description="Stops must remain inside their assigned shift. Overlapping exclusion reasons are handled by Python's existing interval union."
+              title={t("Planned downtime")}
+              description={t(
+                "Stops must remain inside their assigned shift. Overlapping exclusion reasons are handled by Python's existing interval union.",
+              )}
             />
             <EntitySection
               kind="unavailable_periods"
-              title="Unavailable periods"
-              description="Line-wide unavailable intervals may span shifts. Give a reason and explicit timestamp bounds."
+              title={t("Unavailable periods")}
+              description={t(
+                "Line-wide unavailable intervals may span shifts. Give a reason and explicit timestamp bounds.",
+              )}
             />
           </div>
         )}
         {step === 7 && (
           <Panel
-            title="Review the complete input"
-            description="Preliminary checks cover syntax and references. The local Python backend owns authoritative contract and calendar validation."
+            title={t("Review the complete input")}
+            description={t(
+              "Preliminary checks cover syntax and references. The local Python backend owns authoritative contract and calendar validation.",
+            )}
           >
             <dl className="production-summary">
               {[
@@ -436,50 +479,52 @@ export function ProductionData() {
                 ["Unavailable periods", rows(calendar.unavailable_periods).length],
               ].map(([label, count]) => (
                 <div key={String(label)}>
-                  <dt>{label}</dt>
+                  <dt>{textLabel(String(label))}</dt>
                   <dd>{count}</dd>
                 </div>
               ))}
             </dl>
             {issues.length > 0 ? (
-              <section className="production-issues" aria-label="Preliminary input issues">
-                <p>Resolve these errors before validation or export:</p>
+              <section className="production-issues" aria-label={t("Preliminary input issues")}>
+                <p>{t("Resolve these errors before validation or export:")}</p>
                 <ul>
                   {issues.map((issue) => (
-                    <li key={`${issue.path}:${issue.message}`}>
-                      <strong>{issue.path}</strong>: {issue.message}
+                    <li key={`${textLabel(issue.path)}:${validationMessage(issue.message)}`}>
+                      <strong>{textLabel(issue.path)}</strong>: {validationMessage(issue.message)}
                     </li>
                   ))}
                 </ul>
               </section>
             ) : (
               <Notice>
-                Preliminary structure and references pass. Python still needs to check domain rules,
-                break containment, calendar overlaps, profile dates and time offsets.
+                {t(
+                  "Preliminary structure and references pass. Python still needs to check domain rules, break containment, calendar overlaps, profile dates and time offsets.",
+                )}
               </Notice>
             )}
             <div className="production-validation" role="status">
               <Badge tone={receipt ? "teal" : "amber"}>
-                {receipt ? "PYTHON VALIDATED" : "NOT AUTHORITATIVELY VALIDATED"}
+                {receipt ? t("PYTHON VALIDATED") : t("NOT AUTHORITATIVELY VALIDATED")}
               </Badge>
-              {message && <p>{message}</p>}
+              {message && <p>{validationMessage(message)}</p>}
               {!api && (
                 <p>
-                  Configure the local API to validate and activate. Offline import, editing and
-                  export remain available.
+                  {t(
+                    "Configure the local API to validate and activate. Offline import, editing and export remain available.",
+                  )}
                 </p>
               )}
             </div>
             {receipt && (
               <dl className="provenance-grid">
                 <div className="full-width">
-                  <dt>Accepted instance fingerprint</dt>
+                  <dt>{t("Accepted instance fingerprint")}</dt>
                   <dd>
                     <code>{receipt.data.fingerprint}</code>
                   </dd>
                 </div>
                 <div>
-                  <dt>Validation request ID</dt>
+                  <dt>{t("Validation request ID")}</dt>
                   <dd>
                     <code>{receipt.requestId}</code>
                   </dd>
@@ -493,7 +538,7 @@ export function ProductionData() {
                 disabled={!api || busy || editing || issues.length > 0}
                 onClick={() => void validate()}
               >
-                {busy ? "Checking input…" : "Validate with local Python"}
+                {busy ? t("Checking input…") : t("Validate with local Python")}
               </button>
               <button
                 type="button"
@@ -501,30 +546,30 @@ export function ProductionData() {
                 disabled={!receipt || !api || busy || editing}
                 onClick={() => void activate()}
               >
-                Activate validated copy
+                {t("Activate validated copy")}
               </button>
               <a className="button" href="/#/scheduling">
-                Open production scheduling
+                {t("Open production scheduling")}
               </a>
               <a className="button" href="/#/capacity">
-                Open capacity assessment
+                {t("Open capacity assessment")}
               </a>
             </div>
             {dataset?.validatedFingerprint && (
               <p role="status">
-                Active workspace: your validated synthetic copy. Further draft edits require
-                validation and activation again.
+                {t(
+                  "Active workspace: your validated synthetic copy. Further draft edits require validation and activation again.",
+                )}
               </p>
             )}
             <details className="details-block">
-              <summary>System-managed metadata & exact instance</summary>
+              <summary>{t("System-managed metadata & exact instance")}</summary>
               <p>
-                Schema 1 · whole-stage-minute-v1 · one-minute allocation · piece output · synthetic
-                profile evidence. Internal IDs are generated for profiles, qualifications,
-                assignments and stops. No exporter, benchmark, session or credential fields are
-                included.
+                {t(
+                  "Schema 1 · whole-stage-minute-v1 · one-minute allocation · piece output · synthetic profile evidence. Internal IDs are generated for profiles, qualifications, assignments and stops. No exporter, benchmark, session or credential fields are included.",
+                )}
               </p>
-              <JsonBlock label="Exact synthetic scheduling instance">
+              <JsonBlock label={t("Exact synthetic scheduling instance")}>
                 {encodeExact(draft)}
               </JsonBlock>
             </details>
@@ -538,7 +583,7 @@ export function ProductionData() {
           disabled={step === 0 || editing || busy}
           onClick={() => setStep(step - 1)}
         >
-          Previous step
+          {t("Previous step")}
         </button>
         <button
           type="button"
@@ -546,7 +591,7 @@ export function ProductionData() {
           disabled={step === steps.length - 1 || editing || busy}
           onClick={() => setStep(step + 1)}
         >
-          Next step
+          {t("Next step")}
         </button>
       </div>
     </div>

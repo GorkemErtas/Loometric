@@ -4,10 +4,13 @@ import { Badge, Empty, JsonBlock, Notice, Panel } from "../components/ui";
 import { encodeExact } from "../domain/json";
 import { interval } from "../domain/planning";
 import { executionBlock } from "../domain/scenario";
+import { useI18n } from "../i18n/I18n";
 import { usePlanning } from "../state/PlanningWorkspace";
 import { useWorkspace } from "../state/Workspace";
 
 export function Scheduling() {
+  const { t, label: textLabel, clockLabel } = useI18n();
+
   const { dataset, api, capabilities, status } = useWorkspace();
   const { reference, busy, jobs, runReference, submitJob } = usePlanning();
   const blocked = executionBlock(dataset, capabilities),
@@ -18,31 +21,36 @@ export function Scheduling() {
       <PlanningGate />
       {dataset && (
         <Panel
-          title="Frozen scheduling input"
-          description={dataset.description}
-          action={<Badge tone="amber">SYNTHETIC INPUT</Badge>}
+          title={t("Frozen scheduling input")}
+          description={textLabel(dataset.description)}
+          action={<Badge tone="amber">{t("SYNTHETIC INPUT")}</Badge>}
         >
           <dl className="provenance-grid">
             <div>
-              <dt>Instance</dt>
+              <dt>{t("Instance")}</dt>
               <dd>
-                {dataset.instance ? String(dataset.instance.instance_id) : "Capacity-only input"}
+                {dataset.instance ? String(dataset.instance.instance_id) : t("Capacity-only input")}
               </dd>
             </div>
             <div>
-              <dt>Envelope</dt>
+              <dt>{t("Envelope")}</dt>
               <dd>
-                {dataset.planning.orders.length} orders ·{" "}
-                {dataset.planning.orders.reduce((n, o) => n + o.stages.length, 0)} operations /
-                maximum 32 orders, 96 operations
+                {t("{p0} orders · {p1} operations / maximum 32 orders, 96 operations", {
+                  p0: dataset.planning.orders.length,
+                  p1: dataset.planning.orders.reduce((n, o) => n + o.stages.length, 0),
+                })}
               </dd>
             </div>
             <div className="full-width">
-              <dt>Horizon / source offsets</dt>
-              <dd>{horizon ? `${horizon.start} → ${horizon.end}` : "Not a scheduling contract"}</dd>
+              <dt>{t("Horizon / source offsets")}</dt>
+              <dd>
+                {horizon
+                  ? t("{p0} → {p1}", { p0: clockLabel(horizon.start), p1: clockLabel(horizon.end) })
+                  : t("Not a scheduling contract")}
+              </dd>
             </div>
             <div className="full-width">
-              <dt>Source</dt>
+              <dt>{t("Source")}</dt>
               <dd>
                 <code>{dataset.sourceFile}</code>
               </dd>
@@ -50,23 +58,25 @@ export function Scheduling() {
           </dl>
           <div className="panel-actions">
             <a className="button" href="/#/orders">
-              Inspect orders & stages
+              {t("Inspect orders & stages")}
             </a>
             <a className="button" href="/#/resources">
-              Inspect resources & calendar
+              {t("Inspect resources & calendar")}
             </a>
           </div>
           <details className="details-block">
-            <summary>Frozen policy & complete input</summary>
+            <summary>{t("Frozen policy & complete input")}</summary>
             <p>
-              whole-stage-minute-v1: full-batch, nonpreemptive stages, one compatible line and one
-              working fragment; precedence and finite line reservations. Priority 1 is highest. No
-              splitting, shared crews, materials, setups, initial WIP or ML capacity.
+              {t(
+                "whole-stage-minute-v1: full-batch, nonpreemptive stages, one compatible line and one working fragment; precedence and finite line reservations. Priority 1 is highest. No splitting, shared crews, materials, setups, initial WIP or ML capacity.",
+              )}
             </p>
-            <JsonBlock label="Complete frozen scheduling input">
+            <JsonBlock label={t("Complete frozen scheduling input")}>
               {dataset.instance
                 ? encodeExact(dataset.instance)
-                : "The consolidated CSV and M02 capacity exports are inspection data, not executable scheduling instances."}
+                : t(
+                    "The consolidated CSV and capacity exports are inspection data, not executable scheduling instances.",
+                  )}
             </JsonBlock>
           </details>
           <div className="workflow-actions">
@@ -76,7 +86,7 @@ export function Scheduling() {
               disabled={disabled}
               onClick={() => void runReference()}
             >
-              {reference ? "Run reference again" : "Run reference scheduling"}
+              {reference ? t("Run reference again") : t("Run reference scheduling")}
             </button>
             <button
               type="button"
@@ -84,34 +94,34 @@ export function Scheduling() {
               disabled={disabled || !reference?.data.feasible || jobs.length >= 8}
               onClick={() => void submitJob(false)}
             >
-              Submit bounded CP-SAT job
+              {t("Submit bounded CP-SAT job")}
             </button>
             <a className="text-link" href="/#/scenarios">
-              Build a what-if scenario →
+              {t("Build a what-if scenario →")}
             </a>
           </div>
           <p className="table-footnote">
-            M03C inputs exceeding this HTTP envelope are unsupported and never truncated. Jobs use
-            server-fixed seed 42, worker 1, 1 s wall / 1 deterministic unit per phase.
+            {t(
+              "Inputs exceeding this HTTP envelope are unsupported and never truncated. Jobs use server-fixed seed 42, worker 1, 1 s wall / 1 deterministic unit per phase.",
+            )}
           </p>
         </Panel>
       )}
       <Notice>
-        Submitting creates server work. POST is not idempotent: repeated submissions can create
-        duplicates. Leaving a page stops polling; changing dataset/session clears local tracking and
-        results. Jobs may continue on the server. Copy the job ID first; only explicit Cancel
-        requests termination.
+        {t(
+          "Submitting creates server work. POST is not idempotent: repeated submissions can create duplicates. Leaving a page stops polling; changing dataset/session clears local tracking and results. Jobs may continue on the server. Copy the job ID first; only explicit Cancel requests termination.",
+        )}
       </Notice>
       <ActionStatus />
       {reference && dataset ? (
         <>
           <div className="report-receipt">
-            <Badge tone="teal">Actual API response</Badge>
+            <Badge tone="teal">{t("Actual API response")}</Badge>
             <span>
-              Dispatch request ID: <code>{reference.requestId}</code>
+              {t("Dispatch request ID:")} <code>{reference.requestId}</code>
             </span>
             <span>
-              Instance fingerprint: <code>{reference.data.fingerprint}</code>
+              {t("Instance fingerprint:")} <code>{reference.data.fingerprint}</code>
             </span>
           </div>
           <PlanSummary metrics={reference.data.metrics} />
@@ -123,9 +133,10 @@ export function Scheduling() {
         </>
       ) : (
         !busy && (
-          <Empty title="No reference schedule loaded">
-            Select Competing orders, Capacity what-if, Routing trade-off or Parallel production,
-            connect the local API and run the reference scheduler.
+          <Empty title={t("No reference schedule loaded")}>
+            {t(
+              "Select Competing orders, Capacity what-if, Routing trade-off or Parallel production, connect the local API and run the reference scheduler.",
+            )}
           </Empty>
         )
       )}

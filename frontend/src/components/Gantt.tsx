@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { clockLabel, formatExact, stageName } from "../domain/exact";
 import { calendarBands, elapsedMinutes, geometry } from "../domain/gantt";
 import type { Interval, Planning } from "../domain/models";
 import type { Allocation, Comparison, VerifiedPlan } from "../domain/planning";
+import { useI18n } from "../i18n/I18n";
 import { Badge, Empty, Modal, Notice, Panel, TableScroll } from "./ui";
 
 export function Gantt({
@@ -18,13 +18,17 @@ export function Gantt({
   audit?: Comparison["audit"];
   title?: string;
 }) {
+  const { t, label: textLabel, codeLabel, formatExact, clockLabel, stageName } = useI18n();
+
   const [selected, setSelected] = useState<Allocation | null>(null);
   if (!plan.feasible)
     return (
-      <Panel title={title}>
+      <Panel title={textLabel(title)}>
         <Notice>
-          INVALID: independent verification rejected this proposal. No Gantt or performance metrics
-          are accepted. {plan.violations.join(", ")}
+          {t(
+            "INVALID: independent verification rejected this proposal. No Gantt or performance metrics are accepted. {p0}",
+            { p0: plan.violations.join(", ") },
+          )}
         </Notice>
       </Panel>
     );
@@ -39,20 +43,20 @@ export function Gantt({
   return (
     <div className="page-stack">
       <Panel
-        title={title}
-        description="Allocated blocks come from independently verified backend results"
-        action={<Badge tone={plan.complete ? "teal" : "amber"}>{plan.status}</Badge>}
+        title={textLabel(title)}
+        description={t("Allocated blocks come from independently verified backend results")}
+        action={<Badge tone={plan.complete ? "teal" : "amber"}>{codeLabel(plan.status)}</Badge>}
       >
         <div className="gantt-heading">
-          <span>Time axis · exact reported horizon</span>
-          <span className="gantt-source">SYNTHETIC · {plan.instanceId}</span>
+          <span>{t("Time axis · exact reported horizon")}</span>
+          <span className="gantt-source">{t("SYNTHETIC · {p0}", { p0: plan.instanceId })}</span>
         </div>
         <figure
           className="gantt-figure"
-          aria-label={`${title}: allocated operations by production line`}
+          aria-label={t("{p0}: allocated operations by production line", { p0: textLabel(title) })}
         >
           <div className="gantt-axis">
-            <span>Production line</span>
+            <span>{t("Production line")}</span>
             <div>
               <time dateTime={horizon.start}>{clockLabel(horizon.start)}</time>
               <time dateTime={horizon.end}>{clockLabel(horizon.end)}</time>
@@ -79,7 +83,11 @@ export function Gantt({
                           key={b.id}
                           className="gantt-shift"
                           style={style}
-                          title={`Declared shift ${b.shiftId}: ${b.start} → ${b.end}`}
+                          title={t("Declared shift {p0}: {p1} → {p2}", {
+                            p0: b.shiftId,
+                            p1: clockLabel(b.start),
+                            p2: clockLabel(b.end),
+                          })}
                           aria-hidden="true"
                         />
                       )
@@ -95,7 +103,11 @@ export function Gantt({
                           key={b.id}
                           className="gantt-interruption"
                           style={style}
-                          title={`${b.reason}: ${b.start} → ${b.end}`}
+                          title={t("{p0}: {p1} → {p2}", {
+                            p0: "reference" in b ? b.reason : t("Declared break"),
+                            p1: clockLabel(b.start),
+                            p2: clockLabel(b.end),
+                          })}
                           aria-hidden="true"
                         />
                       )
@@ -119,8 +131,23 @@ export function Gantt({
                               ] ?? colors[0],
                           }}
                           onClick={() => setSelected(a)}
-                          aria-label={`Inspect operation ${a.orderId} ${a.stage} on ${a.lineId}, ${a.quantity} pieces, ${a.start} to ${a.end}`}
-                          title={`${a.orderId} · ${a.stage} · ${a.start} → ${a.end}`}
+                          aria-label={t(
+                            "Inspect operation {p0} {p1} on {p2}, {p3} pieces, {p4} to {p5}",
+                            {
+                              p0: a.orderId,
+                              p1: stageName(a.stage),
+                              p2: a.lineId,
+                              p3: formatExact(a.quantity),
+                              p4: clockLabel(a.start),
+                              p5: clockLabel(a.end),
+                            },
+                          )}
+                          title={t("{p0} · {p1} · {p2} → {p3}", {
+                            p0: a.orderId,
+                            p1: stageName(a.stage),
+                            p2: clockLabel(a.start),
+                            p3: clockLabel(a.end),
+                          })}
                         >
                           <strong>{a.orderId}</strong>
                           <span>{stageName(a.stage)}</span>
@@ -134,46 +161,49 @@ export function Gantt({
           <figcaption className="gantt-legend">
             <span>
               <i className="gantt-key gantt-key-operation" />
-              Verified allocation
+              {t("Verified allocation")}
             </span>
             <span>
               <i className="gantt-key gantt-key-shift" />
-              Declared shift window
+              {t("Declared shift window")}
             </span>
             <span>
               <i className="gantt-key gantt-key-stop" />
-              Declared interruption
+              {t("Declared interruption")}
             </span>
           </figcaption>
           <p className="chart-note">
-            Positions use absolute timestamp geometry only. Blocks are not moved, resized or
-            rescheduled. Calendar annotations use declared inputs
-            {audit.length ? " and the backend’s approved change audit" : ""}. Use the table for
-            exact times and on small screens.
+            {t(
+              "Positions use absolute timestamp geometry only. Blocks are not moved, resized or rescheduled. Calendar annotations use declared inputs{p0}. Use the table for exact times and on small screens.",
+              { p0: audit.length ? t(" and the backend’s approved change audit") : "" },
+            )}
           </p>
         </figure>
         {plan.allocations.length === 0 && (
-          <Empty title="No verified allocations">
-            The verified partial plan contains no allocated operations; all work remains explicit
-            below.
+          <Empty title={t("No verified allocations")}>
+            {t(
+              "The verified partial plan contains no allocated operations; all work remains explicit below.",
+            )}
           </Empty>
         )}
         <details className="gantt-table" open>
-          <summary>Structured operation table ({plan.allocations.length})</summary>
-          <TableScroll label={`${title} operation table`}>
+          <summary>
+            {t("Structured operation table ({p0})", { p0: plan.allocations.length })}
+          </summary>
+          <TableScroll label={t("{p0} operation table", { p0: textLabel(title) })}>
             <table>
               <thead>
                 <tr>
-                  <th scope="col">Order / stage</th>
-                  <th scope="col">Line / assignment</th>
-                  <th scope="col">Start → end (source offsets)</th>
+                  <th scope="col">{t("Order / stage")}</th>
+                  <th scope="col">{t("Line / assignment")}</th>
+                  <th scope="col">{t("Start → end (source offsets)")}</th>
                   <th scope="col" className="numeric">
-                    Pieces
+                    {t("Pieces")}
                   </th>
                   <th scope="col" className="numeric">
-                    Elapsed min
+                    {t("Elapsed min")}
                   </th>
-                  <th scope="col">Details</th>
+                  <th scope="col">{t("Details")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -188,19 +218,22 @@ export function Gantt({
                       <span className="cell-secondary">{a.assignmentId}</span>
                     </td>
                     <td>
-                      <time dateTime={a.start}>{a.start}</time>
-                      <span className="cell-secondary">→ {a.end}</span>
+                      <time dateTime={a.start}>{clockLabel(a.start)}</time>
+                      <span className="cell-secondary">→ {clockLabel(a.end)}</span>
                     </td>
                     <td className="numeric">{formatExact(a.quantity)}</td>
-                    <td className="numeric">{elapsedMinutes(a)}</td>
+                    <td className="numeric">{formatExact(elapsedMinutes(a))}</td>
                     <td>
                       <button
                         type="button"
                         className="text-link"
                         onClick={() => setSelected(a)}
-                        aria-label={`Operation details ${a.orderId} ${a.stage}`}
+                        aria-label={t("Operation details {p0} {p1}", {
+                          p0: a.orderId,
+                          p1: stageName(a.stage),
+                        })}
                       >
-                        Inspect
+                        {t("Inspect")}
                       </button>
                     </td>
                   </tr>
@@ -211,22 +244,24 @@ export function Gantt({
         </details>
       </Panel>
       <Panel
-        title="Order completion & unfinished work"
-        description="Finished units require all stages. A valid partial plan leaves demand unfinished."
+        title={t("Order completion & unfinished work")}
+        description={t(
+          "Finished units require all stages. A valid partial plan leaves demand unfinished.",
+        )}
       >
-        <TableScroll label="Verified order outcomes">
+        <TableScroll label={t("Verified order outcomes")}>
           <table>
             <thead>
               <tr>
-                <th scope="col">Order</th>
-                <th scope="col">Outcome</th>
+                <th scope="col">{t("Order")}</th>
+                <th scope="col">{t("Outcome")}</th>
                 <th scope="col" className="numeric">
-                  Finished pieces
+                  {t("Finished pieces")}
                 </th>
                 <th scope="col" className="numeric">
-                  Unfinished pieces
+                  {t("Unfinished pieces")}
                 </th>
-                <th scope="col">Allocated stages / completion</th>
+                <th scope="col">{t("Allocated stages / completion")}</th>
               </tr>
             </thead>
             <tbody>
@@ -235,15 +270,17 @@ export function Gantt({
                   <th scope="row">{order.id}</th>
                   <td>
                     <Badge tone={order.status === "COMPLETED" ? "teal" : "amber"}>
-                      {order.status}
+                      {codeLabel(order.status)}
                     </Badge>
                   </td>
                   <td className="numeric">{formatExact(order.finished)}</td>
                   <td className="numeric">{formatExact(order.unfinished)}</td>
                   <td>
-                    {order.stages.map(stageName).join(", ") || "None allocated"}
+                    {order.stages.map(stageName).join(", ") || t("None allocated")}
                     <span className="cell-secondary">
-                      {order.completion ?? "No completed-order timestamp"}
+                      {order.completion
+                        ? clockLabel(order.completion)
+                        : t("No completed-order timestamp")}
                     </span>
                   </td>
                 </tr>
@@ -253,70 +290,76 @@ export function Gantt({
         </TableScroll>
         <div className="unfinished-list">
           {plan.unscheduled.map((item) => (
-            <div key={`${item.orderId}:${item.stage}`}>
-              <Badge tone="amber">UNSCHEDULED</Badge>
+            <div key={`${item.orderId}:${stageName(item.stage)}`}>
+              <Badge tone="amber">{t("UNSCHEDULED")}</Badge>
               <strong>
                 {item.orderId} · {stageName(item.stage)}
               </strong>
-              <span>{formatExact(item.quantity)} pieces</span>
-              <code>{item.reason}</code>
+              <span>{t("{p0} pieces", { p0: formatExact(item.quantity) })}</span>
+              <code>{codeLabel(item.reason)}</code>
             </div>
           ))}
-          {plan.unscheduled.length === 0 && <p>All required operations are allocated.</p>}
+          {plan.unscheduled.length === 0 && <p>{t("All required operations are allocated.")}</p>}
         </div>
       </Panel>
       {selected && (
         <Modal
-          title={`Operation ${selected.orderId} · ${stageName(selected.stage)}`}
+          title={t("Operation {p0} · {p1}", {
+            p0: selected.orderId,
+            p1: stageName(selected.stage),
+          })}
           onClose={() => setSelected(null)}
         >
           <dl className="detail-grid">
             <div>
-              <dt>Order / stage</dt>
+              <dt>{t("Order / stage")}</dt>
               <dd>
-                {selected.orderId} / {selected.stage}
+                {selected.orderId} / {stageName(selected.stage)}
               </dd>
             </div>
             <div>
-              <dt>Line / assignment</dt>
+              <dt>{t("Line / assignment")}</dt>
               <dd>
                 {selected.lineId} / {selected.assignmentId}
               </dd>
             </div>
             <div>
-              <dt>Shift / profile</dt>
+              <dt>{t("Shift / profile")}</dt>
               <dd>
                 {selected.shiftId} / {selected.profileId}
               </dd>
             </div>
             <div>
-              <dt>Quantity</dt>
-              <dd>{formatExact(selected.quantity)} pieces</dd>
+              <dt>{t("Quantity")}</dt>
+              <dd>{t("{p0} pieces", { p0: formatExact(selected.quantity) })}</dd>
             </div>
             <div className="full-width">
-              <dt>Exact reported interval</dt>
+              <dt>{t("Exact reported interval")}</dt>
               <dd>
-                {selected.start}
+                {clockLabel(selected.start)}
                 <br />
-                {selected.end}
+                {clockLabel(selected.end)}
               </dd>
             </div>
             <div>
-              <dt>Elapsed duration from endpoints</dt>
-              <dd>{elapsedMinutes(selected)} minutes</dd>
+              <dt>{t("Elapsed duration from endpoints")}</dt>
+              <dd>{t("{p0} minutes", { p0: formatExact(elapsedMinutes(selected)) })}</dd>
             </div>
             <div>
-              <dt>Reported reserved labor</dt>
-              <dd>{formatExact(selected.workerMinutes)} worker-minutes</dd>
+              <dt>{t("Reported reserved labor")}</dt>
+              <dd>{t("{p0} worker-minutes", { p0: formatExact(selected.workerMinutes) })}</dd>
             </div>
             <div>
-              <dt>Reported standard capacity</dt>
-              <dd>{formatExact(selected.standardMinutes)} standard worker-minutes</dd>
+              <dt>{t("Reported standard capacity")}</dt>
+              <dd>
+                {t("{p0} standard worker-minutes", { p0: formatExact(selected.standardMinutes) })}
+              </dd>
             </div>
           </dl>
           <Notice>
-            Verified synthetic allocation. No drag-and-drop editing or inferred machine
-            availability.
+            {t(
+              "Verified synthetic allocation. No drag-and-drop editing or inferred machine availability.",
+            )}
           </Notice>
         </Modal>
       )}

@@ -82,7 +82,7 @@ test("real dispatch, verified Gantt, reviewed what-if, bounded scheduling job an
     timeout: 15000,
   });
   await expect(table.getByRole("row", { name: /^Finished units/ })).toContainText("55");
-  await expect(page.locator(".comparison-headline")).toContainText("BETTER");
+  await expect(page.locator(".comparison-headline")).toContainText("Better");
   await axe(page);
   await screenshot(page, "m06b-scenario-comparison");
   await page.getByRole("link", { name: "Production scheduling", exact: true }).click();
@@ -93,17 +93,17 @@ test("real dispatch, verified Gantt, reviewed what-if, bounded scheduling job an
   });
   await expect(page.getByRole("heading", { name: "Selected optimizer-job Gantt" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Producer & solver evidence" })).toContainText(
-    "Selected: greedy",
+    "Selected: Greedy",
   );
   await page.getByText(/Advanced optimizer evidence/).click();
-  await expect(page.getByRole("region", { name: "CP-SAT proof phases" })).toContainText("OPTIMAL");
+  await expect(page.getByRole("region", { name: "CP-SAT proof phases" })).toContainText("Optimal");
   await axe(page);
   await screenshot(page, "m06b-job-result");
   expect(requests.filter((s) => s === "POST /api/v1/scheduling/dispatch")).toHaveLength(1);
   expect(requests.filter((s) => s === "POST /api/v1/scenarios/compare")).toHaveLength(1);
   expect(requests.filter((s) => s === "POST /api/v1/jobs/scheduling")).toHaveLength(1);
   expect(requests.some((s) => /\/prediction|\/optimize|\/catalog/.test(s))).toBe(false);
-  expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+  expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(1);
   expect(await page.content()).not.toContain(token);
   expect(errors).toEqual([]);
 });
@@ -121,11 +121,11 @@ test("real CP-SAT scenario job reports routing recovery and producer-specific pr
     timeout: 30000,
   });
   await expect(page.getByRole("region", { name: "Scenario producer & proof" })).toContainText(
-    "Selected: cp_sat",
+    "Selected: CP-SAT",
   );
   const table = page.getByRole("region", { name: "Scenario metric differences" });
   await expect(table.getByRole("row", { name: /^Finished units/ })).toContainText("28");
-  await expect(page.locator(".comparison-headline")).toContainText("Greedy-only relation: WORSE");
+  await expect(page.locator(".comparison-headline")).toContainText("Greedy-only relation: Worse");
   await axe(page);
   await screenshot(page, "m06b-routing-recovery");
 });
@@ -145,9 +145,9 @@ test("real zero-wall scenario job keeps explicit UNKNOWN fallback; tablet/mobile
     timeout: 25000,
   });
   const proof = page.getByRole("region", { name: "Scenario producer & proof" });
-  await expect(proof).toContainText("Selected: greedy");
+  await expect(proof).toContainText("Selected: Greedy");
   await expect(proof).toContainText("UNKNOWN");
-  await expect(page.locator(".comparison-headline")).toContainText("WORSE");
+  await expect(page.locator(".comparison-headline")).toContainText("Worse");
   await page.setViewportSize({ width: 820, height: 1100 });
   await axe(page);
   await screenshot(page, "m06b-jobs-tablet");
@@ -171,11 +171,18 @@ test("explicit real job cancellation reaches server CANCELLED without a fabricat
   await expect(cancel).toBeEnabled({ timeout: 15000 });
   await cancel.click();
   await expect(page.getByRole("region", { name: "Selected job lifecycle" })).toContainText(
-    "CANCELLED",
+    "Cancelled",
     { timeout: 15000 },
   );
   await expect(page.getByText("Verified job result", { exact: true })).toHaveCount(0);
   await expect(cancel).toBeDisabled();
   await axe(page);
   await screenshot(page, "m06b-cancelled-job");
+});
+
+// Existing workflow assertions explicitly exercise the selectable English locale.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("loometric.language", "en-US");
+  });
 });

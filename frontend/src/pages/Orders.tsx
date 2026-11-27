@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { Badge, Empty, Icon, Modal, Notice, Panel, TableScroll } from "../components/ui";
-import { compareExact, dateLabel, formatExact, stageName } from "../domain/exact";
+import { compareExact } from "../domain/exact";
 import type { Order } from "../domain/models";
+import { useI18n } from "../i18n/I18n";
 import { useWorkspace } from "../state/Workspace";
 
 type SortKey = "id" | "styleId" | "quantity" | "priority" | "release" | "due";
@@ -14,6 +15,17 @@ const columns: { key: SortKey; label: string }[] = [
   { key: "due", label: "Due date" },
 ];
 export function Orders() {
+  const {
+    t,
+    backendText,
+    locale,
+    label: textLabel,
+    codeLabel,
+    formatExact,
+    dateLabel,
+    stageName,
+  } = useI18n();
+
   const { dataset } = useWorkspace();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<{ key: SortKey; direction: "ascending" | "descending" }>({
@@ -28,20 +40,20 @@ export function Orders() {
         .filter((order) =>
           [order.id, order.styleId, ...order.stages]
             .join(" ")
-            .toLowerCase()
-            .includes(search.trim().toLowerCase()),
+            .toLocaleLowerCase(locale)
+            .includes(search.trim().toLocaleLowerCase(locale)),
         )
         .sort((a, b) => {
           const comparison =
             sort.key === "quantity" || sort.key === "priority"
               ? compareExact(a[sort.key], b[sort.key])
-              : a[sort.key].localeCompare(b[sort.key]);
+              : a[sort.key].localeCompare(b[sort.key], locale);
           return sort.direction === "ascending" ? comparison : -comparison;
         }),
-    [planning, search, sort],
+    [planning, search, sort, locale],
   );
   if (!planning)
-    return <Empty title="No planning dataset">Choose a synthetic dataset first.</Empty>;
+    return <Empty title={t("No planning dataset")}>{t("Choose a synthetic dataset first.")}</Empty>;
   const changeSort = (key: SortKey) =>
     setSort((current) => ({
       key,
@@ -51,29 +63,31 @@ export function Orders() {
   return (
     <div className="page-stack">
       <Panel
-        title="Order register"
-        description={`${planning.orders.length} unique orders · source inputs, not scheduled output`}
-        action={<Badge>Planning inputs</Badge>}
+        title={t("Order register")}
+        description={t("{p0} unique orders · source inputs, not scheduled output", {
+          p0: planning.orders.length,
+        })}
+        action={<Badge>{t("Planning inputs")}</Badge>}
       >
         <div className="table-toolbar">
           <label className="search-field">
             <Icon name="search" size={18} />
             <input
               type="search"
-              aria-label="Search orders"
-              placeholder="Search order, style or stage…"
+              aria-label={t("Search orders")}
+              placeholder={t("Search order, style or stage…")}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </label>
           <span className="muted" aria-live="polite">
-            {rows.length} of {planning.orders.length} orders
+            {t("{p0} of {p1} orders", { p0: rows.length, p1: planning.orders.length })}
           </span>
         </div>
-        <TableScroll label="Order register scrollable table">
+        <TableScroll label={t("Order register scrollable table")}>
           <table>
             <caption className="sr-only">
-              Synthetic order register. Activate a column header to change sort order.
+              {t("Synthetic order register. Activate a column header to change sort order.")}
             </caption>
             <thead>
               <tr>
@@ -88,7 +102,7 @@ export function Orders() {
                       className="sort-button"
                       onClick={() => changeSort(column.key)}
                     >
-                      {column.label}
+                      {textLabel(column.label)}
                       <span aria-hidden="true">
                         {sort.key === column.key
                           ? sort.direction === "ascending"
@@ -99,9 +113,9 @@ export function Orders() {
                     </button>
                   </th>
                 ))}
-                <th scope="col">Required stages</th>
+                <th scope="col">{t("Required stages")}</th>
                 <th scope="col">
-                  <span className="sr-only">Details</span>
+                  <span className="sr-only">{t("Details")}</span>
                 </th>
               </tr>
             </thead>
@@ -123,7 +137,7 @@ export function Orders() {
                   <td>
                     <div className="badge-row">
                       {order.stages.map((stage) => (
-                        <Badge key={stage}>{stage}</Badge>
+                        <Badge key={stage}>{stageName(stage)}</Badge>
                       ))}
                     </div>
                   </td>
@@ -131,10 +145,10 @@ export function Orders() {
                     <button
                       className="text-link"
                       type="button"
-                      aria-label={`Inspect ${order.id}`}
+                      aria-label={t("Inspect {p0}", { p0: order.id })}
                       onClick={() => setSelected(order)}
                     >
-                      Inspect <Icon name="arrow" size={15} />
+                      {t("Inspect")} <Icon name="arrow" size={15} />
                     </button>
                   </td>
                 </tr>
@@ -143,42 +157,46 @@ export function Orders() {
           </table>
         </TableScroll>
         {rows.length === 0 && (
-          <Empty title="No matching orders">Try another order ID, style or required stage.</Empty>
+          <Empty title={t("No matching orders")}>
+            {t("Try another order ID, style or required stage.")}
+          </Empty>
         )}
         <p className="table-footnote">
-          Priority is the declared input value; 1 is highest priority in the existing scheduling
-          policy.
+          {t(
+            "Priority is the declared input value; 1 is highest priority in the existing scheduling policy.",
+          )}
         </p>
       </Panel>
       <Notice>
-        Routing below reflects declared line–style capabilities. Release dates, material readiness
-        and shared capacity still require scheduling verification.
+        {t(
+          "Routing below reflects declared line–style capabilities. Release dates, material readiness and shared capacity still require scheduling verification.",
+        )}
       </Notice>
       {selected && (
-        <Modal title={`Order ${selected.id}`} onClose={() => setSelected(null)}>
+        <Modal title={t("Order {p0}", { p0: selected.id })} onClose={() => setSelected(null)}>
           <div className="order-detail">
-            <Badge tone="amber">SYNTHETIC INPUT</Badge>
+            <Badge tone="amber">{t("SYNTHETIC INPUT")}</Badge>
             <dl className="detail-grid">
               <div>
-                <dt>Style</dt>
+                <dt>{t("Style")}</dt>
                 <dd>{selected.styleId}</dd>
               </div>
               <div>
-                <dt>Quantity</dt>
-                <dd>{formatExact(selected.quantity)} pieces</dd>
+                <dt>{t("Quantity")}</dt>
+                <dd>{t("{p0} pieces", { p0: formatExact(selected.quantity) })}</dd>
               </div>
               <div>
-                <dt>Priority</dt>
+                <dt>{t("Priority")}</dt>
                 <dd>P{selected.priority}</dd>
               </div>
               <div>
-                <dt>Release / due</dt>
+                <dt>{t("Release / due")}</dt>
                 <dd>
                   {dateLabel(selected.release)} / {dateLabel(selected.due)}
                 </dd>
               </div>
             </dl>
-            <h3>Declared routing compatibility</h3>
+            <h3>{t("Declared routing compatibility")}</h3>
             {selected.stages.map((stage) => {
               const routes = planning.capabilities.filter(
                 (route) => route.styleId === selected.styleId && route.stage === stage,
@@ -191,23 +209,29 @@ export function Orders() {
                   <strong>{stageName(stage)}</strong>
                   <p>
                     {standard
-                      ? `${formatExact(standard.minutes)} standard worker-minutes / piece · ${standard.unit}`
-                      : "No standard declared"}
+                      ? t("{p0} standard worker-minutes / piece · {p1}", {
+                          p0: formatExact(standard.minutes),
+                          p1: codeLabel(standard.unit),
+                        })
+                      : t("No standard declared")}
                   </p>
                   {routes.length ? (
                     routes.map((route) => (
                       <p key={route.id}>
-                        <code>{route.lineId}</code> · {route.id} · {route.basis}
+                        <code>{route.lineId}</code> · {route.id} ·{" "}
+                        {dataset?.validatedFingerprint ? route.basis : backendText(route.basis)}
                       </p>
                     ))
                   ) : (
-                    <p>No compatible line declared.</p>
+                    <p>{t("No compatible line declared.")}</p>
                   )}
                 </div>
               );
             })}
             <p className="field-help">
-              Capability does not mean this order has been allocated or can meet its due date.
+              {t(
+                "Capability does not mean this order has been allocated or can meet its due date.",
+              )}
             </p>
           </div>
         </Modal>

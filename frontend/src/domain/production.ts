@@ -468,7 +468,7 @@ export async function userDataset(raw: JsonObject, validation: InputValidation):
   return {
     key: `user-${crypto.randomUUID()}`,
     name: "My synthetic production input",
-    description: "M07A · user-defined synthetic assumptions, validated by local Python",
+    description: "User-defined synthetic assumptions, validated by local Python",
     sourceFile: "Local user workspace · exact serialized input (LF)",
     sourceHash: Array.from(new Uint8Array(hash), (b) => b.toString(16).padStart(2, "0")).join(""),
     planning: planningInput(instance.planning),

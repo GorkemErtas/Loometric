@@ -20,14 +20,33 @@ export function sumExact(values: readonly string[]): string {
     scale,
   );
 }
-export function formatExact(value: string): string {
+export function formatExact(value: string, locale = "en-US"): string {
+  if (value.startsWith("-")) return `-${formatExact(value.slice(1), locale)}`;
   const parsed = parts(value);
   const [whole = "0", fraction] = fromParts(parsed.digits, parsed.scale).split(".");
-  return BigInt(whole).toLocaleString("en-US") + (fraction ? `.${fraction}` : "");
+  const separator =
+    new Intl.NumberFormat(locale).formatToParts(1.1).find((p) => p.type === "decimal")?.value ??
+    ".";
+  return (
+    new Intl.NumberFormat(locale).format(BigInt(whole)) +
+    (fraction ? `${separator}${fraction}` : "")
+  );
 }
-export function percentExact(value: string): string {
-  const parsed = parts(value);
-  return `${formatExact(fromParts(parsed.digits * 100n, parsed.scale))}%`;
+export function percentExact(value: string, locale = "en-US"): string {
+  const negative = value.startsWith("-");
+  const parsed = parts(negative ? value.slice(1) : value);
+  return percentValueExact(
+    `${negative ? "-" : ""}${fromParts(parsed.digits * 100n, parsed.scale)}`,
+    locale,
+  );
+}
+export function percentValueExact(value: string, locale = "en-US"): string {
+  const negative = value.startsWith("-");
+  const formatted = formatExact(negative ? value.slice(1) : value, locale);
+  return new Intl.NumberFormat(locale, { style: "percent" })
+    .formatToParts(negative ? -1 : 1)
+    .map((part) => (part.type === "integer" ? formatted : part.value))
+    .join("");
 }
 export function compareExact(a: string, b: string): number {
   const left = parts(a);
@@ -50,26 +69,29 @@ export function visualPercent(value: string, denominator: string): string {
 }
 export const stageName = (stage: string) =>
   stage.replaceAll("_", " ").replace(/^./, (s) => s.toUpperCase());
-export function dateLabel(date: string): string {
-  const [year, month, day] = date.slice(0, 10).split("-");
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  return `${day} ${months[Number(month) - 1] ?? month} ${year}`;
+export function dateLabel(date: string, locale = "en-US"): string {
+  const value = new Date(`${date.slice(0, 10)}T00:00:00Z`);
+  return Number.isFinite(value.getTime())
+    ? new Intl.DateTimeFormat(locale, {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+      }).format(value)
+    : date;
 }
-export const clockLabel = (value: string) =>
-  `${dateLabel(value)}, ${value.slice(11, 16)} ${value.slice(19)}`;
+export const clockLabel = (value: string, locale = "en-US") => {
+  // Preserve the source wall clock and offset; never use the browser timezone.
+  const wall = new Date(`${value.slice(0, 19)}Z`);
+  if (!Number.isFinite(wall.getTime())) return value;
+  const time = new Intl.DateTimeFormat(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    timeZone: "UTC",
+  }).format(wall);
+  return `${dateLabel(value, locale)}, ${time} ${value.match(/(?:Z|[+-]\d{2}:\d{2})$/)?.[0] ?? ""}`;
+};
 
-export const formatSignedExact = (value: string) =>
-  value.startsWith("-") ? `-${formatExact(value.slice(1))}` : formatExact(value);
+export const formatSignedExact = (value: string, locale = "en-US") =>
+  value.startsWith("-") ? `-${formatExact(value.slice(1), locale)}` : formatExact(value, locale);

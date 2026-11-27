@@ -16,9 +16,12 @@ import {
   type PredictionInputs,
   type PredictionReport,
 } from "../domain/predictions";
+import { useI18n } from "../i18n/I18n";
 import { useWorkspace } from "../state/Workspace";
 
 export function Predictions() {
+  const { t, validationMessage, label: textLabel, stageName, formValidation } = useI18n();
+
   const { api, sessionId, rejectSession } = useWorkspace();
   const [inputs, setInputs] = useState<PredictionInputs>({ ...initialInputs });
   const [selection, setSelection] = useState<ModelName | "all" | "legacy">("rf_physics");
@@ -99,52 +102,59 @@ export function Predictions() {
     <div className="predictions-page">
       <div className="prediction-intro">
         <div>
-          <Badge tone="amber">EXPERIMENTAL · SYNTHETIC ONLY</Badge>
-          <h2>Explore planned production conditions</h2>
+          <Badge tone="amber">{t("EXPERIMENTAL · SYNTHETIC ONLY")}</Badge>
+          <h2>{t("Explore planned production conditions")}</h2>
           <p>
-            Execute actual fitted models against hypothetical pre-shift inputs. Forecast standard
-            capacity attainment, not guaranteed production output or intrinsic employee efficiency.
+            {t(
+              "Execute actual fitted models against hypothetical pre-shift inputs. Forecast standard capacity attainment, not guaranteed production output or intrinsic employee efficiency.",
+            )}
           </p>
         </div>
         <div className="prediction-policy">
-          <strong>NO ML PROMOTION</strong>
-          <span>Research and demonstration</span>
-          <span>Human review required</span>
+          <strong>{t("NO ML PROMOTION")}</strong>
+          <span>{t("Research and demonstration")}</span>
+          <span>{t("Human review required")}</span>
         </div>
       </div>
       <div className="prediction-caution">
-        <strong>Known subgroup failures remain visible.</strong> Forest12 packing MAE regressed
-        51.84% in development seed 19 (36 rows). Hist31 failed stage and worst-error gates. Lower
-        aggregate MAE does not establish superiority in every stage.
+        <strong>{t("Known subgroup failures remain visible.")}</strong>{" "}
+        {t(
+          "Forest12 packing MAE regressed 51.84% in development seed 19 (36 rows). Hist31 failed stage and worst-error gates. Lower aggregate MAE does not establish superiority in every stage.",
+        )}
       </div>
       <div className="prediction-caution">
-        <strong>RF Physics · EXP-008.</strong> Retained benchmark MAE improved by 24.05% compared
-        with Forest12. Stage-specific and worst-error regressions remain unresolved. EXP-009
-        prospective validation failed the complete replication criteria.
+        <strong>{t("RF Physics · EXP-008.")}</strong>{" "}
+        {t(
+          "Retained benchmark MAE improved by 24.05% compared with Forest12. Stage-specific and worst-error regressions remain unresolved. EXP-009 prospective validation failed the complete replication criteria.",
+        )}
       </div>
       <div className="prediction-caution">
-        <strong>History Boost · EXP-010.</strong> One fixed residual fit passed fresh held-out
-        demonstration guards using mature past-shift context. Missing or stale history abstains.
-        Baseline worst error still increased 9.11%; first unannounced shocks remain uncertain.
+        <strong>{t("History Boost · EXP-010.")}</strong>{" "}
+        {t(
+          "One fixed residual fit passed fresh held-out demonstration guards using mature past-shift context. Missing or stale history abstains. Baseline worst error still increased 9.11%; first unannounced shocks remain uncertain.",
+        )}
       </div>
       {!api && (
         <div className="notice" role="status">
           <p>
-            Connect with Configure API to run actual models. Example inputs below are editable; no
-            prediction is generated in preview mode.
+            {t(
+              "Connect with Configure API to run actual models. Example inputs below are editable; no prediction is generated in preview mode.",
+            )}
           </p>
         </div>
       )}
       <Panel
-        title="Hypothetical pre-shift inputs"
-        description="One order-stage on one dedicated crew and line. All values must be planned and available before shift start."
+        title={t("Hypothetical pre-shift inputs")}
+        description={t(
+          "One order-stage on one dedicated crew and line. All values must be planned and available before shift start.",
+        )}
       >
-        <form onSubmit={submit} className="prediction-form">
+        <form {...formValidation} onSubmit={submit} className="prediction-form">
           <div className="prediction-form-toolbar">
             <label>
-              Model
+              {t("Model")}
               <select
-                aria-label="Model"
+                aria-label={t("Model")}
                 value={selection}
                 onChange={(event) => {
                   invalidate();
@@ -155,53 +165,54 @@ export function Predictions() {
                   <option key={name} value={name}>
                     {modelLabels[name]} ·{" "}
                     {name === "history_boost"
-                      ? "MATURE HISTORY REQUIRED"
+                      ? t("MATURE HISTORY REQUIRED")
                       : name === "rf_physics"
-                        ? "RESEARCH CANDIDATE"
+                        ? t("RESEARCH CANDIDATE")
                         : name === "grouped_mean"
-                          ? "comparison baseline"
-                          : "EXPERIMENTAL"}
+                          ? t("comparison baseline")
+                          : t("EXPERIMENTAL")}
                   </option>
                 ))}
-                <option value="legacy">Compare all four original models</option>
-                <option value="all">Compare all five models</option>
+                <option value="legacy">{t("Compare all four original models")}</option>
+                <option value="all">{t("Compare all five models")}</option>
               </select>
             </label>
             <p>
-              Default: RF Physics, an experimental research candidate with lower retained benchmark
-              MAE. No operational promotion or factory validation is implied.
+              {t(
+                "Default: RF Physics, an experimental research candidate with lower retained benchmark MAE. No operational promotion or factory validation is implied.",
+              )}
             </p>
           </div>
           <fieldset>
-            <legend>Production context</legend>
+            <legend>{t("Production context")}</legend>
             <div className="prediction-fields">
               <label>
-                Production stage
+                {t("Production stage")}
                 <select
                   value={inputs.stage}
                   onChange={(event) => change("stage", event.target.value)}
                 >
                   {["cutting", "sewing", "finishing", "quality_control", "packing"].map((stage) => (
                     <option key={stage} value={stage}>
-                      {stage.replaceAll("_", " ")}
+                      {stageName(stage)}
                     </option>
                   ))}
                 </select>
-                <span>Single process stage for this observation.</span>
+                <span>{t("Single process stage for this observation.")}</span>
               </label>
               <label>
-                Shift
+                {t("Shift")}
                 <select
                   value={inputs.shift_kind}
                   onChange={(event) => change("shift_kind", event.target.value)}
                 >
-                  <option value="day">Day</option>
-                  <option value="night">Night</option>
+                  <option value="day">{t("Day")}</option>
+                  <option value="night">{t("Night")}</option>
                 </select>
-                <span>Frozen planned shift type.</span>
+                <span>{t("Frozen planned shift type.")}</span>
               </label>
               <label>
-                Shift start weekday
+                {t("Shift start weekday")}
                 <select
                   value={inputs.weekday}
                   onChange={(event) => change("weekday", Number(event.target.value))}
@@ -215,23 +226,22 @@ export function Predictions() {
                     "Saturday",
                     "Sunday — outside v1 support",
                   ].map((day, index) => (
-                    <option key={day} value={index}>
-                      {day}
+                    <option key={textLabel(day)} value={index}>
+                      {textLabel(day)}
                     </option>
                   ))}
                 </select>
-                <span>Local weekday of shift start, including for night shifts.</span>
+                <span>{t("Local weekday of shift start, including for night shifts.")}</span>
               </label>
             </div>
           </fieldset>
           {usesHistory && (
             <fieldset>
-              <legend>Mature historical context · optional fifth model</legend>
+              <legend>{t("Mature historical context · optional fifth model")}</legend>
               <p>
-                Use only the last seven same-crew and same-line reports available before the
-                30-minute pre-shift cutoff. Mean/std exclude past shifts whose output was limited by
-                offered work. Leave missing history empty; History Boost will abstain. These
-                editable values are hypothetical, not imported factory measurements.
+                {t(
+                  "Use only the last seven same-crew and same-line reports available before the 30-minute pre-shift cutoff. Mean/std exclude past shifts whose output was limited by offered work. Leave missing history empty; History Boost will abstain. These editable values are hypothetical, not imported factory measurements.",
+                )}
               </p>
               <div className="prediction-fields">
                 {(
@@ -250,7 +260,7 @@ export function Predictions() {
                   ] as const
                 ).map(([key, label, min, max, step]) => (
                   <label key={key}>
-                    {label}
+                    {textLabel(String(label))}
                     <input
                       type="number"
                       value={history[key] ?? ""}
@@ -271,17 +281,18 @@ export function Predictions() {
                 ))}
               </div>
               <p>
-                At least two uncensored reports and age ≤ 72 hours are required for a candidate
-                point estimate.
+                {t(
+                  "At least two uncensored reports and age ≤ 72 hours are required for a candidate point estimate.",
+                )}
               </p>
             </fieldset>
           )}
           <fieldset>
-            <legend>Planned crew, time and demand</legend>
+            <legend>{t("Planned crew, time and demand")}</legend>
             <div className="prediction-fields">
               {fields.map(([key, label, help, min, max, step]) => (
                 <div key={key} className="prediction-field">
-                  <label htmlFor={`prediction-${key}`}>{label}</label>
+                  <label htmlFor={`prediction-${key}`}>{textLabel(String(label))}</label>
                   <input
                     id={`prediction-${key}`}
                     type="number"
@@ -298,7 +309,7 @@ export function Predictions() {
                     }
                     aria-describedby={`help-${key}`}
                   />
-                  <span id={`help-${key}`}>{help}</span>
+                  <span id={`help-${key}`}>{textLabel(help)}</span>
                 </div>
               ))}
             </div>
@@ -309,8 +320,8 @@ export function Predictions() {
               checked={inputs.planned_machine_available}
               onChange={(event) => change("planned_machine_available", event.target.checked)}
             />
-            Planned machine available
-            <span>Unavailable machine or zero labor/time produces abstention.</span>
+            {t("Planned machine available")}
+            <span>{t("Unavailable machine or zero labor/time produces abstention.")}</span>
           </label>
           <label className="prediction-checkbox">
             <input
@@ -321,15 +332,17 @@ export function Predictions() {
                 setDeclared(event.target.checked);
               }}
             />
-            I am testing hypothetical synthetic pre-shift conditions.
-            <span>No measured factory accuracy or operational authorization is implied.</span>
+            {t("I am testing hypothetical synthetic pre-shift conditions.")}
+            <span>
+              {t("No measured factory accuracy or operational authorization is implied.")}
+            </span>
           </label>
           {issues.length > 0 && (
             <div className="prediction-issues" role="alert">
-              <strong>Check input consistency</strong>
+              <strong>{t("Check input consistency")}</strong>
               <ul>
                 {issues.map((issue) => (
-                  <li key={issue}>{issue}</li>
+                  <li key={validationMessage(issue)}>{validationMessage(issue)}</li>
                 ))}
               </ul>
             </div>
@@ -340,29 +353,29 @@ export function Predictions() {
               type="submit"
               disabled={!api || !declared || issues.length > 0 || loading}
             >
-              {loading ? "Running actual estimators…" : "Predict"}
+              {loading ? t("Running actual estimators…") : t("Predict")}
             </button>
             {loading && (
               <button className="button" type="button" onClick={invalidate}>
-                Cancel request
+                {t("Cancel request")}
               </button>
             )}
             {report && (
               <button className="button" type="button" onClick={() => setBefore(report)}>
-                Use as scenario baseline
+                {t("Use as scenario baseline")}
               </button>
             )}
             {before && (
               <button className="button" type="button" onClick={() => setBefore(null)}>
-                Clear scenario baseline
+                {t("Clear scenario baseline")}
               </button>
             )}
             <span role="status">
               {loading
-                ? "Loading trusted models and computing predictions."
+                ? t("Loading trusted models and computing predictions.")
                 : requestId
-                  ? `API response · ${requestId}`
-                  : "No current prediction response."}
+                  ? t("API response · {p0}", { p0: requestId })
+                  : t("No current prediction response.")}
             </span>
           </div>
         </form>
@@ -372,8 +385,9 @@ export function Predictions() {
           <ErrorNotice error={error} />
           {error.code === "EXPERIMENTAL_ARTIFACT_UNAVAILABLE" && (
             <p>
-              Publish the trusted local experimental artifacts using the documented offline setup,
-              then retry.
+              {t(
+                "Publish the trusted local experimental artifacts using the documented offline setup, then retry.",
+              )}
             </p>
           )}
         </>
@@ -384,9 +398,10 @@ export function Predictions() {
       ) : (
         !loading &&
         !error && (
-          <Empty title="Your next prediction starts with a real request">
-            Review the inputs and synthetic declaration, then predict. Editing inputs clears the
-            current result; a pinned scenario baseline stays visible until the session changes.
+          <Empty title={t("Your next prediction starts with a real request")}>
+            {t(
+              "Review the inputs and synthetic declaration, then predict. Editing inputs clears the current result; a pinned scenario baseline stays visible until the session changes.",
+            )}
           </Empty>
         )
       )}

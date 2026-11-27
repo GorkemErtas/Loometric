@@ -15,6 +15,7 @@ import {
   operations,
   specification,
 } from "../domain/scenario";
+import { useI18n } from "../i18n/I18n";
 import { usePlanning } from "../state/PlanningWorkspace";
 import { useWorkspace } from "../state/Workspace";
 
@@ -41,6 +42,8 @@ function defaults(planning: Planning) {
   };
 }
 export function Scenarios() {
+  const { t, validationMessage, label: textLabel, codeLabel, formValidation } = useI18n();
+
   const { dataset, api, capabilities, status } = useWorkspace();
   const {
     draft,
@@ -78,7 +81,7 @@ export function Scenarios() {
     setValues((current) => ({ ...current, [key]: value }));
   const field = (key: keyof typeof values, label: string) => (
     <label>
-      {label}
+      {textLabel(String(label))}
       <input
         type="text"
         value={values[key]}
@@ -95,7 +98,7 @@ export function Scenarios() {
     choices: { value: string; label: string }[],
   ) => (
     <label>
-      {label}
+      {textLabel(String(label))}
       <select
         value={values[key]}
         required
@@ -124,10 +127,12 @@ export function Scenarios() {
           }
         }}
       >
-        {choices.length === 0 && <option value="">No declared choices</option>}
+        {choices.length === 0 && <option value="">{t("No declared choices")}</option>}
         {choices.map((choice) => (
           <option key={choice.value} value={choice.value}>
-            {choice.label}
+            {key === "value" && operation === "set_availability"
+              ? codeLabel(choice.value)
+              : choice.label}
           </option>
         ))}
       </select>
@@ -171,30 +176,30 @@ export function Scenarios() {
     <div className="page-stack">
       <PlanningGate />
       <Notice>
-        Changes are hypothetical capacity assumptions. The original baseline stays immutable. Use
-        existing lines, profiles, capabilities and declared shifts only. Python validates the
-        complete atomic transaction; no dangling-reference cleanup is inferred.
+        {t(
+          "Changes are hypothetical capacity assumptions. The original baseline stays immutable. Use existing lines, profiles, capabilities and declared shifts only. Python validates the complete atomic transaction; no dangling-reference cleanup is inferred.",
+        )}
       </Notice>
       {!reference && (
         <Notice>
-          Run reference scheduling first to obtain this baseline’s verified fingerprint.{" "}
+          {t("Run reference scheduling first to obtain this baseline’s verified fingerprint.")}{" "}
           <a className="text-link" href="/#/scheduling">
-            Open scheduling →
+            {t("Open scheduling →")}
           </a>
         </Notice>
       )}
       {planning && (
         <>
           <Panel
-            title="1 · Build ordered changes"
-            description="Only the eight existing M04 operations are supported"
-            action={<Badge>Immutable baseline</Badge>}
+            title={t("1 · Build ordered changes")}
+            description={t("Only the eight existing change operations are supported")}
+            action={<Badge>{t("Immutable baseline")}</Badge>}
           >
-            <form className="scenario-form" onSubmit={append}>
+            <form {...formValidation} className="scenario-form" onSubmit={append}>
               <fieldset disabled={!!busy}>
-                <legend className="sr-only">Supported capacity change</legend>
+                <legend className="sr-only">{t("Supported capacity change")}</legend>
                 <label>
-                  Change operation
+                  {t("Change operation")}
                   <select
                     value={operation}
                     onChange={(event) => {
@@ -211,7 +216,7 @@ export function Scenarios() {
                   >
                     {operations.map((op) => (
                       <option key={op} value={op}>
-                        {op.replaceAll("_", " ")}
+                        {codeLabel(op)}
                       </option>
                     ))}
                   </select>
@@ -284,9 +289,9 @@ export function Scenarios() {
                 )}
                 <div className="form-submit">
                   <button className="button" type="submit" disabled={draft.changes.length >= 64}>
-                    Add change to review
+                    {t("Add change to review")}
                   </button>
-                  <span>Ordered list · maximum 64 edits per HTTP request</span>
+                  <span>{t("Ordered list · maximum 64 edits per HTTP request")}</span>
                 </div>
               </fieldset>
             </form>
@@ -294,7 +299,7 @@ export function Scenarios() {
               {draft.changes.map((change, index) => (
                 <li key={encodeExact(change)}>
                   <div>
-                    <strong>{change.operation.replaceAll("_", " ")}</strong>
+                    <strong>{codeLabel(change.operation)}</strong>
                     <code>{encodeExact(change)}</code>
                   </div>
                   <div className="change-actions">
@@ -302,7 +307,7 @@ export function Scenarios() {
                       className="button button-small"
                       type="button"
                       disabled={!!busy || index === 0}
-                      aria-label={`Move change ${index + 1} up`}
+                      aria-label={t("Move change {p0} up", { p0: index + 1 })}
                       onClick={() => {
                         const changes = [...draft.changes];
                         const previous = changes[index - 1];
@@ -319,7 +324,7 @@ export function Scenarios() {
                       className="text-link"
                       type="button"
                       disabled={!!busy}
-                      aria-label={`Remove change ${index + 1}`}
+                      aria-label={t("Remove change {p0}", { p0: index + 1 })}
                       onClick={() =>
                         updateDraft({
                           ...draft,
@@ -327,7 +332,7 @@ export function Scenarios() {
                         })
                       }
                     >
-                      Remove
+                      {t("Remove")}
                     </button>
                   </div>
                 </li>
@@ -335,18 +340,18 @@ export function Scenarios() {
             </ol>
             {draft.changes.length === 0 && (
               <p className="table-footnote">
-                No changes added. An explicit empty/no-op scenario is valid.
+                {t("No changes added. An explicit empty/no-op scenario is valid.")}
               </p>
             )}
           </Panel>
           <Panel
-            title="2 · Declare provenance & execution"
-            description="All fields are included in the strict versioned M04 request"
+            title={t("2 · Declare provenance & execution")}
+            description={t("All fields are included in the strict versioned scenario request")}
           >
             <fieldset className="scenario-metadata" disabled={!!busy}>
-              <legend className="sr-only">Scenario provenance</legend>
+              <legend className="sr-only">{t("Scenario provenance")}</legend>
               <label>
-                Scenario ID
+                {t("Scenario ID")}
                 <input
                   value={draft.id}
                   onChange={(event) => updateDraft({ ...draft, id: event.target.value })}
@@ -354,7 +359,7 @@ export function Scenarios() {
                 />
               </label>
               <label>
-                Scenario label
+                {t("Scenario label")}
                 <input
                   value={draft.label}
                   onChange={(event) => updateDraft({ ...draft, label: event.target.value })}
@@ -362,7 +367,7 @@ export function Scenarios() {
                 />
               </label>
               <label>
-                Synthetic source ID
+                {t("Synthetic source ID")}
                 <input
                   value={draft.sourceId}
                   onChange={(event) => updateDraft({ ...draft, sourceId: event.target.value })}
@@ -370,7 +375,7 @@ export function Scenarios() {
                 />
               </label>
               <label className="full-width">
-                Assumption (single canonical entry)
+                {t("Assumption (single canonical entry)")}
                 <textarea
                   value={draft.assumptions}
                   onChange={(event) => updateDraft({ ...draft, assumptions: event.target.value })}
@@ -386,12 +391,12 @@ export function Scenarios() {
                     updateDraft({ ...draft, optimizer: event.target.checked });
                   }}
                 />
-                Request bounded CP-SAT comparison job
+                {t("Request bounded CP-SAT comparison job")}
               </label>
               {optimizer && (
                 <>
                   <label>
-                    Wall seconds per phase (0–1)
+                    {t("Wall seconds per phase (0–1)")}
                     <input
                       value={draft.wall}
                       onChange={(event) => updateDraft({ ...draft, wall: event.target.value })}
@@ -399,7 +404,7 @@ export function Scenarios() {
                     />
                   </label>
                   <label>
-                    Deterministic units per phase (0–1)
+                    {t("Deterministic units per phase (0–1)")}
                     <input
                       value={draft.deterministic}
                       onChange={(event) =>
@@ -409,9 +414,9 @@ export function Scenarios() {
                     />
                   </label>
                   <p className="field-help full-width">
-                    Explicit seed 42, worker 1, benchmark mode. Zero is an intentional no-search
-                    diagnostic and can produce UNKNOWN with verified greedy fallback. Budgets are
-                    never silently clamped.
+                    {t(
+                      "Explicit seed 42, worker 1, benchmark mode. Zero is an intentional no-search diagnostic and can produce UNKNOWN with verified greedy fallback. Budgets are never silently clamped.",
+                    )}
                   </p>
                 </>
               )}
@@ -423,7 +428,7 @@ export function Scenarios() {
                 disabled={!!busy || !reference || !!executionBlock(dataset, capabilities)}
                 onClick={prepare}
               >
-                Review exact specification
+                {t("Review exact specification")}
               </button>
             </div>
           </Panel>
@@ -431,17 +436,19 @@ export function Scenarios() {
       )}
       {formError && (
         <div className="notice notice-error" role="alert">
-          {formError}
+          {validationMessage(formError)}
         </div>
       )}
       {review && (
         <Panel
-          title="3 · Review before execution"
-          description={`Exact numeric tokens · ${review.optimizer ? "bounded CP-SAT job" : "synchronous greedy comparison"}`}
-          action={<Badge tone="amber">SYNTHETIC</Badge>}
+          title={t("3 · Review before execution")}
+          description={t("Exact numeric tokens · {p0}", {
+            p0: review.optimizer ? t("bounded CP-SAT job") : t("synchronous greedy comparison"),
+          })}
+          action={<Badge tone="amber">{t("SYNTHETIC")}</Badge>}
         >
           <div className="review-json">
-            <JsonBlock label="Exact M04 specification">
+            <JsonBlock label={t("Exact scenario specification")}>
               {stringify(review.specification, null, 2) ?? ""}
             </JsonBlock>
           </div>
@@ -453,14 +460,14 @@ export function Scenarios() {
               onClick={() => void (review.optimizer ? submitJob(true) : runComparison())}
             >
               {review.optimizer
-                ? "Submit reviewed CP-SAT comparison job"
-                : "Run reviewed greedy comparison"}
+                ? t("Submit reviewed CP-SAT comparison job")
+                : t("Run reviewed greedy comparison")}
             </button>
           </div>
           <p className="table-footnote">
-            The backend validates this exact request atomically. Rejected requests are never retried
-            with altered assumptions. A lost POST response may leave an admitted job; do not
-            resubmit automatically.
+            {t(
+              "The backend validates this exact request atomically. Rejected requests are never retried with altered assumptions. A lost POST response may leave an admitted job; do not resubmit automatically.",
+            )}
           </p>
         </Panel>
       )}
@@ -468,9 +475,9 @@ export function Scenarios() {
       {comparison && planning && (
         <>
           <div className="report-receipt">
-            <Badge tone="teal">Actual API comparison</Badge>
+            <Badge tone="teal">{t("Actual API comparison")}</Badge>
             <span>
-              Request ID: <code>{comparison.requestId}</code>
+              {t("Request ID:")} <code>{comparison.requestId}</code>
             </span>
           </div>
           <ComparisonView comparison={comparison.data} planning={planning} />

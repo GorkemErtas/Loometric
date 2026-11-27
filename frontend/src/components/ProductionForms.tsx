@@ -1,6 +1,5 @@
 import { isLosslessNumber } from "lossless-json";
 import { type FormEvent, useId, useState } from "react";
-import { stageName } from "../domain/exact";
 import { type JsonObject, object, parseExact, text } from "../domain/json";
 import {
   calendarOf,
@@ -11,6 +10,7 @@ import {
   stages,
   WorkspaceInputError,
 } from "../domain/production";
+import { useI18n } from "../i18n/I18n";
 import { useProduction } from "../state/ProductionWorkspace";
 import { Panel } from "./ui";
 
@@ -43,6 +43,17 @@ const identity: Record<Kind, string> = {
   planned_downtime: "downtime_id",
   unavailable_periods: "period_id",
 };
+const entitySingular: Record<Kind, string> = {
+  styles: "Product style",
+  orders: "Order",
+  lines: "Production line",
+  capacity_profiles: "Capacity profile",
+  capabilities: "Line capability",
+  shifts: "Shift",
+  assignments: "Shift assignment",
+  planned_downtime: "Planned downtime",
+  unavailable_periods: "Unavailable period",
+};
 const calendarKinds: Kind[] = ["assignments", "planned_downtime", "unavailable_periods"];
 export const entityRows = (draft: JsonObject, kind: Kind) =>
   rows((calendarKinds.includes(kind) ? calendarOf(draft) : planningOf(draft))[kind]);
@@ -51,16 +62,21 @@ const valueText = (value: unknown) =>
 const newId = (kind: Kind) =>
   `${identity[kind].replace("_id", "")}-${crypto.randomUUID().slice(0, 8)}`;
 function InputField({ field, value }: { field: Field; value: unknown }) {
+  const { t, label: textLabel, codeLabel } = useI18n();
+
   const id = useId();
   return (
     <div className="production-field">
-      <label htmlFor={id}>{field.label}</label>
+      <label htmlFor={id}>{textLabel(field.label)}</label>
       {field.choices ? (
         <select id={id} name={field.key} defaultValue={valueText(value)} required={!field.optional}>
-          <option value="">Choose explicitly</option>
+          <option value="">{t("Choose explicitly")}</option>
           {field.choices.map((option) => (
             <option key={option.value} value={option.value}>
-              {option.label}
+              {["stage", "standard-stage", "availability"].includes(field.key) &&
+              [...stages, "available", "unavailable"].includes(option.value)
+                ? codeLabel(option.value)
+                : option.label}
             </option>
           ))}
         </select>
@@ -77,12 +93,14 @@ function InputField({ field, value }: { field: Field; value: unknown }) {
           placeholder={field.type === "timestamp" ? "2030-01-07T08:00:00+03:00" : undefined}
         />
       )}
-      {field.help && <small>{field.help}</small>}
+      {field.help && <small>{textLabel(field.help)}</small>}
     </div>
   );
 }
-const stageOptions = stages.map((value) => ({ value, label: stageName(value) }));
+const stageOptions = stages.map((value) => ({ value, label: value }));
 function RepeatedRows({ kind, initial }: { kind: "standards" | "breaks"; initial: JsonObject[] }) {
+  const { t, label: textLabel, number } = useI18n();
+
   const [items, setItems] = useState(() =>
     initial.map((item) => ({ key: crypto.randomUUID(), item })),
   );
@@ -98,18 +116,22 @@ function RepeatedRows({ kind, initial }: { kind: "standards" | "breaks"; initial
         ];
   return (
     <fieldset className="production-repeater">
-      <legend>{kind === "standards" ? "Stage labor standards" : "Explicit breaks"}</legend>
+      <legend>{kind === "standards" ? t("Stage labor standards") : t("Explicit breaks")}</legend>
       <p className="field-help">
         {kind === "standards"
-          ? "A positive standard describes worker labor per piece, not elapsed machine time. Add each supported stage once."
-          : "No break rows explicitly means no breaks. Python checks containment and overlap; all times must be on the minute grid."}
+          ? t(
+              "A positive standard describes worker labor per piece, not elapsed machine time. Add each supported stage once.",
+            )
+          : t(
+              "No break rows explicitly means no breaks. Python checks containment and overlap; all times must be on the minute grid.",
+            )}
       </p>
       {items.map(({ key, item }, i) => (
         <div className="production-repeat-row" key={key}>
           {fields.map((field, j) => (
             <InputField
               key={field.key}
-              field={{ ...field, label: `${field.label} ${i + 1}` }}
+              field={{ ...field, label: `${textLabel(field.label)} ${number(i + 1)}` }}
               value={
                 kind === "standards"
                   ? item[j === 0 ? "stage" : "standard_minutes_per_unit"]
@@ -120,10 +142,13 @@ function RepeatedRows({ kind, initial }: { kind: "standards" | "breaks"; initial
           <button
             type="button"
             className="button"
-            aria-label={`Remove ${kind === "standards" ? "standard" : "break"} ${i + 1}`}
+            aria-label={t("Remove {p0} {p1}", {
+              p0: kind === "standards" ? t("Stage labor standards") : t("Explicit breaks"),
+              p1: i + 1,
+            })}
             onClick={() => setItems(items.filter((x) => x.key !== key))}
           >
-            Remove
+            {t("Remove")}
           </button>
         </div>
       ))}
@@ -133,21 +158,24 @@ function RepeatedRows({ kind, initial }: { kind: "standards" | "breaks"; initial
         disabled={items.length >= (kind === "standards" ? stages.length : 256)}
         onClick={() => setItems([...items, { key: crypto.randomUUID(), item: {} }])}
       >
-        {kind === "standards" ? "Add stage standard" : "Add break"}
+        {kind === "standards" ? t("Add stage standard") : t("Add break")}
       </button>
     </fieldset>
   );
 }
 function OrderedStages({ initial }: { initial: string[] }) {
+  const { t, stageName } = useI18n();
+
   const id = useId();
   const [selected, setSelected] = useState(initial);
   const [choice, setChoice] = useState("");
   return (
     <fieldset className="production-repeater">
-      <legend>Ordered production stages</legend>
+      <legend>{t("Ordered production stages")}</legend>
       <p className="field-help">
-        Whole batches follow this exact sequence. Every stage needs a standard on the selected
-        style.
+        {t(
+          "Whole batches follow this exact sequence. Every stage needs a standard on the selected style.",
+        )}
       </p>
       <ol>
         {selected.map((stage, i) => (
@@ -157,7 +185,7 @@ function OrderedStages({ initial }: { initial: string[] }) {
             <button
               type="button"
               className="button button-small"
-              aria-label={`Move stage ${i + 1} earlier`}
+              aria-label={t("Move stage {p0} earlier", { p0: i + 1 })}
               disabled={i === 0}
               onClick={() => {
                 const next = [...selected];
@@ -165,12 +193,12 @@ function OrderedStages({ initial }: { initial: string[] }) {
                 setSelected(next);
               }}
             >
-              Earlier
+              {t("Earlier")}
             </button>
             <button
               type="button"
               className="button button-small"
-              aria-label={`Move stage ${i + 1} later`}
+              aria-label={t("Move stage {p0} later", { p0: i + 1 })}
               disabled={i === selected.length - 1}
               onClick={() => {
                 const next = [...selected];
@@ -178,23 +206,23 @@ function OrderedStages({ initial }: { initial: string[] }) {
                 setSelected(next);
               }}
             >
-              Later
+              {t("Later")}
             </button>
             <button
               type="button"
               className="button button-small"
-              aria-label={`Remove stage ${i + 1}`}
+              aria-label={t("Remove stage {p0}", { p0: i + 1 })}
               onClick={() => setSelected(selected.filter((_, n) => n !== i))}
             >
-              Remove
+              {t("Remove")}
             </button>
           </li>
         ))}
       </ol>
       <div className="production-field">
-        <label htmlFor={id}>Add required stage</label>
+        <label htmlFor={id}>{t("Add required stage")}</label>
         <select id={id} value={choice} onChange={(e) => setChoice(e.target.value)}>
-          <option value="">Choose stage</option>
+          <option value="">{t("Choose stage")}</option>
           {stages
             .filter((stage) => !selected.includes(stage))
             .map((stage) => (
@@ -213,7 +241,7 @@ function OrderedStages({ initial }: { initial: string[] }) {
           setChoice("");
         }}
       >
-        Append stage
+        {t("Append stage")}
       </button>
     </fieldset>
   );
@@ -229,6 +257,8 @@ function RecordForm({
   onSave: (value: JsonObject) => void;
   onCancel: () => void;
 }) {
+  const { t, validationMessage, formatExact, dateLabel, clockLabel, formValidation } = useI18n();
+
   const { draft } = useProduction();
   const [formError, setFormError] = useState<string | null>(null);
   const [selectedLine, setSelectedLine] = useState(() => valueText(record?.line_id));
@@ -313,7 +343,7 @@ function RecordForm({
         choices: choices(
           p.shifts,
           "shift_id",
-          (s) => `${text(s.shift_id)} · ${text(object(s.interval).start)}`,
+          (s) => `${text(s.shift_id)} · ${clockLabel(text(object(s.interval).start))}`,
         ),
       },
       {
@@ -323,7 +353,12 @@ function RecordForm({
           rows(p.capacity_profiles).filter((profile) => profile.line_id === selectedLine),
           "profile_id",
           (s) =>
-            `${text(s.line_id)} · ${text(s.effective_date)} · efficiency ${valueText(s.assumed_efficiency)} · ${text(s.profile_id)}`,
+            t("{p0} · {p1} · efficiency {p2} · {p3}", {
+              p0: text(s.line_id),
+              p1: dateLabel(text(s.effective_date)),
+              p2: formatExact(valueText(s.assumed_efficiency)),
+              p3: text(s.profile_id),
+            }),
         ),
       },
     ],
@@ -396,6 +431,7 @@ function RecordForm({
   };
   return (
     <form
+      {...formValidation}
       onSubmit={submit}
       className="form-stack production-form"
       autoComplete="off"
@@ -425,15 +461,15 @@ function RecordForm({
       )}
       {formError && (
         <p className="error-notice" role="alert">
-          {formError}
+          {validationMessage(formError)}
         </p>
       )}
       <div className="panel-actions">
         <button type="submit" className="button button-primary">
-          Save record
+          {t("Save record")}
         </button>
         <button type="button" className="button" onClick={onCancel}>
-          Cancel editing
+          {t("Cancel editing")}
         </button>
       </div>
     </form>
@@ -448,6 +484,17 @@ export function EntitySection({
   title: string;
   description: string;
 }) {
+  const {
+    t,
+    validationMessage,
+    locale,
+    label: textLabel,
+    formatExact,
+    dateLabel,
+    clockLabel,
+    stageName,
+  } = useI18n();
+
   const { draft, replace, invalidate, editing, setEditing } = useProduction();
   const [selected, setSelected] = useState<number | "new" | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -484,22 +531,32 @@ export function EntitySection({
   };
   const summary = (r: JsonObject) =>
     kind === "orders"
-      ? `${valueText(r.quantity)} pieces · ${text(r.style_id)}`
+      ? t("{p0} pieces · {p1}", { p0: formatExact(valueText(r.quantity)), p1: text(r.style_id) })
       : kind === "lines"
-        ? `${stageName(text(r.stage))} · ${valueText(r.worker_count)} workers`
+        ? t("{p0} · {p1} workers", {
+            p0: stageName(text(r.stage)),
+            p1: formatExact(valueText(r.worker_count)),
+          })
         : kind === "capacity_profiles"
-          ? `${text(r.line_id)} · ${text(r.effective_date)} · efficiency ${valueText(r.assumed_efficiency)}`
+          ? t("{p0} · {p1} · efficiency {p2}", {
+              p0: text(r.line_id),
+              p1: dateLabel(text(r.effective_date)),
+              p2: formatExact(valueText(r.assumed_efficiency)),
+            })
           : kind === "capabilities"
             ? `${text(r.line_id)} / ${text(r.style_id)} / ${stageName(text(r.stage))}`
             : kind === "assignments"
               ? `${text(r.line_id)} / ${text(r.shift_id)}`
               : kind === "shifts"
-                ? `${text(object(r.interval).start)} to ${text(object(r.interval).end)}`
+                ? t("{p0} to {p1}", {
+                    p0: clockLabel(text(object(r.interval).start)),
+                    p1: clockLabel(text(object(r.interval).end)),
+                  })
                 : kind === "styles"
                   ? rows(r.standards)
                       .map(
                         (s) =>
-                          `${stageName(text(s.stage))}: ${valueText(s.standard_minutes_per_unit)}`,
+                          `${stageName(text(s.stage))}: ${formatExact(valueText(s.standard_minutes_per_unit))}`,
                       )
                       .join(" · ")
                   : text(r.reason);
@@ -507,7 +564,9 @@ export function EntitySection({
     <Panel title={title} description={description}>
       {collection.length === 0 && (
         <p className="field-help">
-          No {title.toLowerCase()} declared. Add records with explicit synthetic assumptions.
+          {t("No {p0} declared. Add records with explicit synthetic assumptions.", {
+            p0: title.toLocaleLowerCase(locale),
+          })}
         </p>
       )}
       <ul className="production-records">
@@ -522,23 +581,23 @@ export function EntitySection({
                 type="button"
                 className="button button-small"
                 disabled={editing}
-                aria-label={`Edit ${text(record[identity[kind]])}`}
+                aria-label={t("Edit {p0}", { p0: text(record[identity[kind]]) })}
                 onClick={() => {
                   invalidate();
                   setSelected(index);
                   setEditing(true);
                 }}
               >
-                Edit
+                {t("Edit")}
               </button>
               <button
                 type="button"
                 className="button button-small"
                 disabled={editing}
-                aria-label={`Remove ${text(record[identity[kind]])}`}
+                aria-label={t("Remove {p0}", { p0: text(record[identity[kind]]) })}
                 onClick={() => remove(index)}
               >
-                Remove
+                {t("Remove")}
               </button>
             </div>
           </li>
@@ -555,7 +614,12 @@ export function EntitySection({
             setEditing(true);
           }}
         >
-          Add {title.toLowerCase().replace(/ies$/, "y").replace(/s$/, "")}
+          {t("Add {p0}", {
+            p0: (locale === "tr-TR"
+              ? textLabel(entitySingular[kind])
+              : title.replace(/ies$/, "y").replace(/s$/, "")
+            ).toLocaleLowerCase(locale),
+          })}
         </button>
       ) : (
         <RecordForm
@@ -566,39 +630,44 @@ export function EntitySection({
           onCancel={close}
         />
       )}
-      {feedback && <p role="status">{feedback}</p>}
+      {feedback && <p role="status">{validationMessage(feedback)}</p>}
     </Panel>
   );
 }
 export function WorkingDates() {
+  const { t, dateLabel, formValidation } = useI18n();
+
   const { draft, replace } = useProduction();
   const [date, setDate] = useState("");
   const dates = calendarOf(draft).working_dates as string[];
   return (
     <Panel
-      title="Working dates"
-      description="Declare each shift start date explicitly. Overnight shifts belong to their start date; no weekly calendar is inferred."
+      title={t("Working dates")}
+      description={t(
+        "Declare each shift start date explicitly. Overnight shifts belong to their start date; no weekly calendar is inferred.",
+      )}
     >
       <div className="production-dates">
         {dates.map((date, index) => (
           <span key={date}>
-            {date}
+            {dateLabel(date)}
             <button
               type="button"
               className="button button-small"
-              aria-label={`Remove working date ${date}`}
+              aria-label={t("Remove working date {p0}", { p0: dateLabel(date) })}
               onClick={() => {
                 const next = cloneInput(draft);
                 (calendarOf(next).working_dates as string[]).splice(index, 1);
                 replace(next);
               }}
             >
-              Remove
+              {t("Remove")}
             </button>
           </span>
         ))}
       </div>
       <form
+        {...formValidation}
         className="production-date-form"
         onSubmit={(event) => {
           event.preventDefault();
@@ -610,7 +679,7 @@ export function WorkingDates() {
         }}
       >
         <label>
-          Working date
+          {t("Working date")}
           <input
             type="date"
             required
@@ -623,10 +692,10 @@ export function WorkingDates() {
           className="button"
           disabled={!date || dates.includes(date) || dates.length >= 256}
         >
-          Add working date
+          {t("Add working date")}
         </button>
       </form>
-      {dates.includes(date) && <p role="status">This working date is already declared.</p>}
+      {dates.includes(date) && <p role="status">{t("This working date is already declared.")}</p>}
     </Panel>
   );
 }
