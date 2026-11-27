@@ -12,6 +12,8 @@ scenarios, compare schedules and explore experimental pre-shift forecasts.
 - Compare what-if scenarios and run bounded optimization jobs with cancellation.
 - Compare History Boost, RF Physics, Random Forest, histogram boosting and Grouped Mean predictions.
 - Validate garment productivity CSVs and reproduce documented offline ML experiments.
+- Use the complete Turkish interface by default, or select **EN** in the header.
+  Language switching works on desktop and mobile and preserves the current workspace.
 
 ## Local setup
 
@@ -27,6 +29,13 @@ npm run dev
 ```
 
 Open **http://127.0.0.1:5173**. Fixture preview works without a backend.
+The default language is **Türkçe (tr-TR)**. Select **EN** for the English button and
+field names used in the setup instructions below; **TR** switches back. Only this
+language preference is saved in localStorage. API credentials and workspace data
+remain in tab memory. Dates, numbers, percentages and units follow the selected
+locale; model names, identifiers and exported JSON retain their original contracts.
+Preview the [Turkish overview](docs/screenshots/localization-overview-tr.png) or
+[English overview](docs/screenshots/localization-overview-en.png).
 
 **Backend:** open another terminal in the repository root.
 
@@ -60,10 +69,12 @@ includes an optional exact-origin HTTPS gateway template and operating limits.
 No public service was deployed. Frozen model receipts bind the validated Windows
 environment; an untested Linux container deployment is not claimed.
 
-![Actual five-model comparison with matched held-out metrics](docs/screenshots/final-predictions-desktop.png)
+![Turkish five-model comparison with matched held-out metrics](docs/screenshots/final-predictions-desktop.png)
 
 [Mobile candidate view](docs/screenshots/final-predictions-mobile.png) uses the same
 real local API response and explicitly hypothetical inputs.
+The same response is available in the [English desktop view](docs/screenshots/final-predictions-desktop-en.png)
+and [English mobile view](docs/screenshots/final-predictions-mobile-en.png).
 
 ## Checks
 
@@ -92,6 +103,7 @@ model artifacts are required. Detailed final verification results are in the
 - RF Physics metrics come from previously inspected validation data. No independently
   calibrated prediction band is available. Predictions never set planning capacity or efficiency.
 - Sessions, drafts and jobs are memory-only. No database or cloud deployment is included.
+- Only the TR/EN language preference persists; resetting it restores Turkish.
 
 One fixed **History Boost** candidate was trained on 5,700 separate development
 targets, with no parameter search. On four fresh held-out synthetic worlds:

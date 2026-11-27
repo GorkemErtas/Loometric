@@ -144,3 +144,51 @@ A sandbox Vitest attempt initially ran no tests because native worker spawning
 was denied; the native rerun passed. A private fixture's early OpenBLAS import hit
 the hard memory guard; applying the production thread settings before that test
 import fixed the fixture. No resource limit or scientific criterion was relaxed.
+
+## Turkish / English localization — 2026-11-27
+
+The dashboard now defaults to `tr-TR` and offers `en-US` through the responsive
+header selector. The typed catalog covers navigation, page content, forms, native
+and domain validation, errors, code labels, tables, Gantt details, charts and model
+evidence. Only the language string is persisted; API credentials, drafts, requests,
+results and jobs retain their previous memory-only ownership.
+
+Intl display preserves exact planning decimal digits and source time offsets.
+Turkish identifiers, free text and long decimal tokens survive form edits, language
+switches and scheduling JSON export without changing machine contracts. The five
+model names, payload enum values and model outputs remain unchanged. No backend,
+ML dependency, estimator, feature schema or research artifact was modified.
+
+Frontend verification on the existing Windows / Edge environment: **217 unit and
+component tests passed** (19.95 seconds), including 18 localization cases. Biome
+checked 74 files; TypeScript and the production build passed. Vite reports a chunk
+above its 500 kB advisory threshold; no dependency or lazy network loading was added.
+The final complete real-backend browser run passed **18 workflows in 3.0 minutes**.
+It covers all ten pages in both languages at 1440px and 390px, mobile navigation,
+axe accessibility smoke checks, switching/persistence, errors, modals, exact Turkish
+form/export data and unchanged five-model requests/results. The owned API/frontend
+listeners closed and the temporary token was discarded. The historical Python
+results above were not rerun for this frontend presentation task.
+
+Current screenshots were captured from that run and copied byte-for-byte:
+
+- [Turkish overview and selector](screenshots/localization-overview-tr.png),
+  [English overview and selector](screenshots/localization-overview-en.png).
+- [Turkish five-model desktop](screenshots/final-predictions-desktop.png),
+  [English five-model desktop](screenshots/final-predictions-desktop-en.png).
+- [Turkish mobile candidate](screenshots/final-predictions-mobile.png),
+  [English mobile candidate](screenshots/final-predictions-mobile-en.png).
+
+The bilingual model captures use one actual v3 response: predictions are
+0.9036296370677777, 0.8945601867754494, 0.7628348220475517,
+0.8919168184750277 and 0.834534223925279, with ten pairwise comparisons.
+Switching language makes no additional request; JSON enum values, model names and
+NO_ML_PROMOTION remain unchanged. All inputs are explicitly hypothetical.
+
+One initial cold inference request reached the unchanged native deadline and
+returned HTTP 504; later real five-model checks passed with the same limits.
+Intermediate browser runs found missing dynamic demo text, a screen-reader label
+escaping its mobile table scroll region, and notice-link contrast. These were
+corrected without changing scheduling calculations or process budgets. A sandbox
+Vitest attempt started no tests (EPERM); actual unit evidence comes from native
+subprocess runs. Browser snapshots are smoke evidence, not WCAG certification.

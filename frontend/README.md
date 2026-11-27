@@ -1,5 +1,14 @@
 # Loometric local dashboard
 
+The complete interface defaults to **Türkçe (tr-TR)**. The header's **TR / EN**
+selector works on desktop/mobile, updates dates, numbers, percentages, units and
+accessible labels, and preserves the mounted workspace. Select **EN** for the English
+control names in this guide. Only the locale string is stored under
+`loometric.language` in localStorage; tokens, origins, drafts and results are never
+saved there. Invalid or blocked storage uses Turkish and allows in-memory switching.
+Exact JSON exports, model names, enum values and IDs are language-independent.
+See [ADR 0029](../docs/decisions/0029-turkish-english-presentation.md).
+
 React/strict TypeScript local workspace for synthetic M02–M04 inputs and the existing
 M05A/M05B APIs. Five inspection pages are joined by Production scheduling, What-if
 scenarios and Optimization jobs. **Production data** adds the M07A guided input
@@ -140,7 +149,8 @@ Any edit/import/replacement/dataset/session change invalidates the receipt; stal
 replies cannot activate another draft. The original template files remain unchanged.
 One draft and one active user input stay in tab memory; saved records survive page
 navigation, while unsaved open forms reset on departure. Reload loses the draft,
-active input, session and results. No database or automatic browser storage is used.
+active input, session and results. No database or automatic workspace storage is used;
+only the explicitly selected language preference persists.
 Read the [complete M07A fields, ownership and evidence](../docs/architecture/user-defined-production-workspace.md)
 and [ADR 0017](../docs/decisions/0017-user-defined-synthetic-workspace.md).
 
